@@ -1,25 +1,40 @@
 import React from "react";
-import { Carousel, Image } from "antd";
+import { Image } from "antd";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/autoplay";
 import PropTypes from "prop-types";
 
-const ImageGallery = ({ imageSources }) => {
+
+const ImageGallery = ({imageSources}) => {
   return (
-    <div style={{ height: "300px", width: "100%", backgroundColor: "black" }}>
-      <Carousel autoplay autoplaySpeed={5000} dots={{ className: "custom-carousel-dots" }} arrows={true}>
+    <div>
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        spaceBetween={50}
+        slidesPerView={1}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 5000 }}
+        style={{ height: "300px", backgroundColor: "white" }}
+      >
         {imageSources.map((img, index) => (
-          <Image
-            key={index}
-            src={img}
-            preview={false}
-            style={{ objectFit: "contain", height: "300px" }}
-            height={300}
-            width={"100%"}
-          />
+          <SwiperSlide key={index}>
+            <Image
+              src={img}
+              height="100%"
+              width="100%"
+              preview={false}
+            />
+          </SwiperSlide>
         ))}
-      </Carousel>
+      </Swiper>
     </div>
-  );
-};
+  )
+}
 
 ImageGallery.propTypes = {
   imageSources: PropTypes.arrayOf(PropTypes.string),

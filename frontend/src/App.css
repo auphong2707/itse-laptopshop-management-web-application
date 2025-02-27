@@ -1,0 +1,23 @@
+/* Swiper Navigation Buttons */
+.swiper-button-prev,
+.swiper-button-next {
+    color: black !important; /* Change arrow color to black */
+    scale: 0.5;
+}
+
+/* Show arrows on hover */
+.product-slider-container:hover .swiper-button-prev,
+.product-slider-container:hover .swiper-button-next {
+opacity: 1; /* Show arrows when hovering */
+}
+
+/* Ensure buttons are positioned correctly */
+.swiper-button-prev {
+  left: -2px;
+}
+
+.swiper-button-next {
+  right: -2px;
+}
+
+.swiper-slide { width: auto; }
