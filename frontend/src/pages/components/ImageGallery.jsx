@@ -8,6 +8,7 @@ const ImageGallery = ({ imageSources }) => {
       <Carousel autoplay autoplaySpeed={5000} dots={{ className: "custom-carousel-dots" }} arrows={true}>
         {imageSources.map((img, index) => (
           <Image
+            key={index}
             src={img}
             preview={false}
             style={{ objectFit: "contain", height: "300px" }}
