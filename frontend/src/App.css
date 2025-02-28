@@ -21,3 +21,8 @@ opacity: 1; /* Show arrows when hovering */
 }
 
 .swiper-slide { width: auto; }
+
+.ant-tabs-tab-btn {
+  font-weight: bold;
+  font-size: 15px;
+}
