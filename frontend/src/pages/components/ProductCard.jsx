@@ -35,12 +35,12 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
 				)}
 				
 				{/* Product Image */}
-				<Image src={imgSource} height={120} width="100%" />
+				<Image src={imgSource} height={120} width="100%" preview={false}/>
 
 				{/* Star Rating & Reviews */}
 				<div style={{ marginTop: 2, width: "100%" }}>
 					<Rate disabled value={rate} style={{ fontSize: 10 }} allowHalf />
-					<Text style={{ marginLeft: 10, color: "#666", fontSize: 10 }}>({numRate} Reviews)</Text>
+					<Text style={{ marginLeft: 10, color: "#666", fontSize: 10 }} strong={false}>({numRate} Reviews)</Text>
 				</div>
 
 				{/* Product Name */}
@@ -49,6 +49,7 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
 						<Paragraph
 							ellipsis={{ rows: 2, expandable: false }}
 							style={{ cursor: "pointer", fontSize: 13 }}
+							strong={false}
 						>
 							{productName}
 						</Paragraph>
@@ -57,7 +58,7 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
 
 				{/* Price Section */}
 				<div>
-					<Text delete style={{ fontSize: 13, color: "#888" }}>
+					<Text delete style={{ fontSize: 13, color: "#888" }} strong={false}>
 						${originalPrice.toFixed(2)}
 					</Text>
 					<Title level={4} style={{ margin: 0, color: "#000" }}>
