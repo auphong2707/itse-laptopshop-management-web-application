@@ -1,0 +1,68 @@
+import { Button, Typography } from "antd";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { CommentOutlined } from "@ant-design/icons";
+
+const { Text, Paragraph } = Typography;
+
+const testimonials = [
+  {
+    quote: "My first order arrived today in perfect condition. From the time I sent a question about the item to making the purchase, to the shipping and now the delivery, your company, Tecs, has stayed in touch. Such great service. I look forward to shopping on your site in the future and would highly recommend it.",
+    author: "Tama Brown",
+  },
+  {
+    quote: "Absolutely fantastic customer service! The team was super responsive and helped me with all my concerns. Highly recommended!",
+    author: "John Doe",
+  },
+  {
+    quote: "Great experience from start to finish! The product quality exceeded my expectations, and shipping was faster than expected.",
+    author: "Emily Smith",
+  },
+];
+
+const TestimonialSlider = () => {
+  return (
+    <div style={{ background: "#F5F7FF", padding: "40px", borderRadius: "10px", position: "relative" }}>
+			<Text style={{ color:"black", fontSize:90, position: "absolute", left:100, top:5 }} italic strong>''</Text>
+			<div style={{ marginLeft: "130px", marginRight: "80px" }}>
+				<Swiper
+					modules={[Pagination]}
+					spaceBetween={30}
+					slidesPerView={1}
+					pagination={{ clickable: true, el: ".custom-pagination" }}
+				>
+					{testimonials.map((testimonial, index) => (
+						<SwiperSlide key={index}>
+							<div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "left" }}>
+								<Paragraph style={{ fontSize: "19px", textAlign: "justify" }} >{testimonial.quote}</Paragraph>
+								<div style={{ marginTop: "12px", textAlign: "right", color: "#333", fontSize: "16px" }}>
+									- {testimonial.author}
+								</div>
+							</div>
+
+							<br></br>
+							<br></br>
+							<br></br>
+						</SwiperSlide>
+					))}
+				</Swiper>
+			</div>
+
+
+			{/* Right-aligned pagination */}
+			<div className="custom-pagination" style={{
+				display: "flex",
+				justifyContent: "right",
+				paddingRight: "40px",
+			}}></div>
+
+      <Button color="blue" variant="outlined" style={{ position:"absolute", borderRadius: "20px", bottom: "30px", left: "100px", fontSize: "16px" }}>
+        Leave Us A Review
+      </Button>
+    </div>
+  );
+};
+
+export default TestimonialSlider;
