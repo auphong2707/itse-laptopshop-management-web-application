@@ -13,19 +13,17 @@ import PropTypes from "prop-types";
 
 const ProductSlider = ({productData}) => {
   return (
-    <div>
-      <Swiper
-        modules={[Navigation]}      // Use the Navigation module
-        navigation                 // Enable navigation arrows
-        slidesPerView="auto"          // Number of slides visible at once
-      >
-        {productData.map((product, index) => (
-          <SwiperSlide key={index}>
-            <ProductCard {...product} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <Swiper
+      modules={[Navigation]}      // Use the Navigation module
+      navigation                 // Enable navigation arrows
+      slidesPerView="auto"          // Number of slides visible at once
+    >
+      {productData.map((product, index) => (
+        <SwiperSlide key={index}>
+          <ProductCard {...product} />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 };
 
