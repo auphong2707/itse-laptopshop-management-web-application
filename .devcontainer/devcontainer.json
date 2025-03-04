@@ -16,7 +16,7 @@
 	// "forwardPorts": [3000, 5432],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "cd ./frontend && npm install && cd ../backend && pip install -r requirements.txt",
+	"postCreateCommand": "chmod -R 777 . && ./entrypoint.sh",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
