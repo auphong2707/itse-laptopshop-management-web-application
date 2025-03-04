@@ -72,12 +72,28 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
     except Exception as e:
         print(f"Error occurred: {str(e)}")
 
-def generate_reviews(sql_output_path='./backend/commands/data_sample.sql', num_reviews=20):
-    laptop_ids = list(range(1, 100))
-    user_names = ['Phong', 'PhongPhong', 'PhongPhongPhong', 'PhongPhongPhongPhongPhong', 'P']
+def generate_reviews(sql_output_path='./backend/commands/data_sample.sql', num_reviews=30):
+    laptop_ids = list(range(1, 200))
+    user_names = [
+    'Nguyen Van An', 
+    'Tran Thi Binh', 
+    'Le Minh Chi', 
+    'Pham Duc Duy', 
+    'Hoang Thi Em', 
+    'Vu Quang Phat', 
+    'Bui Tuan Ga', 
+    'Doan Huyen Ha'
+    ]
     ratings = [1, 2, 3, 4, 5]
     review_texts = [
-        'Great laptop!', 'Average performance.', 'Very satisfied.', 'Not bad.', 'Disappointing.'
+    'Sản phẩm thực sự xuất sắc! Tôi đã sử dụng laptop này trong hơn một tháng và rất ấn tượng với hiệu năng mạnh mẽ, pin trâu và thiết kế tinh tế. Màn hình hiển thị sắc nét, bàn phím gõ rất êm, phù hợp cho cả công việc văn phòng lẫn chơi game nhẹ. Giao hàng nhanh, đóng gói cẩn thận, đáng giá từng đồng!',
+    'Máy có hiệu năng khá tốt, đáp ứng được nhu cầu làm việc hàng ngày của tôi như lướt web, soạn thảo văn bản và xem video. Tuy nhiên, loa âm thanh hơi nhỏ, đôi lúc phải dùng tai nghe để trải nghiệm tốt hơn. Nhìn chung, với mức giá này thì đây là lựa chọn ổn, không có gì để phàn nàn quá nhiều.',
+    'Sản phẩm ở mức trung bình. Tôi mua để làm việc từ xa, cấu hình đủ dùng nhưng tốc độ khởi động hơi chậm so với kỳ vọng. Màn hình màu sắc tạm ổn, không quá nổi bật. Điểm cộng là trọng lượng nhẹ, dễ mang theo, nhưng tôi mong nhà sản xuất cải thiện thêm về phần mềm đi kèm.',
+    'Thành thật mà nói, tôi không hài lòng lắm. Máy chạy ổn trong tuần đầu, nhưng sau đó bắt đầu có hiện tượng giật lag khi mở nhiều ứng dụng cùng lúc. Pin tụt khá nhanh, chỉ dùng được khoảng 3-4 tiếng dù quảng cáo là 6 tiếng. Đóng gói giao hàng thì ổn, nhưng chất lượng sản phẩm cần được xem xét lại.',
+    'Rất thất vọng với chiếc laptop này. Tôi mua để chỉnh sửa ảnh và video nhưng máy quá yếu, không thể xử lý các phần mềm nặng dù cấu hình quảng cáo là đủ dùng. Quạt tản nhiệt kêu to, nóng máy sau khoảng 1 tiếng sử dụng. Tôi đã liên hệ đổi trả nhưng chưa nhận được phản hồi thỏa đáng từ cửa hàng.',
+    'Tuyệt vời! Đây là lần đầu tiên tôi mua laptop online mà hài lòng đến vậy. Máy chạy mượt mà, thiết kế sang trọng, phù hợp với công việc lập trình của tôi. Đặc biệt, pin dùng được hơn 8 tiếng liên tục, rất tiện khi phải di chuyển nhiều. Đội ngũ hỗ trợ khách hàng cũng rất nhiệt tình, cho 5 sao không suy nghĩ!',
+    'Sản phẩm tốt trong tầm giá. Tôi dùng để học online và làm việc nhóm, máy đáp ứng ổn mọi nhu cầu cơ bản. Điểm trừ nhỏ là vỏ máy dễ bám vân tay, phải lau thường xuyên để giữ sạch sẽ. Giao hàng đúng hẹn, nhân viên tư vấn nhiệt tình, tôi khá hài lòng với trải nghiệm mua sắm lần này.',
+    'Máy tạm ổn, không quá đặc biệt. Hiệu năng đủ để lướt web, xem phim và làm việc nhẹ, nhưng khi chạy đa nhiệm thì hơi đuối. Màn hình có góc nhìn hẹp, ngồi lệch một chút là màu sắc bị biến đổi. Với giá tiền này, tôi nghĩ có thể tìm được lựa chọn tốt hơn trên thị trường.'
     ]
     values = []
     for _ in range(num_reviews):
@@ -96,7 +112,16 @@ def generate_reviews(sql_output_path='./backend/commands/data_sample.sql', num_r
         sql_file.write(insert_query + "\n")
 
 def generate_subscriptions(sql_output_path='./backend/commands/data_sample.sql', num_subs=20):
-    names = ['Phong', 'PhongPhong', 'PhongPhongPhong', 'PhongPhongPhongPhongPhong', 'P']
+    names = [
+    'NguyenVanAn', 
+    'TranThiBinh', 
+    'LeMinhChi', 
+    'PhamDucDuy', 
+    'HoangThiEm', 
+    'VuQuangPhat', 
+    'BuiTuanGa', 
+    'DoanHuyenHa'
+    ]
     domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
     values = []
     used_emails = set() 
