@@ -30,3 +30,9 @@ class LaptopCreate(BaseModel):
     number_ethernet_ports: int
     number_audio_jacks: int
     image_base64: Optional[str]  # Optional field
+
+class LaptopResponse(LaptopCreate):
+    id: int 
+
+    class Config:
+        orm_mode = True  

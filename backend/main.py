@@ -21,3 +21,18 @@ def create_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_laptop)
     return {"message": "Laptop added successfully", "laptop": new_laptop}
+
+@app.delete("/laptops/{laptop_id}")
+def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
+    '''
+    Delete laptop from database
+    '''
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if laptop is None:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    db.delete(laptop)
+    db.commit()
+    return {"message": "Laptop deleted successfully"}
+
+    
