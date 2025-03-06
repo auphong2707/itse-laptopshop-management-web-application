@@ -29,10 +29,40 @@ class LaptopCreate(BaseModel):
     number_hdmi_ports: int
     number_ethernet_ports: int
     number_audio_jacks: int
-    image_base64: Optional[str]  # Optional field
+    image_base64: Optional[str] = None  # Optional field
+
+class LaptopUpdate(BaseModel):
+    brand: Optional[str] = None
+    name: Optional[str] = None
+    cpu: Optional[str] = None
+    vga: Optional[str] = None
+    ram_amount: Optional[int] = None
+    ram_type: Optional[str] = None
+    storage_amount: Optional[int] = None
+    storage_type: Optional[str] = None
+    webcam_resolution: Optional[str] = None
+    screen_size: Optional[float] = None
+    screen_resolution: Optional[str] = None
+    screen_refresh_rate: Optional[int] = None
+    screen_brightness: Optional[int] = None
+    battery_capacity: Optional[float] = None
+    battery_cells: Optional[int] = None
+    weight: Optional[str] = None
+    default_os: Optional[str] = None
+    warranty: Optional[int] = None
+    price: Optional[int] = None
+    width: Optional[float] = None
+    depth: Optional[float] = None
+    height: Optional[float] = None
+    number_usb_a_ports: Optional[int] = None
+    number_usb_c_ports: Optional[int] = None
+    number_hdmi_ports: Optional[int] = None
+    number_ethernet_ports: Optional[int] = None
+    number_audio_jacks: Optional[int] = None
+    image_base64: Optional[str] = None  # Optional field
 
 class LaptopResponse(LaptopCreate):
-    id: int 
+    id: int  
 
     class Config:
         orm_mode = True  

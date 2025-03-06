@@ -35,4 +35,22 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Laptop deleted successfully"}
 
+@app.put("/laptops/{laptop_id}")
+def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)):
+    '''
+    Update laptop in database
+    '''
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if laptop is None:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    update_data = laptop_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(laptop, key, value)
+
+    db.commit()
+    db.refresh(laptop)
+
+    return {"message": "Laptop updated successfully", "laptop": laptop}
+
     
