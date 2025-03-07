@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS laptops (
     weight DECIMAL(5,2),
     default_os TEXT,
     warranty INTEGER,
-    price INTEGER,
     width DECIMAL(5,2),
     depth DECIMAL(5,2),
     height DECIMAL(5,2),
@@ -30,6 +29,8 @@ CREATE TABLE IF NOT EXISTS laptops (
     number_audio_jacks INTEGER,
     product_image_mini TEXT,
     quantity INTEGER,
+    original_price INT,
+    sale_price INT,
 );
 
 CREATE TABLE IF NOT EXISTS reviews (

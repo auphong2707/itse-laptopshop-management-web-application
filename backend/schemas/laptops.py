@@ -20,7 +20,6 @@ class LaptopCreate(BaseModel):
     weight: float
     default_os: str
     warranty: int
-    price: int
     width: float
     depth: float
     height: float
@@ -31,6 +30,8 @@ class LaptopCreate(BaseModel):
     number_audio_jacks: int
     product_image_mini: str
     quantity: int
+    original_price: int
+    sale_price: int
 
 class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
@@ -51,7 +52,6 @@ class LaptopUpdate(BaseModel):
     weight: Optional[float] = None
     default_os: Optional[str] = None
     warranty: Optional[int] = None
-    price: Optional[int] = None
     width: Optional[float] = None
     depth: Optional[float] = None
     height: Optional[float] = None
@@ -62,6 +62,8 @@ class LaptopUpdate(BaseModel):
     number_audio_jacks: Optional[int] = None
     product_image_mini: Optional[str] = None
     quantity: Optional[int] = None
+    original_price: Optional[int] = None
+    sale_price: Optional[int] = None
 
 class LaptopResponse(LaptopCreate):
     id: int  

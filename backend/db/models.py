@@ -26,7 +26,6 @@ class Laptop(Base):
     weight = Column(String)
     default_os = Column(String)
     warranty = Column(Integer)
-    price = Column(Integer, nullable=False)
     width = Column(DECIMAL(5,2))
     depth = Column(DECIMAL(5,2))
     height = Column(DECIMAL(5,2))
@@ -37,3 +36,5 @@ class Laptop(Base):
     number_audio_jacks = Column(Integer)
     product_image_mini = Column(String)
     quantity = Column(Integer, nullable=False)
+    original_price = Column(Integer, nullable=False)
+    sale_price = Column(Integer, nullable=False)

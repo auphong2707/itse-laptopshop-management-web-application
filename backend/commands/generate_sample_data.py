@@ -15,8 +15,8 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
     """
     insert_query = """INSERT INTO laptops (brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
         storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness, 
-        battery_capacity, battery_cells, weight, default_os, warranty, price, width, depth, height, 
-        number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity) VALUES """
+        battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height, 
+        number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
 
     def convert_value(value):
         if isinstance(value, str) and value.lower() == 'n/a':
@@ -51,7 +51,6 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
                 convert_value(laptop['weight']),
                 convert_value(laptop['default_os']),
                 convert_value(laptop['warranty']),
-                convert_value(laptop['price']),
                 convert_value(laptop['width']),
                 convert_value(laptop['depth']),
                 convert_value(laptop['height']),
@@ -61,7 +60,9 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
                 convert_value(laptop['number_ethernet_ports']),
                 convert_value(laptop['number_audio_jacks']),
                 'NULL',
-                str(random.randint(0, 20))
+                str(random.randint(0, 20)),
+                convert_value(laptop['price']),
+                convert_value(laptop['price'] - random.randint(0, 20)/100 * laptop['price'])
             )
 
             values.append(f"({', '.join(value_tuple)})")
