@@ -81,8 +81,8 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
     except Exception as e:
         print(f"Error occurred: {str(e)}")
 
-def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=1000):
-    laptop_ids = list(range(1, 200))
+def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=10000):
+    laptop_ids = list(range(1, 316))
     user_names = [
     'Nguyen Van An', 
     'Tran Thi Binh', 
