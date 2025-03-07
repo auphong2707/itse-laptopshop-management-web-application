@@ -53,12 +53,12 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
-@app.get("/laptops/")
-def get_laptops(db: Session = Depends(get_db)):
+@app.get("/laptops/{limit}")
+def get_latest_laptops(limit: int, db: Session = Depends(get_db)):
     '''
-    Get all laptops from database
+    Get latest laptops from database
     '''
-    laptops = db.query(Laptop).all()
+    laptops = db.query(Laptop).order_by(Laptop.inserted_at.desc()).limit(limit).all()
     return laptops
 
 @app.get("/laptops/{laptop_id}")

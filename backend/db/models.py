@@ -7,6 +7,7 @@ class Laptop(Base):
     __tablename__ = "laptops"
 
     id = Column(Integer, primary_key=True, index=True)
+    inserted_at = Column(String, nullable=False)
     brand = Column(String, nullable=False)
     name = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
