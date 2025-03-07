@@ -17,7 +17,7 @@ class LaptopCreate(BaseModel):
     screen_brightness: int
     battery_capacity: float
     battery_cells: int
-    weight: str
+    weight: float
     default_os: str
     warranty: int
     price: int
@@ -47,7 +47,7 @@ class LaptopUpdate(BaseModel):
     screen_brightness: Optional[int] = None
     battery_capacity: Optional[float] = None
     battery_cells: Optional[int] = None
-    weight: Optional[str] = None
+    weight: Optional[float] = None
     default_os: Optional[str] = None
     warranty: Optional[int] = None
     price: Optional[int] = None
