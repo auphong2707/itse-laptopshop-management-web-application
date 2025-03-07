@@ -53,4 +53,22 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
+@app.get("/laptops/")
+def get_laptops(db: Session = Depends(get_db)):
+    '''
+    Get all laptops from database
+    '''
+    laptops = db.query(Laptop).all()
+    return laptops
+
+@app.get("/laptops/{laptop_id}")
+def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
+    '''
+    Get laptop by id
+    '''
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if laptop is None:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    return laptop
     
