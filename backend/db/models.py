@@ -36,3 +36,4 @@ class Laptop(Base):
     number_ethernet_ports = Column(Integer)
     number_audio_jacks = Column(Integer)
     product_image_mini = Column(String)
+    quantity = Column(Integer, nullable=False)

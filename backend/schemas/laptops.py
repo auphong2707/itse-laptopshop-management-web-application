@@ -30,6 +30,7 @@ class LaptopCreate(BaseModel):
     number_ethernet_ports: int
     number_audio_jacks: int
     product_image_mini: str
+    quantity: int
 
 class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
@@ -60,6 +61,7 @@ class LaptopUpdate(BaseModel):
     number_ethernet_ports: Optional[int] = None
     number_audio_jacks: Optional[int] = None
     product_image_mini: Optional[str] = None
+    quantity: Optional[int] = None
 
 class LaptopResponse(LaptopCreate):
     id: int  
