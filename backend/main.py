@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -68,12 +68,60 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
-@app.get("/laptops/{limit}")
-def get_latest_laptops(limit: int, db: Session = Depends(get_db)):
-    '''
-    Get latest laptops from database
-    '''
-    laptops = db.query(Laptop).order_by(Laptop.inserted_at.desc()).limit(limit).all()
+@app.get("/laptops/latest")
+def get_latest_laptops(
+    projection: str = Query("all"),
+    brand: str = Query("all"),
+    limit: int = Query(10),
+    db: Session = Depends(get_db),
+):
+    """
+    Get latest laptops from database, optionally filtering by brand,
+    and returning either full objects or partial "product-card" fields.
+    """
+    # 1) Start with a base query
+    query = db.query(Laptop)
+    
+    # 2) Filter by brand if not "all"
+    if brand.lower() != "all":
+        query = query.filter(Laptop.brand == brand)
+
+    # 3) If projection == "product-card", select only certain fields
+    if projection == "product-card":
+        # 'with_entities' returns tuples by default
+        query = query.with_entities(
+            Laptop.quantity,
+            Laptop.product_image_mini,
+            Laptop.rate,
+            Laptop.num_rate,
+            Laptop.name,
+            Laptop.original_price,
+            Laptop.sale_price
+        )
+        # 4) Sort and limit
+        laptops = query.order_by(Laptop.inserted_at.desc()).limit(limit).all()
+        
+        # 5) Convert each tuple to a dict
+        laptops = [
+            {
+                "quantity": row[0],
+                "product_image_mini": row[1],
+                "rate": row[2],
+                "num_rate": row[3],
+                "name": row[4],
+                "original_price": row[5],
+                "sale_price": row[6],
+            }
+            for row in laptops
+        ]
+    else:
+        # "all" or anything else -> select entire Laptop model
+        laptops = (
+            query.order_by(Laptop.inserted_at.desc())
+            .limit(limit)
+            .all()
+        )
+
     return laptops
 
 @app.get("/laptops/id/{laptop_id}")

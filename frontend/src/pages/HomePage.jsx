@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Layout, Typography, Image, Divider } from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
 import ImageGallery from "./components/ImageGallery";
@@ -8,6 +8,8 @@ import TabProductSlider from './components/TabProductSlider';
 import NewsCardGridLayout from './components/NewsCardGridLayout';
 import TestimonialSlider from './components/TestimonialSlider';
 import WebsiteFooter from './components/WebsiteFooter';
+
+import axios from 'axios';
 
 const { Content } = Layout;
 const { Text, Link } = Typography;
@@ -19,11 +21,6 @@ const imageSources = [
   "None",
   "None"
 ]
-
-const productData = [];
-for (let i = 0; i < 10; i++) {
-  productData.push(getRandomProductCardData());
-}
 
 const newsData = [
   { img: "/path-to-image1.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals to enhance your home office setup, your gaming rig, or your business workspace.", date: "01.09.2020" },
@@ -42,6 +39,30 @@ const contentStyle = {
 };
 
 const HomePage = () => {
+  const [newProductData, setNewProductData] = React.useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/laptops/latest?projection=product-card&limit=20')
+      .then((response) => {
+        const data = response.data;
+        const transformed = data.map(item => {
+          return {
+            productName: item.name.toUpperCase(),
+            numRate: item.num_rate,
+            originalPrice: item.original_price,
+            imgSource: item.product_image_mini,
+            inStock: item.quantity > 0,
+            rate: item.rate,
+            salePrice: item.sale_price
+          };
+        });
+
+        setNewProductData(transformed);
+      }
+    );
+  }
+  , []);
+
   return (
     <Layout>
       {/* Header */}
@@ -66,7 +87,7 @@ const HomePage = () => {
               See All New Products
             </Link>
           </div>
-          <ProductSlider productData={productData} />
+          <ProductSlider productData={newProductData} />
         </div>
 
         <br></br>
