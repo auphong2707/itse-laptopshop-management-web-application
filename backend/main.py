@@ -12,7 +12,7 @@ def read_root():
     return {"message": "Welcome to Laptop Management API!"}
 
 @app.post("/laptops/")
-def create_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
+def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     '''
     Insert new laptop into database
     '''
