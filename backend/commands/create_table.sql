@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS laptops (
     screen_brightness INTEGER,
     battery_capacity DECIMAL(5,2),
     battery_cells INTEGER,
-    weight TEXT,
+    weight DECIMAL(5,2),
     default_os TEXT,
     warranty INTEGER,
     price INTEGER,

@@ -2,8 +2,14 @@ import json
 import random 
 from datetime import datetime
 
+
+def clear_old_commands():
+    with open('./backend/commands/insert_sample_data.sql', 'w') as sql_file:
+        sql_file.write("")
+    print("Old commands cleared")
+
 def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json', 
-                                 sql_output_path='./backend/commands/data_sample.sql'):
+                                 sql_output_path='./backend/commands/insert_sample_data.sql'):
     """
     Generate insert queries from JSON data file
     """
@@ -31,31 +37,32 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
                 convert_value(laptop['name']),
                 convert_value(laptop['cpu']),
                 convert_value(laptop['vga']),
-                laptop['ram_amount'],
+                convert_value(laptop['ram_amount']),
                 convert_value(laptop['ram_type']),
-                laptop['storage_amount'],
+                convert_value(laptop['storage_amount']),
                 convert_value(laptop['storage_type']),
                 convert_value(laptop['webcam_resolution']),
-                laptop['screen_size'],
+                convert_value(laptop['screen_size']),
                 convert_value(laptop['screen_resolution']),
-                laptop['screen_refresh_rate'],
-                laptop['screen_brightness'],
-                laptop['battery_capacity'],
+                convert_value(laptop['screen_refresh_rate']),
+                convert_value(laptop['screen_brightness']),
+                convert_value(laptop['battery_capacity']),
                 convert_value(laptop['battery_cells']),
                 convert_value(laptop['weight']),
                 convert_value(laptop['default_os']),
                 convert_value(laptop['warranty']),
-                laptop['price'],
-                laptop['width'],
-                laptop['depth'],
-                laptop['height'],
-                laptop['number_usb_a_ports'],
-                laptop['number_usb_c_ports'],
-                laptop['number_hdmi_ports'],
-                laptop['number_ethernet_ports'],
-                laptop['number_audio_jacks'],
-                'NULL'  # image_base64 = NULL 
+                convert_value(laptop['price']),
+                convert_value(laptop['width']),
+                convert_value(laptop['depth']),
+                convert_value(laptop['height']),
+                convert_value(laptop['number_usb_a_ports']),
+                convert_value(laptop['number_usb_c_ports']),
+                convert_value(laptop['number_hdmi_ports']),
+                convert_value(laptop['number_ethernet_ports']),
+                convert_value(laptop['number_audio_jacks']),
+                'NULL'  # image_base64 = NULL
             )
+
             values.append(f"({', '.join(value_tuple)})")
 
         insert_query += ', '.join(values) + ";"
@@ -72,7 +79,7 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
     except Exception as e:
         print(f"Error occurred: {str(e)}")
 
-def generate_reviews(sql_output_path='./backend/commands/data_sample.sql', num_reviews=30):
+def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=30):
     laptop_ids = list(range(1, 200))
     user_names = [
     'Nguyen Van An', 
@@ -111,7 +118,7 @@ def generate_reviews(sql_output_path='./backend/commands/data_sample.sql', num_r
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
-def generate_subscriptions(sql_output_path='./backend/commands/data_sample.sql', num_subs=20):
+def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_data.sql', num_subs=20):
     names = [
     'NguyenVanAn', 
     'TranThiBinh', 
@@ -140,6 +147,8 @@ def generate_subscriptions(sql_output_path='./backend/commands/data_sample.sql',
         sql_file.write(insert_query + "\n")
 
 if __name__ == "__main__":
-    # generate_laptop_insert_queries()
+    # Clear the existing content of the SQL file
+    clear_old_commands()
+    generate_laptop_insert_queries()
     generate_reviews()
     generate_subscriptions()
