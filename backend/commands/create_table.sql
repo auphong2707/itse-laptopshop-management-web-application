@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS laptops (
     number_hdmi_ports INTEGER,
     number_ethernet_ports INTEGER,
     number_audio_jacks INTEGER,
-    image_base64 TEXT
+    product_image_mini TEXT,
 );
 
 CREATE TABLE IF NOT EXISTS reviews (

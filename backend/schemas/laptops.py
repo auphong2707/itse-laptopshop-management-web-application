@@ -29,7 +29,7 @@ class LaptopCreate(BaseModel):
     number_hdmi_ports: int
     number_ethernet_ports: int
     number_audio_jacks: int
-    image_base64: Optional[str] = None  # Optional field
+    product_image_mini: str
 
 class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
@@ -59,7 +59,7 @@ class LaptopUpdate(BaseModel):
     number_hdmi_ports: Optional[int] = None
     number_ethernet_ports: Optional[int] = None
     number_audio_jacks: Optional[int] = None
-    image_base64: Optional[str] = None  # Optional field
+    product_image_mini: Optional[str] = None
 
 class LaptopResponse(LaptopCreate):
     id: int  

@@ -35,4 +35,4 @@ class Laptop(Base):
     number_hdmi_ports = Column(Integer)
     number_ethernet_ports = Column(Integer)
     number_audio_jacks = Column(Integer)
-    image_base64 = Column(String, nullable=True) 
+    product_image_mini = Column(String)
