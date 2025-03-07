@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from db.models import *
@@ -6,6 +7,20 @@ from db.session import *
 from schemas.laptops import *
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -61,7 +76,7 @@ def get_latest_laptops(limit: int, db: Session = Depends(get_db)):
     laptops = db.query(Laptop).order_by(Laptop.inserted_at.desc()).limit(limit).all()
     return laptops
 
-@app.get("/laptops/{laptop_id}")
+@app.get("/laptops/id/{laptop_id}")
 def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
     '''
     Get laptop by id
