@@ -38,3 +38,5 @@ class Laptop(Base):
     quantity = Column(Integer, nullable=False)
     original_price = Column(Integer, nullable=False)
     sale_price = Column(Integer, nullable=False)
+    rate = Column(DECIMAL(3,2))
+    num_rate = Column(Integer)

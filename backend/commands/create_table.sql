@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS laptops (
     quantity INTEGER,
     original_price INT,
     sale_price INT,
+    rate DECIMAL(3,2) DEFAULT 0.00,
+    num_rate INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
@@ -48,3 +50,22 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
     email TEXT NOT NULL UNIQUE,
     subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE OR REPLACE FUNCTION update_laptop_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Update rate and num_rate in laptops table
+    UPDATE laptops
+    SET 
+        rate = (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE laptop_id = NEW.laptop_id),
+        num_rate = (SELECT COUNT(*) FROM reviews WHERE laptop_id = NEW.laptop_id)
+    WHERE id = NEW.laptop_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_laptop_rating_trigger
+AFTER INSERT OR UPDATE OR DELETE ON reviews
+FOR EACH ROW
+EXECUTE FUNCTION update_laptop_rating();
