@@ -17,7 +17,7 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
       <Tabs
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key)}
-        tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
+        tabBarStyle={{borderBottom: "none", paddingBottom: "1rem" }}
         style={{ width: "100%", height: "800px" }}
       >
         {tabLabels.map((label, index) => (
@@ -29,6 +29,16 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
           </Tabs.TabPane>
         ))}
       </Tabs>
+
+      <div style={{
+        position: "absolute",
+        top: "179px",
+        left: "0",
+        width: "100vw", // Dàn toàn màn hình
+        height: "1px",  // Độ dày của vạch
+        backgroundColor: "#ddd", // Màu gạch dưới
+        zIndex: "10", // Đảm bảo nằm trên gạch dưới gốc của Tabs
+      }}></div>
     </div>
   );
 };
