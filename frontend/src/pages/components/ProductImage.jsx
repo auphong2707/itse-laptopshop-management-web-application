@@ -18,19 +18,20 @@ const ProductImage = () => {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      gap: "20px", // Khoảng cách giữa ảnh và button
+      gap: "20px",
       paddingRight: "8rem",
-      paddingTop: "0rem",
+      paddingTop: "-2rem",
     }}>
       
-      {/* Icons Container - Chuyển sang bên trái ảnh */}
+      {/* Icons Container */}
       <div style={{
         display: "flex",
         flexDirection: "column",
         gap: "10px",
         zIndex: "10",
-        position: "relative", // Đặt lại relative thay vì absolute
-        marginRight: "10px", // Dịch sang phải gần ảnh hơn
+        position: "relative", 
+        marginRight: "10px", 
+        marginBottom: "300px",
       }}>
         <IconButton icon={<HeartOutlined />} tooltip="Add to Wishlist" />
         <IconButton icon={<BarChartOutlined />} tooltip="Compare" />
@@ -45,7 +46,7 @@ const ProductImage = () => {
           slidesPerView={1}
           pagination={{ clickable: true, dynamicBullets: true }}
           autoplay={{ delay: 5000 }}
-          style={{ height: "100%", width: "100%", backgroundColor: "white" }}
+          style={{ height: "100%", width: "100%", backgroundColor: "white", marginTop: "-5rem" }}
         >
           {imageSources.map((img, index) => (
             <SwiperSlide key={index} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
