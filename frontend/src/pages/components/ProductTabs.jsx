@@ -10,7 +10,7 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
       display: "flex", 
       justifyContent: "start", 
       alignItems: "center", 
-      padding: "1rem 7%", 
+      padding: "1rem 12%", 
       borderBottom: "2px solid #ddd"
     }}>
       {/* Tabs Section */}
@@ -18,7 +18,7 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
         activeKey={activeTab}
         onChange={(key) => setActiveTab(key)}
         tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
-        style={{ width: "100%" }}
+        style={{ width: "100%", height: "800px" }}
       >
         {tabLabels.map((label, index) => (
           <Tabs.TabPane 

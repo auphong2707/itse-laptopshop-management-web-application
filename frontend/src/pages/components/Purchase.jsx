@@ -16,7 +16,7 @@ const Purchase = () => {
     <div style={{ 
       position: "absolute", 
       top: "100px",
-      right: "-5px", 
+      right: "65px", 
       display: "flex", 
       justifyContent: "flex-end", 
       alignItems: "center", 
