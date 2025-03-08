@@ -104,7 +104,7 @@ const ProductPage = () => {
 
         <Purchase />
         {/* Left Side: Product Tabs */}
-        <div style={{ width: "50%", paddingLeft: "7%" }}>
+        <div style={{ width: "70%", paddingLeft: "7%" }}>
           <ProductTabs
             tabLabels={["About Product", "Details", "Specs"]}
             tabContents={[
