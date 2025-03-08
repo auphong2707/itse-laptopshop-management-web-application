@@ -47,6 +47,7 @@ const AboutProduct = () => (
   <div style={{ maxWidth: "60%", paddingLeft: "10%", paddingRight: "5%" }}>
     <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
     <p style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.6" }}>
+    MSI MPG Trident 3 10SC-005AU Intel i7 10700F, 2060 SUPER, 16GB RAM, 512GB SSD, 2TB HDD, Windows 10 Home, Gaming Keyboard and Mouse 3 Years Warranty Gaming Desktop
     </p>
     <ExtraInfo />
   </div>
