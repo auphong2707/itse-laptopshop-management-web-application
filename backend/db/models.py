@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DECIMAL
+from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -57,3 +57,14 @@ class LaptopCardView(Base):
     name = Column(String, nullable=False)
     original_price = Column(Integer, nullable=False)
     sale_price = Column(Integer, nullable=False)
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    laptop_id = Column(Integer, ForeignKey("laptops.id", ondelete="CASCADE"), nullable=False)
+    user_name = Column(String, nullable=True)
+    rating = Column(Integer, nullable=False)
+    review_text = Column(String, nullable=True)
+    created_at = Column(String, nullable=False)

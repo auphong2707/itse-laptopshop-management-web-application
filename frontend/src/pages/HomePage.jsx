@@ -38,7 +38,7 @@ const contentStyle = {
   backgroundColor: 'white',
 };
 
-const transformData = (data) => {
+const transformLaptopData = (data) => {
   return data.map(item => {
     return {
       productName: item.name.toUpperCase(),
@@ -49,6 +49,15 @@ const transformData = (data) => {
       rate: item.rate,
       salePrice: item.sale_price
     };
+  });
+};
+
+const transformTestimonialData = (data) => {
+  return data.map(item => {
+    return {
+      testimonial: item.review_text,
+      author: item.user_name
+    }
   });
 };
 
@@ -65,25 +74,27 @@ const HomePage = () => {
   };
 
   const [brandProductData, setBrandProductData] = React.useState({
-    "asus": { 
-      "rog": [], "tuf": [], "zenbook": [], "vivobook": []
-    },
-    "lenovo": { 
-      "legion": [], "loq": [], "thinkpad": [], "thinkbook": [], "yoga": [], "ideapad": [] 
-    },
-    "acer": { 
-      "predator": [], "nitro": [], "swift": [], "aspire": [] 
-    },
-    "dell": { 
-      "alienware": [], "g series": [], "xps": [], "inspiron": [], "latitude": [], "precision": [] 
-    },
-    "hp": { 
-      "omen": [], "victus": [], "spectre": [], "envy": [], "pavilion": [], "elitebook": []
-    },
-    "msi": { 
-      "titan": [], "raider": [], "stealth": [], "katana": [], "prestigate": [], "creator": [] 
-    }
-});
+      "asus": { 
+        "rog": [], "tuf": [], "zenbook": [], "vivobook": []
+      },
+      "lenovo": { 
+        "legion": [], "loq": [], "thinkpad": [], "thinkbook": [], "yoga": [], "ideapad": [] 
+      },
+      "acer": { 
+        "predator": [], "nitro": [], "swift": [], "aspire": [] 
+      },
+      "dell": { 
+        "alienware": [], "g series": [], "xps": [], "inspiron": [], "latitude": [], "precision": [] 
+      },
+      "hp": { 
+        "omen": [], "victus": [], "spectre": [], "envy": [], "pavilion": [], "elitebook": []
+      },
+      "msi": { 
+        "titan": [], "raider": [], "stealth": [], "katana": [], "prestigate": [], "creator": [] 
+      }
+  });
+
+  const [testimonialData, setTestimonialData] = React.useState([])
 
 
   useEffect(() => {
@@ -92,19 +103,25 @@ const HomePage = () => {
         // Fetch general latest laptops (limit 20)
         const newProductRequest = axios.get(
           'http://localhost:8000/laptops/latest?projection=product-card&limit=20'
-        ).then(response => transformData(response.data));
+        ).then(response => transformLaptopData(response.data));
   
         // Fetch brand-specific laptops
         const brandRequests = Object.entries(brands).flatMap(([brand, subBrands]) =>
           subBrands.map(subBrand =>
             axios.get(`http://localhost:8000/laptops/latest?projection=product-card&brand=${brand}&subbrand=${subBrand}`)
-              .then(response => ({ brand, subBrand, data: transformData(response.data) }))
+              .then(response => ({ brand, subBrand, data: transformLaptopData(response.data) }))
           )
         );
+
+        // Fetch testimonials
+        const testimonialRequest = axios.get(
+          'http://localhost:8000/reviews?rating=5'
+        ).then(response => transformTestimonialData(response.data));
   
         // Await all requests together
-        const [newProductData, ...brandResults] = await Promise.all([
+        const [newProductData, testimonialData, ...brandResults] = await Promise.all([
           newProductRequest,
+          testimonialRequest,
           ...brandRequests
         ]);
   
@@ -120,6 +137,8 @@ const HomePage = () => {
           });
           return newData;
         });
+        
+        setTestimonialData(testimonialData);
   
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -129,9 +148,6 @@ const HomePage = () => {
     fetchData();
   }
   , []);
-
-  console.log(brandProductData);
-  console.log(brandProductData["asus"]);
 
   return (
     <Layout>
@@ -281,7 +297,7 @@ const HomePage = () => {
         <br></br>
 
         <div style={{ width: "85%", margin: "auto" }}>
-          <TestimonialSlider />
+          <TestimonialSlider testimonialData={testimonialData}/>
         </div>
 
       </Content>

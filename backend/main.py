@@ -123,4 +123,17 @@ def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Laptop not found")
 
     return laptop
-    
+
+@app.get("/reviews")
+def get_testimonials(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5), db: Session = Depends(get_db)):
+    '''
+    Get testimonials
+    '''
+    testimonials = (
+        db.query(Review)
+          .filter(Review.rating.in_(rating))
+          .order_by(Review.created_at.desc())
+          .limit(limit).all()
+        )
+
+    return testimonials
