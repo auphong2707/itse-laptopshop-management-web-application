@@ -70,7 +70,7 @@ const HomePage = () => {
     acer: ['predator', 'nitro', 'swift', 'aspire'],
     dell: ['alienware', 'g series', 'xps', 'inspiron', 'latitude', 'precision'],
     hp: ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook'],
-    msi: ['titan', 'raider', 'stealth', 'katana', 'prestigate', 'creator']
+    msi: ['stealth', 'katana', 'creator', 'modern']
   };
 
   const [brandProductData, setBrandProductData] = React.useState({
@@ -90,7 +90,7 @@ const HomePage = () => {
         "omen": [], "victus": [], "spectre": [], "envy": [], "pavilion": [], "elitebook": []
       },
       "msi": { 
-        "titan": [], "raider": [], "stealth": [], "katana": [], "prestigate": [], "creator": [] 
+        "stealth": [], "katana": [], "creator": [], "modern": []
       }
   });
 
@@ -242,8 +242,8 @@ const HomePage = () => {
 
         {/* MSI sub-brands */}
         <TabProductSlider
-          tabLabels={["MSI TITAN", "MSI RAIDER", "MSI STEALTH", "MSI KATANA", "MSI PRESTIGE", "MSI CREATOR"]}
-          tabBanners={["None", "None", "None", "None", "None", "None"]}
+          tabLabels={["MSI STEALTH", "MSI KATANA", "MSI CREATOR", "MSI MODERN"]}
+          tabBanners={["None", "None", "None", "None"]}
           tabProductData={Object.values(brandProductData["msi"])}
         />
 

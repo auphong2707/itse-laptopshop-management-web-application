@@ -38,7 +38,7 @@ def get_sub_brand(brand, name):
                 return sub_brand
 
     elif brand == 'msi':
-        sub_brands = ['titan', 'raider', 'stealth', 'katana', 'prestigate', 'creator']
+        sub_brands = ['stealth', 'katana', 'prestigate', 'creator', 'modern']
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
