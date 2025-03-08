@@ -72,6 +72,7 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 def get_latest_laptops(
     projection: str = Query("all"),
     brand: str = Query("all"),
+    subbrand: str = Query("all"),
     limit: int = Query(10),
     db: Session = Depends(get_db),
 ):
@@ -85,8 +86,12 @@ def get_latest_laptops(
     # 2) Filter by brand if not "all"
     if brand.lower() != "all":
         query = query.filter(Laptop.brand == brand)
+    
+    # 3) Filter by sub_brand if not "all"
+    if subbrand.lower() != "all":
+        query = query.filter(Laptop.sub_brand == subbrand)
 
-    # 3) If projection == "product-card", select only certain fields
+    # 4) If projection == "product-card", select only certain fields
     if projection == "product-card":
         # 'with_entities' returns tuples by default
         query = query.with_entities(
@@ -98,10 +103,9 @@ def get_latest_laptops(
             Laptop.original_price,
             Laptop.sale_price
         )
-        # 4) Sort and limit
+        
         laptops = query.order_by(Laptop.inserted_at.desc()).limit(limit).all()
         
-        # 5) Convert each tuple to a dict
         laptops = [
             {
                 "quantity": row[0],

@@ -38,30 +38,100 @@ const contentStyle = {
   backgroundColor: 'white',
 };
 
+const transformData = (data) => {
+  return data.map(item => {
+    return {
+      productName: item.name.toUpperCase(),
+      numRate: item.num_rate,
+      originalPrice: item.original_price,
+      imgSource: item.product_image_mini,
+      inStock: item.quantity > 0,
+      rate: item.rate,
+      salePrice: item.sale_price
+    };
+  });
+};
+
 const HomePage = () => {
   const [newProductData, setNewProductData] = React.useState([]);
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/laptops/latest?projection=product-card&limit=20')
-      .then((response) => {
-        const data = response.data;
-        const transformed = data.map(item => {
-          return {
-            productName: item.name.toUpperCase(),
-            numRate: item.num_rate,
-            originalPrice: item.original_price,
-            imgSource: item.product_image_mini,
-            inStock: item.quantity > 0,
-            rate: item.rate,
-            salePrice: item.sale_price
-          };
-        });
+  const brands = {
+    asus: ['rog', 'tuf', 'zenbook', 'vivobook'],
+    lenovo: ['legion', 'loq', 'thinkpad', 'thinkbook', 'yoga','ideapad'],
+    acer: ['predator', 'nitro', 'swift', 'aspire'],
+    dell: ['alienware', 'g series', 'xps', 'inspiron', 'latitude', 'precision'],
+    hp: ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook'],
+    msi: ['titan', 'raider', 'stealth', 'katana', 'prestigate', 'creator']
+  };
 
-        setNewProductData(transformed);
+  const [brandProductData, setBrandProductData] = React.useState({
+    "asus": { 
+      "rog": [], "tuf": [], "zenbook": [], "vivobook": []
+    },
+    "lenovo": { 
+      "legion": [], "loq": [], "thinkpad": [], "thinkbook": [], "yoga": [], "ideapad": [] 
+    },
+    "acer": { 
+      "predator": [], "nitro": [], "swift": [], "aspire": [] 
+    },
+    "dell": { 
+      "alienware": [], "g series": [], "xps": [], "inspiron": [], "latitude": [], "precision": [] 
+    },
+    "hp": { 
+      "omen": [], "victus": [], "spectre": [], "envy": [], "pavilion": [], "elitebook": []
+    },
+    "msi": { 
+      "titan": [], "raider": [], "stealth": [], "katana": [], "prestigate": [], "creator": [] 
+    }
+});
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch general latest laptops (limit 20)
+        const newProductRequest = axios.get(
+          'http://localhost:8000/laptops/latest?projection=product-card&limit=20'
+        ).then(response => transformData(response.data));
+  
+        // Fetch brand-specific laptops
+        const brandRequests = Object.entries(brands).flatMap(([brand, subBrands]) =>
+          subBrands.map(subBrand =>
+            axios.get(`http://localhost:8000/laptops/latest?projection=product-card&brand=${brand}&subbrand=${subBrand}`)
+              .then(response => ({ brand, subBrand, data: transformData(response.data) }))
+          )
+        );
+  
+        // Await all requests together
+        const [newProductData, ...brandResults] = await Promise.all([
+          newProductRequest,
+          ...brandRequests
+        ]);
+  
+        // Update state in a single render pass
+        setNewProductData(newProductData);
+        setBrandProductData(prevState => {
+          const newData = { ...prevState };
+          brandResults.forEach(({ brand, subBrand, data }) => {
+            newData[brand] = {
+              ...newData[brand],
+              [subBrand]: data
+            };
+          });
+          return newData;
+        });
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    );
+    };
+
+    fetchData();
   }
   , []);
+
+  console.log(brandProductData);
+  console.log(brandProductData["asus"]);
 
   return (
     <Layout>
@@ -106,15 +176,9 @@ const HomePage = () => {
 
         {/* ASUS sub-brands */}
         <TabProductSlider
-          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK", "ASUS EXPERTBOOK"]}
-          tabBanners={["None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK"]}
+          tabBanners={["None", "None", "None", "None"]}
+          tabProductData={Object.values(brandProductData["asus"])}
         />
 
         <br></br>
@@ -124,14 +188,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["LENOVO LEGION", "LENOVO LOQ", "LENOVO THINKPAD", "LENOVO THINKBOOK", "LENOVO YOGA", "LENOVO IDEAPAD"]}
           tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["lenovo"])}
         />
 
         <br></br>
@@ -141,12 +198,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["ACER PREDATOR", "ACER NITRO", "ACER SWIFT", "ACER ASPIRE"]}
           tabBanners={["None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["acer"])}
         />
         
         <br></br>
@@ -156,14 +208,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["DELL ALIENWARE", "DELL G SERIES", "DELL XPS", "DELL INSPIRON", "DELL LATITUDE", "DELL PRECISION"]}
           tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["dell"])}
         />
 
         <br></br>
@@ -171,17 +216,9 @@ const HomePage = () => {
 
         {/* HP sub-brands */}
         <TabProductSlider
-          tabLabels={["HP OMEN", "HP VICTUS", "HP SPECTRE", "HP ENVY", "HP PAVILION", "HP ELITEBOOK", "HP ZBOOK"]}
+          tabLabels={["HP OMEN", "HP VICTUS", "HP SPECTRE", "HP ENVY", "HP PAVILION", "HP ELITEBOOK"]}
           tabBanners={["None", "None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["hp"])}
         />
 
         <br></br>
@@ -191,14 +228,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["MSI TITAN", "MSI RAIDER", "MSI STEALTH", "MSI KATANA", "MSI PRESTIGE", "MSI CREATOR"]}
           tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["msi"])}
         />
 
         <br></br>
