@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS laptops (
     id SERIAL PRIMARY KEY,
     inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     brand TEXT,
+    sub_brand TEXT,
     name TEXT,
     cpu TEXT,
     vga TEXT,

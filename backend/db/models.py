@@ -9,6 +9,7 @@ class Laptop(Base):
     id = Column(Integer, primary_key=True, index=True)
     inserted_at = Column(String, nullable=False)
     brand = Column(String, nullable=False)
+    sub_brand = Column(String)
     name = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
     vga = Column(String)

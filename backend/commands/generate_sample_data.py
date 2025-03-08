@@ -1,19 +1,61 @@
 import json
-import random 
-from datetime import datetime
+import random
+import os
 
+NUM_LAPTOPS = 0
+
+def get_sub_brand(brand, name):
+    if brand == 'asus':
+        sub_brands = ['rog', 'tuf', 'zenbook', 'vivobook']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'lenovo':
+        sub_brands = ['legion', 'loq', 'thinkpad', 'thinkbook', 'yoga','ideapad']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'acer':
+        sub_brands = ['predator', 'nitro', 'swift', 'aspire']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'dell':
+        sub_brands = ['alienware', 'gaming g', 'xps', 'inspiron', 'latitude', 'precision']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                if sub_brand == 'gaming g':
+                    return 'g series'
+                return sub_brand
+
+    elif brand == 'hp':
+        sub_brands = ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'msi':
+        sub_brands = ['titan', 'raider', 'stealth', 'katana', 'prestigate', 'creator']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+    
+    return 'n/a'
 
 def clear_old_commands():
     with open('./backend/commands/insert_sample_data.sql', 'w') as sql_file:
         sql_file.write("")
     print("Old commands cleared")
 
-def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json', 
+def generate_laptop_insert_queries(json_data_directory='./backend/data/', 
                                  sql_output_path='./backend/commands/insert_sample_data.sql'):
     """
     Generate insert queries from JSON data file
     """
-    insert_query = """INSERT INTO laptops (brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
+    insert_query = """INSERT INTO laptops (brand, sub_brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
         storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness, 
         battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height, 
         number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
@@ -28,12 +70,21 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
         return f"'{value}'" if isinstance(value, str) else str(value)
 
     try:
-        with open(json_file_path, 'r') as file:
-            laptops = json.load(file)
+        laptops = []
+        json_file_paths = [os.path.join(json_data_directory, file) for file in os.listdir(json_data_directory) if file.endswith('.json')]
+        for json_file_path in json_file_paths:
+            with open(json_file_path, 'r') as file:
+                data = json.load(file)
+                laptops.extend(data)
+        global NUM_LAPTOPS
         values = []
         for laptop in laptops:
+            if laptop['price'] == 'n/a':
+                continue
+            NUM_LAPTOPS += 1
             value_tuple = (
                 convert_value(laptop['brand']),
+                convert_value(get_sub_brand(laptop['brand'], laptop['name'])),
                 convert_value(laptop['name']),
                 convert_value(laptop['cpu']),
                 convert_value(laptop['vga']),
@@ -82,7 +133,8 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
         print(f"Error occurred: {str(e)}")
 
 def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=10000):
-    laptop_ids = list(range(1, 316))
+    global NUM_LAPTOPS
+    laptop_ids = list(range(1, NUM_LAPTOPS + 1))
     user_names = [
     'Nguyen Van An', 
     'Tran Thi Binh', 

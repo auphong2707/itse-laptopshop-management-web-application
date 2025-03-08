@@ -3,6 +3,7 @@ from typing import Optional
 
 class LaptopCreate(BaseModel):
     brand: str
+    sub_brand: str
     name: str
     cpu: str
     vga: str
@@ -35,6 +36,7 @@ class LaptopCreate(BaseModel):
 
 class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
+    sub_brand: Optional[str] = None
     name: Optional[str] = None
     cpu: Optional[str] = None
     vga: Optional[str] = None
