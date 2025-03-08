@@ -125,9 +125,9 @@ def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
     return laptop
 
 @app.get("/reviews")
-def get_testimonials(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5), db: Session = Depends(get_db)):
+def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5), db: Session = Depends(get_db)):
     '''
-    Get testimonials
+    Get reviews
     '''
     testimonials = (
         db.query(Review)
