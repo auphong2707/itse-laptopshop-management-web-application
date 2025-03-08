@@ -80,48 +80,33 @@ def get_latest_laptops(
     Get latest laptops from database, optionally filtering by brand,
     and returning either full objects or partial "product-card" fields.
     """
-    # 1) Start with a base query
-    query = db.query(Laptop)
+    if projection == "product-card":
+        type = LaptopCardView
+    else:
+        type = Laptop
+
+    # 1) Select all fields if projection is "all"
+    query = db.query(type)
     
     # 2) Filter by brand if not "all"
     if brand.lower() != "all":
-        query = query.filter(Laptop.brand == brand)
+        query = query.filter(type.brand == brand)
     
     # 3) Filter by sub_brand if not "all"
     if subbrand.lower() != "all":
-        query = query.filter(Laptop.sub_brand == subbrand)
+        query = query.filter(type.sub_brand == subbrand)
 
-    # 4) If projection == "product-card", select only certain fields
+    # 4) Execute query and return results
     if projection == "product-card":
-        # 'with_entities' returns tuples by default
-        query = query.with_entities(
-            Laptop.quantity,
-            Laptop.product_image_mini,
-            Laptop.rate,
-            Laptop.num_rate,
-            Laptop.name,
-            Laptop.original_price,
-            Laptop.sale_price
+        laptops = (
+            query.order_by(type.inserted_at.desc())
+            .limit(limit).
+            all()
         )
-        
-        laptops = query.order_by(Laptop.inserted_at.desc()).limit(limit).all()
-        
-        laptops = [
-            {
-                "quantity": row[0],
-                "product_image_mini": row[1],
-                "rate": row[2],
-                "num_rate": row[3],
-                "name": row[4],
-                "original_price": row[5],
-                "sale_price": row[6],
-            }
-            for row in laptops
-        ]
     else:
         # "all" or anything else -> select entire Laptop model
         laptops = (
-            query.order_by(Laptop.inserted_at.desc())
+            query.order_by(type.inserted_at.desc())
             .limit(limit)
             .all()
         )

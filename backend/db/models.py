@@ -41,3 +41,19 @@ class Laptop(Base):
     sale_price = Column(Integer, nullable=False)
     rate = Column(DECIMAL(3,2))
     num_rate = Column(Integer)
+
+class LaptopCardView(Base):
+    __tablename__ = "laptop_card_view"
+    __table_args__ = {"extend_existing": True}
+
+    id = Column(Integer, primary_key=True)
+    brand = Column(String, nullable=False)
+    sub_brand = Column(String)
+    inserted_at = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False)
+    product_image_mini = Column(String)
+    rate = Column(DECIMAL(3, 2))
+    num_rate = Column(Integer, default=0)
+    name = Column(String, nullable=False)
+    original_price = Column(Integer, nullable=False)
+    sale_price = Column(Integer, nullable=False)

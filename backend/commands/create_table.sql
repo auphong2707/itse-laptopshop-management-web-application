@@ -70,3 +70,18 @@ CREATE TRIGGER update_laptop_rating_trigger
 AFTER INSERT OR UPDATE OR DELETE ON reviews
 FOR EACH ROW
 EXECUTE FUNCTION update_laptop_rating();
+
+CREATE OR REPLACE VIEW laptop_card_view AS
+    SELECT 
+        id,
+        inserted_at,
+        brand,
+        sub_brand,
+        quantity,
+        product_image_mini,
+        rate,
+        num_rate,
+        name,
+        original_price,
+        sale_price
+    FROM laptops
