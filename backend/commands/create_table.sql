@@ -84,4 +84,12 @@ CREATE OR REPLACE VIEW laptop_card_view AS
         name,
         original_price,
         sale_price
-    FROM laptops
+    FROM laptops;
+
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    image_url TEXT,
+    description TEXT NOT NULL,
+    link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

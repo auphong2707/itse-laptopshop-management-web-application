@@ -137,3 +137,11 @@ def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5), db
         )
 
     return testimonials
+
+@app.get("/posts")
+def get_posts(limit: int = Query(12), db: Session = Depends(get_db)):
+    '''
+    Get posts
+    '''
+    posts = db.query(Post).order_by(Post.created_at.desc()).limit(limit).all()
+    return posts

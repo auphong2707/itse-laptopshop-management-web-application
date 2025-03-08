@@ -3,9 +3,8 @@ import { Layout, Typography, Image, Divider } from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
 import ImageGallery from "./components/ImageGallery";
 import ProductSlider from './components/ProductSlider';
-import { getRandomProductCardData } from "./components/ProductCard";
 import TabProductSlider from './components/TabProductSlider';
-import NewsCardGridLayout from './components/NewsCardGridLayout';
+import PostCardGridLayout from './components/PostCardGridLayout';
 import TestimonialSlider from './components/TestimonialSlider';
 import WebsiteFooter from './components/WebsiteFooter';
 
@@ -21,17 +20,6 @@ const imageSources = [
   "None",
   "None"
 ]
-
-const newsData = [
-  { img: "/path-to-image1.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals to enhance your home office setup, your gaming rig, or your business workspace.", date: "01.09.2020" },
-  { img: "/path-to-image2.jpg", title: "As a gamer, superior sound counts for a lot. You need to hear enemies tiptoeing up behind you or a sneak attack.", date: "01.09.2020" },
-  { img: "/path-to-image3.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image4.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image5.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image6.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image7.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image8.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" }
-];
 
 const contentStyle = {
   color: '#fff',
@@ -57,6 +45,17 @@ const transformTestimonialData = (data) => {
     return {
       testimonial: item.review_text,
       author: item.user_name
+    }
+  });
+};
+
+const transformPostData = (data) => {
+  return data.map(item => {
+    return {
+      img: item.image_url,
+      title: item.description,
+      date: item.created_at.split('T')[0].replace(/-/g, '.'),
+      link: item.link
     }
   });
 };
@@ -96,6 +95,8 @@ const HomePage = () => {
 
   const [testimonialData, setTestimonialData] = React.useState([])
 
+  const [postData, setPostData] = React.useState([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,11 +118,16 @@ const HomePage = () => {
         const testimonialRequest = axios.get(
           'http://localhost:8000/reviews?rating=5'
         ).then(response => transformTestimonialData(response.data));
+
+        const postRequest = axios.get(
+          'http://localhost:8000/posts?limit=18'
+        ).then(response => transformPostData(response.data));
   
         // Await all requests together
-        const [newProductData, testimonialData, ...brandResults] = await Promise.all([
+        const [newProductData, testimonialData, postData, ...brandResults] = await Promise.all([
           newProductRequest,
           testimonialRequest,
+          postRequest,
           ...brandRequests
         ]);
   
@@ -138,6 +144,8 @@ const HomePage = () => {
           return newData;
         });
         
+        setPostData(postData);
+
         setTestimonialData(testimonialData);
   
       } catch (error) {
@@ -280,7 +288,7 @@ const HomePage = () => {
         <br></br>
         <br></br>
 
-        {/* News tab */}
+        {/* Post tab */}
         <div>
           <Text strong style={{ fontSize: 25, color: "#333" }}>
             Follow us on Instagram for News, Offers & More
@@ -289,7 +297,7 @@ const HomePage = () => {
 
         <br></br>
 
-        <NewsCardGridLayout newsData={newsData} />
+        <PostCardGridLayout postData={postData} />
 
         <br></br>
         <br></br>

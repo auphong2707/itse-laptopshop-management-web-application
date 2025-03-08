@@ -1,6 +1,7 @@
 import json
 import random
 import os
+from datetime import datetime, timedelta
 
 NUM_LAPTOPS = 0
 
@@ -123,7 +124,7 @@ def generate_laptop_insert_queries(json_data_directory='./backend/data/',
         with open(sql_output_path, 'a') as sql_file:
             sql_file.write(insert_query + "\n")
 
-        print(f"INSERT queries successfully written to {sql_output_path}")
+        print(f"INSERT laptop queries successfully written to {sql_output_path}")
 
     except FileNotFoundError:
         print(f"Error: JSON file not found at {json_file_path}")
@@ -172,6 +173,8 @@ def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql'
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
+    print(f"INSERT review queries successfully written to {sql_output_path}")
+
 def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_data.sql', num_subs=20):
     names = [
     'NguyenVanAn', 
@@ -200,9 +203,62 @@ def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_dat
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
+    print(f"INSERT subscription queries successfully written to {sql_output_path}")
+
+import random
+from datetime import datetime, timedelta
+
+def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
+    descriptions = [
+        "Khám phá những chiếc laptop chơi game mới nhất!",
+        "Nâng cấp góc làm việc của bạn với những phụ kiện tuyệt vời.",
+        "Tìm hiểu về những chiếc laptop giá rẻ đáng mua nhất.",
+        "Dòng ultrabook mới vừa ra mắt!",
+        "Tương lai của máy tính đang ở đây!",
+        "10 mẹo giúp bạn làm việc hiệu quả hơn với laptop.",
+        "Tối ưu thời lượng pin với những bước đơn giản.",
+        "Chơi game di động: Những laptop gaming tốt nhất để mang theo.",
+    ]
+    
+    image_urls = [
+        "https://example.com/images/laptop1.jpg",
+        "https://example.com/images/laptop2.jpg",
+        "https://example.com/images/laptop3.jpg",
+        "https://example.com/images/laptop4.jpg",
+    ]
+    
+    links = [
+        "https://example.com/bai-viet-1",
+        "https://example.com/bai-viet-2",
+        "https://example.com/bai-viet-3",
+        "https://example.com/bai-viet-4",
+    ]
+    
+    values = []  
+
+    for _ in range(num_posts):  # Không kiểm tra trùng lặp
+        description = random.choice(descriptions)
+        image_url = random.choice(image_urls)
+        link = random.choice(links)
+        
+        # Sinh ngày ngẫu nhiên trong 365 ngày gần nhất
+        days_ago = random.randint(0, 365)
+        created_at = (datetime.now() - timedelta(days=days_ago)).date()
+        
+        values.append(f"('{image_url}', '{description}', '{link}', '{created_at}')")
+
+    insert_query = "INSERT INTO posts (image_url, description, link, created_at) VALUES "
+    insert_query += ', '.join(values) + ";"
+
+    with open(sql_output_path, 'a') as sql_file:
+        sql_file.write(insert_query + "\n")
+
+    print(f"INSERT post queries successfully written to {sql_output_path}")
+
 if __name__ == "__main__":
     # Clear the existing content of the SQL file
     clear_old_commands()
     generate_laptop_insert_queries()
     generate_reviews()
     generate_subscriptions()
+    generate_posts()

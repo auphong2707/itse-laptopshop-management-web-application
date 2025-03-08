@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL
+from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -68,3 +68,12 @@ class Review(Base):
     rating = Column(Integer, nullable=False)
     review_text = Column(String, nullable=True)
     created_at = Column(String, nullable=False)
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    image_url = Column(String, nullable=True)  # URL for the image
+    description = Column(String, nullable=False)  # Post description
+    link = Column(String, nullable=True)  # Optional URL link
+    created_at = Column(DateTime, server_default=func.current_timestamp())
