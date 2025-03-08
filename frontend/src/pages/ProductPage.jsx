@@ -44,7 +44,7 @@ const ExtraInfo = () => (
 );
 
 const AboutProduct = () => (
-  <div style={{ maxWidth: "60%", paddingLeft: "5%", paddingRight: "5%" }}>
+  <div style={{ maxWidth: "100%", paddingLeft: "12%", paddingRight: "0%" }}>
     <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
     <p style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.6" }}>
     MSI MPG Trident 3 10SC-005AU Intel i7 10700F, 2060 SUPER, 16GB RAM, 512GB SSD, 2TB HDD, Windows 10 Home, Gaming Keyboard and Mouse 3 Years Warranty Gaming Desktop
@@ -54,7 +54,7 @@ const AboutProduct = () => (
 );
 
 const Details = () => (
-  <div style={{ maxWidth: "60%", paddingLeft: "5%", paddingRight: "5%" }}>
+  <div style={{ maxWidth: "100%", paddingLeft: "12%", paddingRight: "0%" }}>
     <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
     <ul style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.8" }}>
       <li>Intel Core i7-10700F</li>
@@ -70,7 +70,7 @@ const Details = () => (
 );
 
 const Specs = () => (
-  <div style={{ maxWidth: "60%", paddingLeft: "5%", paddingRight: "5%" }}>
+  <div style={{ maxWidth: "100%", paddingLeft: "12%", paddingRight: "0%" }}>
     <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
     <Table
       columns={[
@@ -93,18 +93,33 @@ const ProductPage = () => {
   return (
     <Layout>
       <WebsiteHeader />
-      <Content className="responsive-padding" style={{ backgroundColor: "#fff", padding: "0rem " }}>
+      <Content className="responsive-padding" style={{ 
+        backgroundColor: "#fff", 
+        padding: "0rem", 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center",
+        height: "100%"
+      }}>
+
         <Purchase />
+        {/* Left Side: Product Tabs */}
+        <div style={{ width: "50%", paddingLeft: "7%" }}>
+          <ProductTabs
+            tabLabels={["About Product", "Details", "Specs"]}
+            tabContents={[
+              AboutProduct(),
+              Details(),
+              Specs()
+            ]}
+          />
+        </div>
+
+        {/* Right Side: Product Image */}
         <ProductImage />
-        <ProductTabs
-          tabLabels={["About Product", "Details", "Specs"]}
-          tabContents={[
-            AboutProduct(),
-            Details(),
-            Specs()
-          ]}
-        />
+
       </Content>
+
 
       {/* Advertisement */}
       <ImageGallery imageSources={imageSources} />
