@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from db.models import *
@@ -6,6 +7,20 @@ from db.session import *
 from schemas.laptops import *
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
@@ -53,15 +68,52 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
-@app.get("/laptops/")
-def get_laptops(db: Session = Depends(get_db)):
-    '''
-    Get all laptops from database
-    '''
-    laptops = db.query(Laptop).all()
+@app.get("/laptops/latest")
+def get_latest_laptops(
+    projection: str = Query("all"),
+    brand: str = Query("all"),
+    subbrand: str = Query("all"),
+    limit: int = Query(10),
+    db: Session = Depends(get_db),
+):
+    """
+    Get latest laptops from database, optionally filtering by brand,
+    and returning either full objects or partial "product-card" fields.
+    """
+    if projection == "product-card":
+        type = LaptopCardView
+    else:
+        type = Laptop
+
+    # 1) Select all fields if projection is "all"
+    query = db.query(type)
+    
+    # 2) Filter by brand if not "all"
+    if brand.lower() != "all":
+        query = query.filter(type.brand == brand)
+    
+    # 3) Filter by sub_brand if not "all"
+    if subbrand.lower() != "all":
+        query = query.filter(type.sub_brand == subbrand)
+
+    # 4) Execute query and return results
+    if projection == "product-card":
+        laptops = (
+            query.order_by(type.inserted_at.desc())
+            .limit(limit).
+            all()
+        )
+    else:
+        # "all" or anything else -> select entire Laptop model
+        laptops = (
+            query.order_by(type.inserted_at.desc())
+            .limit(limit)
+            .all()
+        )
+
     return laptops
 
-@app.get("/laptops/{laptop_id}")
+@app.get("/laptops/id/{laptop_id}")
 def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
     '''
     Get laptop by id
@@ -71,4 +123,25 @@ def get_laptop(laptop_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Laptop not found")
 
     return laptop
-    
+
+@app.get("/reviews")
+def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5), db: Session = Depends(get_db)):
+    '''
+    Get reviews
+    '''
+    testimonials = (
+        db.query(Review)
+          .filter(Review.rating.in_(rating))
+          .order_by(Review.created_at.desc())
+          .limit(limit).all()
+        )
+
+    return testimonials
+
+@app.get("/posts")
+def get_posts(limit: int = Query(12), db: Session = Depends(get_db)):
+    '''
+    Get posts
+    '''
+    posts = db.query(Post).order_by(Post.created_at.desc()).limit(limit).all()
+    return posts

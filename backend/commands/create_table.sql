@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS laptops (
     id SERIAL PRIMARY KEY,
+    inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     brand TEXT,
+    sub_brand TEXT,
     name TEXT,
     cpu TEXT,
     vga TEXT,
@@ -18,7 +20,6 @@ CREATE TABLE IF NOT EXISTS laptops (
     weight DECIMAL(5,2),
     default_os TEXT,
     warranty INTEGER,
-    price INTEGER,
     width DECIMAL(5,2),
     depth DECIMAL(5,2),
     height DECIMAL(5,2),
@@ -27,7 +28,12 @@ CREATE TABLE IF NOT EXISTS laptops (
     number_hdmi_ports INTEGER,
     number_ethernet_ports INTEGER,
     number_audio_jacks INTEGER,
-    image_base64 TEXT
+    product_image_mini TEXT,
+    quantity INTEGER,
+    original_price INT,
+    sale_price INT,
+    rate DECIMAL(3,2) DEFAULT 0.00,
+    num_rate INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
@@ -44,4 +50,46 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION update_laptop_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Update rate and num_rate in laptops table
+    UPDATE laptops
+    SET 
+        rate = (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE laptop_id = NEW.laptop_id),
+        num_rate = (SELECT COUNT(*) FROM reviews WHERE laptop_id = NEW.laptop_id)
+    WHERE id = NEW.laptop_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_laptop_rating_trigger
+AFTER INSERT OR UPDATE OR DELETE ON reviews
+FOR EACH ROW
+EXECUTE FUNCTION update_laptop_rating();
+
+CREATE OR REPLACE VIEW laptop_card_view AS
+    SELECT 
+        id,
+        inserted_at,
+        brand,
+        sub_brand,
+        quantity,
+        product_image_mini,
+        rate,
+        num_rate,
+        name,
+        original_price,
+        sale_price
+    FROM laptops;
+
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    image_url TEXT,
+    description TEXT NOT NULL,
+    link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

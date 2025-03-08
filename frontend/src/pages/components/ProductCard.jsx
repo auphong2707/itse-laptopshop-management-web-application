@@ -5,6 +5,10 @@ import PropTypes from "prop-types";
 
 const { Title, Text, Paragraph } = Typography;
 
+const formatPrice = (price) => {
+	return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalPrice, salePrice }) => {
   return (
 		<div style={{ padding: 3 }}>
@@ -59,10 +63,10 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
 				{/* Price Section */}
 				<div>
 					<Text delete style={{ fontSize: 13, color: "#888" }} strong={false}>
-						${originalPrice.toFixed(2)}
+						{formatPrice(originalPrice)}đ
 					</Text>
 					<Title level={4} style={{ margin: 0, color: "#000" }}>
-						${salePrice.toFixed(2)}
+						{formatPrice(salePrice)}đ
 					</Title>
 				</div>
 			</Card>

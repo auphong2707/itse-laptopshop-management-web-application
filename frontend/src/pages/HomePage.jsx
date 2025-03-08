@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Layout, Typography, Image, Divider } from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
 import ImageGallery from "./components/ImageGallery";
 import ProductSlider from './components/ProductSlider';
-import { getRandomProductCardData } from "./components/ProductCard";
 import TabProductSlider from './components/TabProductSlider';
-import NewsCardGridLayout from './components/NewsCardGridLayout';
+import PostCardGridLayout from './components/PostCardGridLayout';
 import TestimonialSlider from './components/TestimonialSlider';
 import WebsiteFooter from './components/WebsiteFooter';
+
+import axios from 'axios';
 
 const { Content } = Layout;
 const { Text, Link } = Typography;
@@ -20,28 +21,142 @@ const imageSources = [
   "None"
 ]
 
-const productData = [];
-for (let i = 0; i < 10; i++) {
-  productData.push(getRandomProductCardData());
-}
-
-const newsData = [
-  { img: "/path-to-image1.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals to enhance your home office setup, your gaming rig, or your business workspace.", date: "01.09.2020" },
-  { img: "/path-to-image2.jpg", title: "As a gamer, superior sound counts for a lot. You need to hear enemies tiptoeing up behind you or a sneak attack.", date: "01.09.2020" },
-  { img: "/path-to-image3.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image4.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image5.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image6.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image7.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" },
-  { img: "/path-to-image8.jpg", title: "If you've recently made a desktop PC or laptop purchase, you might want to consider adding peripherals.", date: "01.09.2020" }
-];
-
 const contentStyle = {
   color: '#fff',
   backgroundColor: 'white',
 };
 
+const transformLaptopData = (data) => {
+  return data.map(item => {
+    return {
+      productName: item.name.toUpperCase(),
+      numRate: item.num_rate,
+      originalPrice: item.original_price,
+      imgSource: item.product_image_mini,
+      inStock: item.quantity > 0,
+      rate: item.rate,
+      salePrice: item.sale_price
+    };
+  });
+};
+
+const transformTestimonialData = (data) => {
+  return data.map(item => {
+    return {
+      testimonial: item.review_text,
+      author: item.user_name
+    }
+  });
+};
+
+const transformPostData = (data) => {
+  return data.map(item => {
+    return {
+      img: item.image_url,
+      title: item.description,
+      date: item.created_at.split('T')[0].replace(/-/g, '.'),
+      link: item.link
+    }
+  });
+};
+
 const HomePage = () => {
+  const [newProductData, setNewProductData] = React.useState([]);
+
+  const brands = {
+    asus: ['rog', 'tuf', 'zenbook', 'vivobook'],
+    lenovo: ['legion', 'loq', 'thinkpad', 'thinkbook', 'yoga','ideapad'],
+    acer: ['predator', 'nitro', 'swift', 'aspire'],
+    dell: ['alienware', 'g series', 'xps', 'inspiron', 'latitude', 'precision'],
+    hp: ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook'],
+    msi: ['stealth', 'katana', 'creator', 'modern']
+  };
+
+  const [brandProductData, setBrandProductData] = React.useState({
+      "asus": { 
+        "rog": [], "tuf": [], "zenbook": [], "vivobook": []
+      },
+      "lenovo": { 
+        "legion": [], "loq": [], "thinkpad": [], "thinkbook": [], "yoga": [], "ideapad": [] 
+      },
+      "acer": { 
+        "predator": [], "nitro": [], "swift": [], "aspire": [] 
+      },
+      "dell": { 
+        "alienware": [], "g series": [], "xps": [], "inspiron": [], "latitude": [], "precision": [] 
+      },
+      "hp": { 
+        "omen": [], "victus": [], "spectre": [], "envy": [], "pavilion": [], "elitebook": []
+      },
+      "msi": { 
+        "stealth": [], "katana": [], "creator": [], "modern": []
+      }
+  });
+
+  const [testimonialData, setTestimonialData] = React.useState([])
+
+  const [postData, setPostData] = React.useState([]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch general latest laptops (limit 20)
+        const newProductRequest = axios.get(
+          'http://localhost:8000/laptops/latest?projection=product-card&limit=20'
+        ).then(response => transformLaptopData(response.data));
+  
+        // Fetch brand-specific laptops
+        const brandRequests = Object.entries(brands).flatMap(([brand, subBrands]) =>
+          subBrands.map(subBrand =>
+            axios.get(`http://localhost:8000/laptops/latest?projection=product-card&brand=${brand}&subbrand=${subBrand}`)
+              .then(response => ({ brand, subBrand, data: transformLaptopData(response.data) }))
+          )
+        );
+
+        // Fetch testimonials
+        const testimonialRequest = axios.get(
+          'http://localhost:8000/reviews?rating=5'
+        ).then(response => transformTestimonialData(response.data));
+
+        const postRequest = axios.get(
+          'http://localhost:8000/posts?limit=18'
+        ).then(response => transformPostData(response.data));
+  
+        // Await all requests together
+        const [newProductData, testimonialData, postData, ...brandResults] = await Promise.all([
+          newProductRequest,
+          testimonialRequest,
+          postRequest,
+          ...brandRequests
+        ]);
+  
+        // Update state in a single render pass
+        setNewProductData(newProductData);
+        setBrandProductData(prevState => {
+          const newData = { ...prevState };
+          brandResults.forEach(({ brand, subBrand, data }) => {
+            newData[brand] = {
+              ...newData[brand],
+              [subBrand]: data
+            };
+          });
+          return newData;
+        });
+        
+        setPostData(postData);
+
+        setTestimonialData(testimonialData);
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }
+  , []);
+
   return (
     <Layout>
       {/* Header */}
@@ -66,7 +181,7 @@ const HomePage = () => {
               See All New Products
             </Link>
           </div>
-          <ProductSlider productData={productData} />
+          <ProductSlider productData={newProductData} />
         </div>
 
         <br></br>
@@ -85,15 +200,9 @@ const HomePage = () => {
 
         {/* ASUS sub-brands */}
         <TabProductSlider
-          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK", "ASUS EXPERTBOOK"]}
-          tabBanners={["None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK"]}
+          tabBanners={["None", "None", "None", "None"]}
+          tabProductData={Object.values(brandProductData["asus"])}
         />
 
         <br></br>
@@ -103,14 +212,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["LENOVO LEGION", "LENOVO LOQ", "LENOVO THINKPAD", "LENOVO THINKBOOK", "LENOVO YOGA", "LENOVO IDEAPAD"]}
           tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["lenovo"])}
         />
 
         <br></br>
@@ -120,12 +222,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["ACER PREDATOR", "ACER NITRO", "ACER SWIFT", "ACER ASPIRE"]}
           tabBanners={["None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["acer"])}
         />
         
         <br></br>
@@ -135,14 +232,7 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={["DELL ALIENWARE", "DELL G SERIES", "DELL XPS", "DELL INSPIRON", "DELL LATITUDE", "DELL PRECISION"]}
           tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["dell"])}
         />
 
         <br></br>
@@ -150,17 +240,9 @@ const HomePage = () => {
 
         {/* HP sub-brands */}
         <TabProductSlider
-          tabLabels={["HP OMEN", "HP VICTUS", "HP SPECTRE", "HP ENVY", "HP PAVILION", "HP ELITEBOOK", "HP ZBOOK"]}
+          tabLabels={["HP OMEN", "HP VICTUS", "HP SPECTRE", "HP ENVY", "HP PAVILION", "HP ELITEBOOK"]}
           tabBanners={["None", "None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabProductData={Object.values(brandProductData["hp"])}
         />
 
         <br></br>
@@ -168,16 +250,9 @@ const HomePage = () => {
 
         {/* MSI sub-brands */}
         <TabProductSlider
-          tabLabels={["MSI TITAN", "MSI RAIDER", "MSI STEALTH", "MSI KATANA", "MSI PRESTIGE", "MSI CREATOR"]}
-          tabBanners={["None", "None", "None", "None", "None", "None"]}
-          tabProductData={[
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-            Array.from({ length: 10 }, (_, i) => getRandomProductCardData()),
-          ]}
+          tabLabels={["MSI STEALTH", "MSI KATANA", "MSI CREATOR", "MSI MODERN"]}
+          tabBanners={["None", "None", "None", "None"]}
+          tabProductData={Object.values(brandProductData["msi"])}
         />
 
         <br></br>
@@ -213,7 +288,7 @@ const HomePage = () => {
         <br></br>
         <br></br>
 
-        {/* News tab */}
+        {/* Post tab */}
         <div>
           <Text strong style={{ fontSize: 25, color: "#333" }}>
             Follow us on Instagram for News, Offers & More
@@ -222,7 +297,7 @@ const HomePage = () => {
 
         <br></br>
 
-        <NewsCardGridLayout newsData={newsData} />
+        <PostCardGridLayout postData={postData} />
 
         <br></br>
         <br></br>
@@ -230,7 +305,7 @@ const HomePage = () => {
         <br></br>
 
         <div style={{ width: "85%", margin: "auto" }}>
-          <TestimonialSlider />
+          <TestimonialSlider testimonialData={testimonialData}/>
         </div>
 
       </Content>

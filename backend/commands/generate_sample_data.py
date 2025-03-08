@@ -1,22 +1,65 @@
 import json
-import random 
-from datetime import datetime
+import random
+import os
+from datetime import datetime, timedelta
 
+NUM_LAPTOPS = 0
+
+def get_sub_brand(brand, name):
+    if brand == 'asus':
+        sub_brands = ['rog', 'tuf', 'zenbook', 'vivobook']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'lenovo':
+        sub_brands = ['legion', 'loq', 'thinkpad', 'thinkbook', 'yoga','ideapad']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'acer':
+        sub_brands = ['predator', 'nitro', 'swift', 'aspire']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'dell':
+        sub_brands = ['alienware', 'gaming g', 'xps', 'inspiron', 'latitude', 'precision']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                if sub_brand == 'gaming g':
+                    return 'g series'
+                return sub_brand
+
+    elif brand == 'hp':
+        sub_brands = ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+
+    elif brand == 'msi':
+        sub_brands = ['stealth', 'katana', 'prestigate', 'creator', 'modern']
+        for sub_brand in sub_brands:
+            if sub_brand in name.lower():
+                return sub_brand
+    
+    return 'n/a'
 
 def clear_old_commands():
     with open('./backend/commands/insert_sample_data.sql', 'w') as sql_file:
         sql_file.write("")
     print("Old commands cleared")
 
-def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json', 
+def generate_laptop_insert_queries(json_data_directory='./backend/data/', 
                                  sql_output_path='./backend/commands/insert_sample_data.sql'):
     """
     Generate insert queries from JSON data file
     """
-    insert_query = """INSERT INTO laptops (brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
+    insert_query = """INSERT INTO laptops (brand, sub_brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
         storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness, 
-        battery_capacity, battery_cells, weight, default_os, warranty, price, width, depth, height, 
-        number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, image_base64) VALUES """
+        battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height, 
+        number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
 
     def convert_value(value):
         if isinstance(value, str) and value.lower() == 'n/a':
@@ -28,12 +71,21 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
         return f"'{value}'" if isinstance(value, str) else str(value)
 
     try:
-        with open(json_file_path, 'r') as file:
-            laptops = json.load(file)
+        laptops = []
+        json_file_paths = [os.path.join(json_data_directory, file) for file in os.listdir(json_data_directory) if file.endswith('.json')]
+        for json_file_path in json_file_paths:
+            with open(json_file_path, 'r') as file:
+                data = json.load(file)
+                laptops.extend(data)
+        global NUM_LAPTOPS
         values = []
         for laptop in laptops:
+            if laptop['price'] == 'n/a':
+                continue
+            NUM_LAPTOPS += 1
             value_tuple = (
                 convert_value(laptop['brand']),
+                convert_value(get_sub_brand(laptop['brand'], laptop['name'])),
                 convert_value(laptop['name']),
                 convert_value(laptop['cpu']),
                 convert_value(laptop['vga']),
@@ -51,7 +103,6 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
                 convert_value(laptop['weight']),
                 convert_value(laptop['default_os']),
                 convert_value(laptop['warranty']),
-                convert_value(laptop['price']),
                 convert_value(laptop['width']),
                 convert_value(laptop['depth']),
                 convert_value(laptop['height']),
@@ -60,7 +111,10 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
                 convert_value(laptop['number_hdmi_ports']),
                 convert_value(laptop['number_ethernet_ports']),
                 convert_value(laptop['number_audio_jacks']),
-                'NULL'  # image_base64 = NULL
+                'NULL',
+                str(random.randint(0, 20)),
+                convert_value(laptop['price']),
+                convert_value(laptop['price'] - random.randint(0, 20)/100 * laptop['price'])
             )
 
             values.append(f"({', '.join(value_tuple)})")
@@ -70,7 +124,7 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
         with open(sql_output_path, 'a') as sql_file:
             sql_file.write(insert_query + "\n")
 
-        print(f"INSERT queries successfully written to {sql_output_path}")
+        print(f"INSERT laptop queries successfully written to {sql_output_path}")
 
     except FileNotFoundError:
         print(f"Error: JSON file not found at {json_file_path}")
@@ -79,8 +133,9 @@ def generate_laptop_insert_queries(json_file_path='./backend/data/tgdd_data.json
     except Exception as e:
         print(f"Error occurred: {str(e)}")
 
-def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=30):
-    laptop_ids = list(range(1, 200))
+def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=10000):
+    global NUM_LAPTOPS
+    laptop_ids = list(range(1, NUM_LAPTOPS + 1))
     user_names = [
     'Nguyen Van An', 
     'Tran Thi Binh', 
@@ -118,6 +173,8 @@ def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql'
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
+    print(f"INSERT review queries successfully written to {sql_output_path}")
+
 def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_data.sql', num_subs=20):
     names = [
     'NguyenVanAn', 
@@ -146,9 +203,62 @@ def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_dat
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
+    print(f"INSERT subscription queries successfully written to {sql_output_path}")
+
+import random
+from datetime import datetime, timedelta
+
+def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
+    descriptions = [
+        "Khám phá những chiếc laptop chơi game mới nhất!",
+        "Nâng cấp góc làm việc của bạn với những phụ kiện tuyệt vời.",
+        "Tìm hiểu về những chiếc laptop giá rẻ đáng mua nhất.",
+        "Dòng ultrabook mới vừa ra mắt!",
+        "Tương lai của máy tính đang ở đây!",
+        "10 mẹo giúp bạn làm việc hiệu quả hơn với laptop.",
+        "Tối ưu thời lượng pin với những bước đơn giản.",
+        "Chơi game di động: Những laptop gaming tốt nhất để mang theo.",
+    ]
+    
+    image_urls = [
+        "https://example.com/images/laptop1.jpg",
+        "https://example.com/images/laptop2.jpg",
+        "https://example.com/images/laptop3.jpg",
+        "https://example.com/images/laptop4.jpg",
+    ]
+    
+    links = [
+        "https://example.com/bai-viet-1",
+        "https://example.com/bai-viet-2",
+        "https://example.com/bai-viet-3",
+        "https://example.com/bai-viet-4",
+    ]
+    
+    values = []  
+
+    for _ in range(num_posts):  # Không kiểm tra trùng lặp
+        description = random.choice(descriptions)
+        image_url = random.choice(image_urls)
+        link = random.choice(links)
+        
+        # Sinh ngày ngẫu nhiên trong 365 ngày gần nhất
+        days_ago = random.randint(0, 365)
+        created_at = (datetime.now() - timedelta(days=days_ago)).date()
+        
+        values.append(f"('{image_url}', '{description}', '{link}', '{created_at}')")
+
+    insert_query = "INSERT INTO posts (image_url, description, link, created_at) VALUES "
+    insert_query += ', '.join(values) + ";"
+
+    with open(sql_output_path, 'a') as sql_file:
+        sql_file.write(insert_query + "\n")
+
+    print(f"INSERT post queries successfully written to {sql_output_path}")
+
 if __name__ == "__main__":
     # Clear the existing content of the SQL file
     clear_old_commands()
     generate_laptop_insert_queries()
     generate_reviews()
     generate_subscriptions()
+    generate_posts()
