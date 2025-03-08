@@ -19,7 +19,7 @@ const ProductImage = () => {
       justifyContent: "center",
       alignItems: "center",
       gap: "20px",
-      paddingRight: "8rem",
+      paddingRight: "12rem",
       paddingTop: "-2rem",
     }}>
       
