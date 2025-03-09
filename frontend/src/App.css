@@ -26,3 +26,10 @@ opacity: 1; /* Show arrows when hovering */
   font-weight: bold;
   font-size: 15px;
 }
+
+.grid-division {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  height: auto;
+  column-gap: 30px;
+}
