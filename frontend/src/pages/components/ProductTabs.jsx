@@ -34,10 +34,10 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
         position: "absolute",
         top: "179px",
         left: "0",
-        width: "100vw", // Dàn toàn màn hình
-        height: "1px",  // Độ dày của vạch
-        backgroundColor: "#ddd", // Màu gạch dưới
-        zIndex: "10", // Đảm bảo nằm trên gạch dưới gốc của Tabs
+        width: "100vw",
+        height: "1px", 
+        backgroundColor: "#ddd", 
+        zIndex: "10",
       }}></div>
     </div>
   );
