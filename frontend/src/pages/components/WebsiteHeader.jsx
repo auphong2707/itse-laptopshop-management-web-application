@@ -27,7 +27,9 @@ const AccountMenu = () => {
   const menu = (
 	<Menu
 		onClick={handleMenuClick}
-		style={{ minWidth: "165px" }}
+		style={{
+			minWidth: "165px"
+		}}
 	>
 	  <Menu.Item key="account" style={{ fontWeight: "bold" }}>My Account</Menu.Item>
 	  <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
@@ -40,7 +42,14 @@ const AccountMenu = () => {
   
 
   return (
-    <Dropdown overlay={menu} trigger={["click"]} open={open} onOpenChange={setOpen}>
+    <Dropdown 
+			overlay={menu}
+			trigger={["click"]} 
+			open={open} 
+			onOpenChange={setOpen}
+			placement="bottomCenter"
+			overlayStyle={{ paddingRight: "145px"}}
+		>
       <Avatar 
         icon={<UserOutlined />} 
         style={{ cursor: "pointer" }} 
