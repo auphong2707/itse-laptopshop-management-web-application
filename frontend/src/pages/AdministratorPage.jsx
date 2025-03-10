@@ -72,7 +72,7 @@ const AdministratorPage = () => {
     <Layout>
       <WebsiteHeader />
 
-      <Content style={{ padding: "1.5rem 10%", backgroundColor: "#fff" }}>
+      <Content style={{ padding: "1.5rem 12%", backgroundColor: "#fff" }}>
         <Breadcrumb separator=">" style={{ marginBottom: "1rem", fontSize: "14px" }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
