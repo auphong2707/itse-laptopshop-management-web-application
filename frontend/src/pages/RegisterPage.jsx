@@ -23,7 +23,7 @@ const CustomerLoginPage = () => {
 
   const nextStep = async () => {
     try {
-      await form.validateFields(); // Kiểm tra tất cả các trường trước khi cho phép chuyển bước
+      await form.validateFields(); 
       setCurrent(current + 1);
     } catch (errorInfo) {
       console.log("Validation failed:", errorInfo);
@@ -43,9 +43,7 @@ const CustomerLoginPage = () => {
           Sign up
         </Title>
 
-        <Title level={3} className="responsive-padding">
-          {current === 0 ? "Information" : "Set up password"}
-        </Title>
+
 
         <div className="responsive-padding">
           <Divider style={{ borderWidth: 1 }} />
@@ -57,71 +55,107 @@ const CustomerLoginPage = () => {
               {current === 0 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"}}>First Name <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>First Name <span style={{ color: "red" }}>*</span></span>}
                     name="firstName"
                     rules={[{ required: true, message: "Please enter your first name." }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your first name" autoComplete="given-name" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your first name" 
+                      autoComplete="given-name"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Last Name <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Last Name <span style={{ color: "red" }}>*</span></span>}
                     name="lastName"
                     rules={[{ required: true, message: "Please enter your last name." }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your last name" autoComplete="family-name" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your last name" 
+                      autoComplete="given-name"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
                     name="phoneNumber"
                     rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^\d+$/, message: "Invalid phone number" }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your phone number" autoComplete="tel" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your phone number" 
+                      autoComplete="tel"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Email <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Email <span style={{ color: "red" }}>*</span></span>}
                     name="email"
                     rules={[{ required: true, message: "Please enter your email." }, { type: "email", message: "Please enter a valid email." }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your email" autoComplete="email" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your email" 
+                      autoComplete="email"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>  
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Company</span>}
+                    label={<span style={{ fontSize: "1.3rem"  }}>Company</span>}
                     name="company"
                   >
-                    <Input placeholder="Enter your company name" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your company name" 
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Address</span>}
+                    label={<span style={{ fontSize: "1.3rem"  }}>Address</span>}
                     name="address"
                   >
-                    <Input placeholder="Enter your address" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your address" 
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>                              
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Country<span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Country<span style={{ color: "red" }}>*</span></span>}
                     name="country"
                     rules={[{ required: true, message: "Please enter your country" }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your country" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your last name" 
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Zip/Postal code <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Zip/Postal code <span style={{ color: "red" }}>*</span></span>}
                     name="zipPostalCode"
                     rules={[{ required: true, message: "Please enter your zip/postal code" }]}
                     required = {false}
                   >
-                    <Input placeholder="Enter your zip/postal code" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your zip/postal code" 
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item style={{ marginTop: "50px" }}>
@@ -139,16 +173,21 @@ const CustomerLoginPage = () => {
               {current === 1 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"  }}>Password <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Password <span style={{ color: "red" }}>*</span></span>}
                     name="password"
                     rules={[{ required: true, message: "Please enter your password." }]}
                     required = {false}
                   >
-                    <Input.Password placeholder="Enter your password" autoComplete="new-password" />
+                    <Input     
+                      size="large" 
+                      placeholder="Enter your password" 
+                      autoComplete="new-password"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
                   
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"  }}>Confirm Password <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontSize: "1.4rem" }}>Confirm Password <span style={{ color: "red" }}>*</span></span>}
                     name="confirmPassword"
                     rules={[
                       { required: true, message: "Please confirm your password." },
@@ -163,7 +202,12 @@ const CustomerLoginPage = () => {
                     ]}
                     required = {false}
                   >
-                    <Input.Password placeholder="Enter your password" autoComplete="new-password" />
+                    <Input     
+                      size="large" 
+                      placeholder="Confirm your password" 
+                      autoComplete="new-password"
+                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                    />
                   </Form.Item>
 
                   <Form.Item style={{ marginTop: "50px" }}>
@@ -191,8 +235,11 @@ const CustomerLoginPage = () => {
                 }
               }}
               direction="vertical"
-              items={[{ title: 'Information', description }, { title: 'Set up password', description }]}
-              style={{ marginBottom: "2rem" }}
+              items={[
+                { title: <span style={{ fontSize: "1.2rem"}}>Information</span>, description },
+                { title: <span style={{ fontSize: "1.2rem"}}>Set up password</span>, description }
+              ]}
+              style={{ marginBottom: "2rem", fontSize: "1.2rem" }}
             />
           </Col>
         </Row>
