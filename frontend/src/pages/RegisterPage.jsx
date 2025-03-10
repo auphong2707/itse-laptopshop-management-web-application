@@ -39,11 +39,13 @@ const CustomerLoginPage = () => {
           <Breadcrumb.Item>Sign Up</Breadcrumb.Item>
         </Breadcrumb>
 
-        <Title level={2} className="responsive-padding" style={{ marginBottom: "2rem" }}>
+        <Title level={1} className="responsive-padding" style={{ marginBottom: "2rem" }}>
           Sign up
         </Title>
 
-        <Title level={4} className="responsive-padding">Information</Title>
+        <Title level={3} className="responsive-padding">
+          {current === 0 ? "Information" : "Set up password"}
+        </Title>
 
         <div className="responsive-padding">
           <Divider style={{ borderWidth: 1 }} />
@@ -55,7 +57,7 @@ const CustomerLoginPage = () => {
               {current === 0 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>First Name <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"}}>First Name <span style={{ color: "red" }}>*</span></span>}
                     name="firstName"
                     rules={[{ required: true, message: "Please enter your first name." }]}
                     required = {false}
@@ -64,7 +66,7 @@ const CustomerLoginPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Last Name <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Last Name <span style={{ color: "red" }}>*</span></span>}
                     name="lastName"
                     rules={[{ required: true, message: "Please enter your last name." }]}
                     required = {false}
@@ -73,7 +75,7 @@ const CustomerLoginPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
                     name="phoneNumber"
                     rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^\d+$/, message: "Invalid phone number" }]}
                     required = {false}
@@ -82,7 +84,7 @@ const CustomerLoginPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Email <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Email <span style={{ color: "red" }}>*</span></span>}
                     name="email"
                     rules={[{ required: true, message: "Please enter your email." }, { type: "email", message: "Please enter a valid email." }]}
                     required = {false}
@@ -91,21 +93,21 @@ const CustomerLoginPage = () => {
                   </Form.Item>  
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Company</span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Company</span>}
                     name="company"
                   >
                     <Input placeholder="Enter your company name" />
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Address</span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Address</span>}
                     name="address"
                   >
                     <Input placeholder="Enter your address" />
                   </Form.Item>                              
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Country<span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Country<span style={{ color: "red" }}>*</span></span>}
                     name="country"
                     rules={[{ required: true, message: "Please enter your country" }]}
                     required = {false}
@@ -114,7 +116,7 @@ const CustomerLoginPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Zip/Postal code <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Zip/Postal code <span style={{ color: "red" }}>*</span></span>}
                     name="zipPostalCode"
                     rules={[{ required: true, message: "Please enter your zip/postal code" }]}
                     required = {false}
@@ -126,7 +128,7 @@ const CustomerLoginPage = () => {
                     <Button
                       type="primary" 
                       onClick={nextStep}
-                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "0.9rem", fontWeight: "bold" }}
+                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "1rem", fontWeight: "bold" }}
                     >
                       Next
                     </Button>
@@ -137,7 +139,7 @@ const CustomerLoginPage = () => {
               {current === 1 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontWeight: "bold" }}>Password <span style={{ color: "red" }}>*</span></span>}
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"  }}>Password <span style={{ color: "red" }}>*</span></span>}
                     name="password"
                     rules={[{ required: true, message: "Please enter your password." }]}
                     required = {false}
@@ -145,11 +147,30 @@ const CustomerLoginPage = () => {
                     <Input.Password placeholder="Enter your password" autoComplete="new-password" />
                   </Form.Item>
                   
+                  <Form.Item
+                    label={<span style={{ fontWeight: "bold", fontSize: "1.1rem"  }}>Confirm Password <span style={{ color: "red" }}>*</span></span>}
+                    name="confirmPassword"
+                    rules={[
+                      { required: true, message: "Please confirm your password." },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(new Error("Passwords do not match!"));
+                        },
+                      }),
+                    ]}
+                    required = {false}
+                  >
+                    <Input.Password placeholder="Enter your password" autoComplete="new-password" />
+                  </Form.Item>
+
                   <Form.Item style={{ marginTop: "50px" }}>
                     <Button
                       type="primary" 
                       htmlType="submit"
-                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "0.9rem", fontWeight: "bold" }}
+                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "1rem", fontWeight: "bold" }}
                     >
                       Finish
                     </Button>
