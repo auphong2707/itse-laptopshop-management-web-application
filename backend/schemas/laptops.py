@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class LaptopCreate(BaseModel):
@@ -70,5 +70,4 @@ class LaptopUpdate(BaseModel):
 class LaptopResponse(LaptopCreate):
     id: int  
 
-    class Config:
-        orm_mode = True  
+    model_config = ConfigDict(from_attributes=True)
