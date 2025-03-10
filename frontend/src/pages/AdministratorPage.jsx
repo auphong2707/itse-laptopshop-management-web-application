@@ -55,7 +55,7 @@ const AdminTabs = ({ tabLabels, tabContents }) => {
 
 			<div style={{
 				position: "absolute",
-				top: "306px",
+				top: "300px",
 				left: "0",
 				width: "100vw",
 				height: "1px", 
