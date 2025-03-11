@@ -60,3 +60,17 @@ def test_get_laptop_by_id():
     response = client.get(f"/laptops/id/{laptop_id}")
     assert response.status_code == 200
     assert response.json()["id"] == laptop_id
+
+def test_update_laptop():
+    updated_data = {
+        "sale_price": 20000000,
+        "ram_amount": 32
+    }
+
+    response = client.put(f"/laptops/{laptop_id}", json=updated_data)
+    assert response.status_code == 200
+    response_data = response.json()
+
+    assert response_data["message"] == "Laptop updated successfully"
+    assert response_data["laptop"]["sale_price"] == updated_data["sale_price"]
+    assert response_data["laptop"]["ram_amount"] == updated_data["ram_amount"]
