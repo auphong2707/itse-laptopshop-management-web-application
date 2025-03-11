@@ -39,7 +39,7 @@ TEST_SAMPLE = {
     "sale_price": 1800
 }
 
-
+# [CRUD TESTING]
 def test_create_laptop(client):
     '''
     Test create laptop
@@ -92,3 +92,17 @@ def test_get_latest_laptops():
     assert isinstance(response.json(), list)
     assert len(response.json()) > 0
 
+# [EDGE CASE TESTING]
+def test_create_laptop_missing_fields():
+    response = client.post("/laptops/", json={})  
+    assert response.status_code == 422  
+
+def test_update_non_existent_laptop():
+    response = client.put("/laptops/999999", json={"sale_price": 1200})  # Laptop ID 9999 does not exist
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Laptop not found"
+
+def test_delete_non_existent_laptop():
+    response = client.delete("/laptops/9999999")  
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Laptop not found"
