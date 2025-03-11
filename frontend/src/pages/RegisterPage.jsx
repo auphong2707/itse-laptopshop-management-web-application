@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Row, Col, Form, Typography, Input, Layout, Button, Breadcrumb, Steps, Divider } from 'antd';
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from './components/WebsiteFooter';
@@ -35,8 +36,12 @@ const CustomerLoginPage = () => {
       <WebsiteHeader />
       <Content className="responsive-padding" style={contentStyle}>
         <Breadcrumb className="responsive-padding" separator=">" style={{ marginBottom: "1rem" }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Sign Up</Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/">Home</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/register">Sign Up</Link>
+          </Breadcrumb.Item>
         </Breadcrumb>
 
         <Title level={1} className="responsive-padding" style={{ marginBottom: "2rem" }}>

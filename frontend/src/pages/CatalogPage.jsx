@@ -1,4 +1,5 @@
 import { Layout, Breadcrumb, Typography, Select, Pagination, Button, Collapse, Checkbox, Divider, Slider, InputNumber } from "antd";
+import { useState } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
@@ -312,7 +313,9 @@ const FilterSection = () => {
 };
 
 
-const CatalogPage = () => {
+const CatalogPage = ({ inputBrand }) => {
+	const [brand, setBrand] = useState(inputBrand);
+
 	return (
 		<Layout>
 			<WebsiteHeader />
@@ -334,7 +337,7 @@ const CatalogPage = () => {
 					</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Title level={1}>ASUS Laptop</Title>
+				<Title level={1}>{brand} Laptop</Title>
 
 				<br></br>
 

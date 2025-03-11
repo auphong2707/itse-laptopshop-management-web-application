@@ -177,7 +177,7 @@ const HomePage = () => {
               New Products
             </Text>
 
-            <Link href={null} underline>
+            <Link href={"/laptops/"} underline>
               See All New Products
             </Link>
           </div>

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Row, Col, Form, Typography, Input, Button, Layout, Breadcrumb } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from './components/WebsiteFooter';
 
 const { Content } = Layout;
-const { Text, Link, Title } = Typography;
+const { Text, Title } = Typography;
 
 const contentStyle = {
     backgroundColor: "#fff",
@@ -13,9 +14,10 @@ const contentStyle = {
   
 const CustomerLoginPage = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const handleSignIn = (values) => {
-    // Handle sign-in logic here (e.g., call API)
+    // Handle sign-in logic
     console.log("Sign-in form values:", values);
   };
 
@@ -28,8 +30,12 @@ const CustomerLoginPage = () => {
       <Content className="responsive-padding" style={contentStyle}>
         
         <Breadcrumb className="responsive-padding" separator=">" style={{ marginBottom: "1rem" }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Login</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to="/">Home</Link>
+        </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/customer/login">Login</Link>
+          </Breadcrumb.Item>
         </Breadcrumb>
 
         <Title level={2} className="responsive-padding" style={{ marginBottom: "2rem" }}>
@@ -132,13 +138,15 @@ const CustomerLoginPage = () => {
               </ul>
 
               <Button 
-              type="primary"
-              style={{
-                padding: "1rem 2rem",  
-                borderRadius: "25px",
-                fontSize: "0.9rem",
-                fontWeight: "bold",
-              }}>
+                type="primary"
+                style={{
+                  padding: "1rem 2rem",  
+                  borderRadius: "25px",
+                  fontSize: "0.9rem",
+                  fontWeight: "bold",
+                }}
+                onClick={() => navigate("/register")}
+              >
                 Create An Account
               </Button>
             </div>

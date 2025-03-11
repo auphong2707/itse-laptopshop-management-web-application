@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar } from "antd";
+import { useNavigate, Link } from 'react-router-dom';
 import { FacebookFilled, InstagramFilled, ShoppingCartOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import logo from '/vite.svg';
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 const { Header } = Layout;
 
 const headerStyle = {
@@ -18,6 +19,7 @@ const headerStyle = {
 
 const AccountMenu = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleMenuClick = (e) => {
     console.log("Clicked menu item:", e.key);
@@ -35,8 +37,18 @@ const AccountMenu = () => {
 	  <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
 	  <Menu.Item key="compare" style={{ fontWeight: "bold" }}>Compare (0)</Menu.Item>
 	  <Menu.Divider />
-	  <Menu.Item key="create" style={{ fontWeight: "bold" }}>Create an Account</Menu.Item>
-	  <Menu.Item key="signin" style={{ fontWeight: "bold" }}>Sign In</Menu.Item>
+	  <Menu.Item
+      key="signin" 
+      style={{ fontWeight: "bold" }} 
+      onClick={() => navigate("/register")}
+      >Create an Account
+    </Menu.Item>
+	  <Menu.Item 
+      key="signin" 
+      style={{ fontWeight: "bold" }} 
+      onClick={() => navigate("/customer/login")}
+      >Sign In
+    </Menu.Item>
 	</Menu>
   );
   
@@ -70,7 +82,7 @@ const WebsiteHeader = () => {
 
         <div style={{ display: "flex", flexDirection: "row", gap: "5px" }}>
           <Text strong style={{ color: "grey" }}>Visit our showroom in 1234 Street Address City Address, 1234</Text>
-          <Link strong underline style={{ color: "white" }}>Contact Us</Link>
+          <Typography.Link strong underline style={{ color: "white" }}>Contact Us</Typography.Link>
         </div>
 
         <Space>
@@ -83,15 +95,17 @@ const WebsiteHeader = () => {
       {/* Bottom Bar */}
       <Flex style={{ backgroundColor: "white", height: "60px" }} align="center" justify="space-between" className="responsive-padding">
         <Flex align="center" gap="large">
-          <img src={logo} alt="Shop Logo" className="shop-logo" align="center" />
+          <Link to="/">
+            <img src={logo} alt="Shop Logo" className="shop-logo" align="center" style={{ cursor: "pointer" }} />
+          </Link>
 
           <Flex align="center" gap="middle">
-            <Link strong style={{ color: "black" }}>Gaming Laptops</Link>
-            <Link strong style={{ color: "black" }}>Business Laptops</Link>
-            <Link strong style={{ color: "black" }}>Workstations</Link>
-            <Link strong style={{ color: "black" }}>Ultrabooks</Link>
-            <Link strong style={{ color: "black" }}>Accessories</Link>
-            <Link
+            <Typography.Link strong style={{ color: "black" }}>Gaming Laptops</Typography.Link>
+            <Typography.Link strong style={{ color: "black" }}>Business Laptops</Typography.Link>
+            <Typography.Link strong style={{ color: "black" }}>Workstations</Typography.Link>
+            <Typography.Link strong style={{ color: "black" }}>Ultrabooks</Typography.Link>
+            <Typography.Link strong style={{ color: "black" }}>Accessories</Typography.Link>
+            <Typography.Link
               strong
               style={{
                 color: "rgba(1, 86, 255, 1)",
@@ -103,7 +117,7 @@ const WebsiteHeader = () => {
               onMouseLeave={(e) => { e.target.style.backgroundColor = "white", e.target.style.color = "rgba(1, 86, 255, 1)" }}
             >
               Our Deals
-            </Link>
+            </Typography.Link>
           </Flex>
         </Flex>
 
