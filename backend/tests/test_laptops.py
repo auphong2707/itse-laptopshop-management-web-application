@@ -93,9 +93,16 @@ def test_get_latest_laptops():
     assert len(response.json()) > 0
 
 # [EDGE CASE TESTING]
-def test_create_laptop_missing_fields():
-    response = client.post("/laptops/", json={})  
-    assert response.status_code == 422  
+# [FETCHING EDGE CASES]
+def test_get_non_existent_laptop():
+    response = client.get("/laptops/id/99999") 
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Laptop not found"
+
+def test_get_latest_laptops_exceeding_limit():
+    response = client.get("/laptops/latest?limit=10000000")  # Request more than available
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)  
 
 def test_update_non_existent_laptop():
     response = client.put("/laptops/999999", json={"sale_price": 1200})  # Laptop ID 9999 does not exist
@@ -106,6 +113,11 @@ def test_delete_non_existent_laptop():
     response = client.delete("/laptops/9999999")  
     assert response.status_code == 404
     assert response.json()["detail"] == "Laptop not found"
+
+# [CREATION EDGE CASES]
+def test_create_laptop_missing_fields():
+    response = client.post("/laptops/", json={})  
+    assert response.status_code == 422 
 
 def test_create_laptop_invalid_price():
     invalid_laptop = TEST_SAMPLE.copy()
