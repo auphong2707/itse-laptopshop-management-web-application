@@ -106,3 +106,21 @@ def test_delete_non_existent_laptop():
     response = client.delete("/laptops/9999999")  
     assert response.status_code == 404
     assert response.json()["detail"] == "Laptop not found"
+
+def test_create_laptop_invalid_price():
+    invalid_laptop = TEST_SAMPLE.copy()
+    invalid_laptop["sale_price"] = -100  
+
+    response = client.post("/laptops/", json=invalid_laptop)
+    assert response.status_code == 422  
+
+def test_create_laptop_empty_fields():
+    response = client.post("/laptops/", json={"brand": "", "name": "", "price": 1500})
+    assert response.status_code == 422 
+
+def test_create_laptop_wrong_data_type():
+    invalid_laptop = TEST_SAMPLE.copy()
+    invalid_laptop["screen_size"] = "fifteen"  # Invalid type (should be float)
+
+    response = client.post("/laptops/", json=invalid_laptop)
+    assert response.status_code == 422  # Should fail validation
