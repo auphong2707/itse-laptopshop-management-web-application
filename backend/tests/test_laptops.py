@@ -74,3 +74,13 @@ def test_update_laptop():
     assert response_data["message"] == "Laptop updated successfully"
     assert response_data["laptop"]["sale_price"] == updated_data["sale_price"]
     assert response_data["laptop"]["ram_amount"] == updated_data["ram_amount"]
+
+def test_delete_laptop():
+    response = client.delete(f"/laptops/{laptop_id}")
+    assert response.status_code == 200
+    assert response.json()["message"] == "Laptop deleted successfully"
+
+def test_get_delete_laptop():
+    response = client.get(f"/laptops/id/{laptop_id}")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Laptop not found"
