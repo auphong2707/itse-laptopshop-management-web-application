@@ -38,12 +38,13 @@ TEST_SAMPLE = {
     "original_price": 2000,
     "sale_price": 1800
 }
+
+
 def test_create_laptop(client):
     '''
     Test create laptop
     '''
     global laptop_id
-
     response = client.post("/laptops/", json=TEST_SAMPLE)
     assert response.status_code == 200
     response_data = response.json() 
@@ -84,3 +85,10 @@ def test_get_delete_laptop():
     response = client.get(f"/laptops/id/{laptop_id}")
     assert response.status_code == 404
     assert response.json()["detail"] == "Laptop not found"
+
+def test_get_latest_laptops():
+    response = client.get("/laptops/latest")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    assert len(response.json()) > 0
+
