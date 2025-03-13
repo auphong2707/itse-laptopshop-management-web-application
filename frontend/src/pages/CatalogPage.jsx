@@ -49,12 +49,12 @@ const CustomButton = styled(Button)`
 
 
 const brands = [
-  { name: "asus", logo: "./public/brand-logo/asus-logo.png" },
-  { name: "lenovo", logo: "./public/brand-logo/lenovo-logo.png" },
-  { name: "acer", logo: "./public/brand-logo/acer-logo.png" },
-  { name: "dell", logo: "./public/brand-logo/dell-logo.png" },
-  { name: "hp", logo: "./public/brand-logo/hp-logo.png" },
-  { name: "msi", logo: "./public/brand-logo/msi-logo.png" },
+  { name: "asus", logo: "/public/brand-logo/asus-logo.png" },
+  { name: "lenovo", logo: "/public/brand-logo/lenovo-logo.png" },
+  { name: "acer", logo: "/public/brand-logo/acer-logo.png" },
+  { name: "dell", logo: "/public/brand-logo/dell-logo.png" },
+  { name: "hp", logo: "/public/brand-logo/hp-logo.png" },
+  { name: "msi", logo: "/public/brand-logo/msi-logo.png" },
 ];
 
 const BrandsSection = () => {
