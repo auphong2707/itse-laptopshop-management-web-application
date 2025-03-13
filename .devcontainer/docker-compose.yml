@@ -44,12 +44,26 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"  # Expose HTTP API
       - "9300:9300"  # Expose internal cluster communication
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     restart: unless-stopped
+    networks:
+      - app-network
+
+  logstash:
+    build:
+      context: ..
+      dockerfile: .devcontainer/DockerfileLogstash
+    container_name: logstash
+    depends_on:
+      - db
+      - elasticsearch
+    ports:
+      - "5044:5044"
     networks:
       - app-network
 
