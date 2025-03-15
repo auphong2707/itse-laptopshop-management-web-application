@@ -145,3 +145,36 @@ def get_posts(limit: int = Query(12), db: Session = Depends(get_db)):
     '''
     posts = db.query(Post).order_by(Post.created_at.desc()).limit(limit).all()
     return posts
+
+@app.post("/accounts")
+def create_account(user_data: FirebaseUserCreate):
+    """
+    Create a new Firebase user account.
+    """
+    try:
+        # Create user in Firebase
+        user_record = auth.create_user(
+            email=user_data.email,
+            password=user_data.password,
+            display_name=user_data.display_name,
+        )
+        return {
+            "message": "Account created successfully in Firebase",
+            "uid": user_record.uid,
+            "email": user_record.email,
+            "display_name": user_record.display_name,
+        }
+    except Exception as e:
+        # Catch any Firebase-specific errors (e.g., email already in use)
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.delete("/accounts/{uid}")
+def delete_account(uid: str):
+    """
+    Delete the user from Firebase by UID.
+    """
+    try:
+        auth.delete_user(uid)
+        return {"message": f"Account with UID {uid} deleted successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
