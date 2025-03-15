@@ -1,10 +1,21 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+import firebase_admin
+from firebase_admin import credentials, auth
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
+
+
+# Path to your downloaded service account JSON
+cred = credentials.Certificate(".json")
+
+# Initialize the default Firebase app
+firebase_admin.initialize_app(cred)
 
 app = FastAPI()
 
@@ -145,6 +156,12 @@ def get_posts(limit: int = Query(12), db: Session = Depends(get_db)):
     '''
     posts = db.query(Post).order_by(Post.created_at.desc()).limit(limit).all()
     return posts
+
+
+class FirebaseUserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    display_name: Optional[str] = None
 
 @app.post("/accounts")
 def create_account(user_data: FirebaseUserCreate):
