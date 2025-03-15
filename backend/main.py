@@ -5,20 +5,22 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 import firebase_admin
 from firebase_admin import credentials, auth
+from typing import Optional
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
 
-
+from firebase_auth import ExtendedUserCreate
 # Path to your downloaded service account JSON
-cred = credentials.Certificate(".json")
+cred = credentials.Certificate("my_service_account.json")
 
 # Initialize the default Firebase app
 firebase_admin.initialize_app(cred)
 
 app = FastAPI()
 
+db = firestore.client()
 
 origins = [
     "http://localhost:3000",
@@ -157,32 +159,37 @@ def get_posts(limit: int = Query(12), db: Session = Depends(get_db)):
     posts = db.query(Post).order_by(Post.created_at.desc()).limit(limit).all()
     return posts
 
-
-class FirebaseUserCreate(BaseModel):
-    email: EmailStr
-    password: str
-    display_name: Optional[str] = None
-
 @app.post("/accounts")
-def create_account(user_data: FirebaseUserCreate):
+def create_account(user_data: ExtendedUserCreate):
     """
-    Create a new Firebase user account.
+    Create a new Firebase user and store extended profile data in Firestore.
     """
     try:
-        # Create user in Firebase
+        # 1) Create user in Firebase Authentication
         user_record = auth.create_user(
             email=user_data.email,
             password=user_data.password,
             display_name=user_data.display_name,
+            phone_number=user_data.phone_number,
         )
+
+        # 2) Store extra profile fields in Firestore, keyed by the user's UID
+        db.collection("users").document(user_record.uid).set({
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "company": user_data.company,   
+            "address": user_data.address,
+            "country": user_data.country,
+            "zip_code": user_data.zip_code,
+            # Add as many fields as you need
+        })
+
         return {
-            "message": "Account created successfully in Firebase",
+            "message": "Account and profile created successfully",
             "uid": user_record.uid,
             "email": user_record.email,
-            "display_name": user_record.display_name,
         }
     except Exception as e:
-        # Catch any Firebase-specific errors (e.g., email already in use)
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete("/accounts/{uid}")
