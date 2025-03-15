@@ -1,11 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
-from typing import Optional
 import firebase_admin
 from firebase_admin import credentials, auth
-from typing import Optional
 
 from db.models import *
 from db.session import *

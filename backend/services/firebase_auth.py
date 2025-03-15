@@ -1,3 +1,5 @@
+from pydantic import BaseModel, EmailStr
+
 class ExtendedUserCreate(BaseModel):
     email: EmailStr
     password: str
