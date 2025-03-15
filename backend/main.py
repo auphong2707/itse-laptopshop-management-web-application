@@ -2,13 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, firestore
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
 
-from firebase_auth import ExtendedUserCreate
+from services.firebase_auth import ExtendedUserCreate
 # Path to your downloaded service account JSON
 cred = credentials.Certificate("my_service_account.json")
 
