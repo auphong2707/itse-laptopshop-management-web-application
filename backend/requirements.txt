@@ -47,3 +47,4 @@ uvloop==0.21.0
 virtualenv==20.29.2
 watchfiles==1.0.4
 websockets==15.0
+firebase-admin==6.6.0
