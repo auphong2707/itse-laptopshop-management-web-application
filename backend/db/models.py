@@ -1,5 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func, TIMESTAMP
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -7,7 +7,7 @@ class Laptop(Base):
     __tablename__ = "laptops"
 
     id = Column(Integer, primary_key=True, index=True)
-    inserted_at = Column(String, nullable=False)
+    inserted_at = Column(TIMESTAMP, server_default=func.now())
     brand = Column(String, nullable=False)
     sub_brand = Column(String)
     name = Column(String, nullable=False)
