@@ -1,3 +1,4 @@
+from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -22,6 +23,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initialize Elasticsearch Client
+es = Elasticsearch("http://localhost:9200")
+ES_INDEX = "laptops"
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Laptop Management API!"}
@@ -35,6 +40,17 @@ def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     db.add(new_laptop)
     db.commit()
     db.refresh(new_laptop)
+
+    # Index the laptop in Elasticsearch
+    es.index(index=ES_INDEX, id=new_laptop.id, body={
+        "brand": new_laptop.brand,
+        "model": new_laptop.model,
+        "ram": new_laptop.ram,
+        "storage": new_laptop.storage,
+        "price": new_laptop.price,
+        "inserted_at": str(new_laptop.inserted_at)
+    })
+
     return {"message": "Laptop added successfully", "laptop": new_laptop}
 
 @app.delete("/laptops/{laptop_id}")
@@ -48,6 +64,10 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
 
     db.delete(laptop)
     db.commit()
+
+    # Remove laptop from Elasticsearch
+    es.delete(index=ES_INDEX, id=laptop_id, ignore=[404])
+
     return {"message": "Laptop deleted successfully"}
 
 @app.put("/laptops/{laptop_id}")
@@ -66,7 +86,33 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
     db.commit()
     db.refresh(laptop)
 
+    # Update in Elasticsearch
+    es.update(index=ES_INDEX, id=laptop.id, body={"doc": update_data})
+    
     return {"message": "Laptop updated successfully", "laptop": laptop}
+
+@app.get("/search/")
+def search_laptops(
+    query: str = Query(..., description="Search query"),
+    limit: int = Query(10, description="Number of results to return")
+):
+    """
+    Full-text search based only on the 'name' and 'serial number' fields.
+    """
+    search_query = {
+        "bool": {
+            "should": [
+                {"match": {"name": query}},  # Search in "name" field
+                {"match": {"serial_number": query}}  # Search in "serial_number" field
+            ],
+            "minimum_should_match": 1  # At least one must match
+        }
+    }
+
+    results = es.search(index=ES_INDEX, body={"query": search_query, "size": limit})  # Execute search
+
+    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}  # Return results
+
 
 @app.get("/laptops/latest")
 def get_latest_laptops(
