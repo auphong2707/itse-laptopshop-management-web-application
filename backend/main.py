@@ -113,6 +113,64 @@ def search_laptops(
 
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}  # Return results
 
+@app.get("/filter/")
+def filter_laptops(
+    brand: str = Query(None, description="Filter by brand (Dell, HP, Lenovo, Asus, Apple, Acer, MSI, LG)"),
+    cpu: str = Query(None, description="Filter by CPU"),
+    vga: str = Query(None, description="Filter by VGA"),
+    ram: int = Query(None, description="Filter by RAM (8GB, 16GB, 32GB)"),
+    storage: int = Query(None, description="Filter by Storage (256GB, 512GB, 1024GB)"),
+    storage_type: str = Query(None, description="Filter by Storage Type (HDD, SSD)"),
+    screen_size: int = Query(None, description="Filter by Screen Size (13, 14, 15, 16 inches)"),
+    weight_min: float = Query(None, description="Minimum Weight"),
+    weight_max: float = Query(None, description="Maximum Weight"),
+    price_min: int = Query(None, description="Minimum Price"),
+    price_max: int = Query(None, description="Maximum Price"),
+    limit: int = Query(10, description="Number of results to return")
+):
+    """
+    Filters laptops based on brand, CPU, VGA, RAM, storage, storage type, screen size, weight, and price.
+    """
+    filter_query = {
+        "bool": {
+            "filter": []
+        }
+    }
+
+    # Apply filters dynamically based on user input
+    if brand:
+        filter_query["bool"]["filter"].append({"term": {"brand.keyword": brand}})
+    if cpu:
+        filter_query["bool"]["filter"].append({"term": {"cpu.keyword": cpu}})
+    if vga:
+        filter_query["bool"]["filter"].append({"term": {"vga.keyword": vga}})
+    if ram:
+        filter_query["bool"]["filter"].append({"term": {"ram": ram}})
+    if storage:
+        filter_query["bool"]["filter"].append({"term": {"storage": storage}})
+    if storage_type:
+        filter_query["bool"]["filter"].append({"term": {"storage_type.keyword": storage_type}})
+    if screen_size:
+        filter_query["bool"]["filter"].append({"term": {"screen_size": screen_size}})
+    if weight_min is not None or weight_max is not None:
+        weight_filter = {"range": {"weight": {}}}
+        if weight_min is not None:
+            weight_filter["range"]["weight"]["gte"] = weight_min
+        if weight_max is not None:
+            weight_filter["range"]["weight"]["lte"] = weight_max
+        filter_query["bool"]["filter"].append(weight_filter)
+    if price_min is not None or price_max is not None:
+        price_filter = {"range": {"price": {}}}
+        if price_min is not None:
+            price_filter["range"]["price"]["gte"] = price_min
+        if price_max is not None:
+            price_filter["range"]["price"]["lte"] = price_max
+        filter_query["bool"]["filter"].append(price_filter)
+
+    # Execute query in Elasticsearch
+    results = es.search(index=ES_INDEX, body={"query": filter_query, "size": limit})
+
+    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
 @app.get("/laptops/latest")
 def get_latest_laptops(
