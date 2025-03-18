@@ -115,22 +115,23 @@ def search_laptops(
 
 @app.get("/filter/")
 def filter_laptops(
-    brand: str = Query(None, description="Filter by brand (Dell, HP, Lenovo, Asus, Apple, Acer, MSI, LG)"),
-    cpu: str = Query(None, description="Filter by CPU"),
-    vga: str = Query(None, description="Filter by VGA"),
-    ram: int = Query(None, description="Filter by RAM (8GB, 16GB, 32GB)"),
-    storage: int = Query(None, description="Filter by Storage (256GB, 512GB, 1024GB)"),
-    storage_type: str = Query(None, description="Filter by Storage Type (HDD, SSD)"),
-    screen_size: int = Query(None, description="Filter by Screen Size (13, 14, 15, 16 inches)"),
-    weight_min: float = Query(None, description="Minimum Weight"),
-    weight_max: float = Query(None, description="Maximum Weight"),
     price_min: int = Query(None, description="Minimum Price"),
     price_max: int = Query(None, description="Maximum Price"),
+    brand: str = Query(None, description="Filter by brand (Dell, HP, Lenovo, Asus, Apple, Acer, MSI)"),
+    sub_brand: list = Query([], description="Filter by sub-brand (e.g., ROG, TUF, ZenBook, VivoBook)"),
+    cpu: list = Query([], description="Filter by CPU (AMD Ryzen 3, 5, 7, 9; Intel Core i3, i5, i7, i9; Apple M1, M2, M3, M4)"),
+    vga: list = Query([], description="Filter by VGA (e.g., Nvidia MX, GTX, RTX 20 Series, AMD Radeon RX)"),
+    ram: int = Query(None, description="Filter by RAM (8GB, 16GB, 32GB, 64GB)"),
+    storage: int = Query(None, description="Filter by Storage (256GB, 512GB, 1024GB)"),
+    screen_size: int = Query(None, description="Filter by Screen Size (13, 14, 15, 16, 17 inches)"),
+    weight_min: float = Query(None, description="Minimum Weight"),
+    weight_max: float = Query(None, description="Maximum Weight"),
     limit: int = Query(10, description="Number of results to return")
 ):
     """
     Filters laptops based on brand, CPU, VGA, RAM, storage, storage type, screen size, weight, and price.
     """
+
     filter_query = {
         "bool": {
             "filter": []
@@ -140,16 +141,16 @@ def filter_laptops(
     # Apply filters dynamically based on user input
     if brand:
         filter_query["bool"]["filter"].append({"term": {"brand.keyword": brand}})
+    if sub_brand:
+        filter_query["bool"]["filter"].append({"terms": {"sub_brand.keyword": sub_brand}})
     if cpu:
-        filter_query["bool"]["filter"].append({"term": {"cpu.keyword": cpu}})
+        filter_query["bool"]["filter"].append({"terms": {"cpu.keyword": cpu}})
     if vga:
-        filter_query["bool"]["filter"].append({"term": {"vga.keyword": vga}})
+        filter_query["bool"]["filter"].append({"terms": {"vga.keyword": vga}})
     if ram:
         filter_query["bool"]["filter"].append({"term": {"ram": ram}})
     if storage:
         filter_query["bool"]["filter"].append({"term": {"storage": storage}})
-    if storage_type:
-        filter_query["bool"]["filter"].append({"term": {"storage_type.keyword": storage_type}})
     if screen_size:
         filter_query["bool"]["filter"].append({"term": {"screen_size": screen_size}})
     if weight_min is not None or weight_max is not None:
