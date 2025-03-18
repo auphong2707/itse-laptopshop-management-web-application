@@ -2,47 +2,72 @@ import React, { useState } from "react";
 import { Form, Input, InputNumber, Button, Upload, Row, Col, Layout, Typography, Breadcrumb, Tabs } from "antd";
 import { Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import styled from "styled-components";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 
 const { Content } = Layout;
 const { Title } = Typography;
 
+const CustomUpload = styled(Upload)`
+  width: 100%;
+  height: 100%;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgb(136, 38, 38);
+  
+  // Optional: Style the inner div (the "Add pictures" area)
+  .ant-upload-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: #868e96;
+    background: #F5F7FF;
+  }
+`;
+
 const RequiredLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>
 	  {label}<span style={{ color: "red", marginLeft: 4 }}>*</span>
 	</span>
-  );
+);
   
-  const OptionalLabel = ({ label }) => (
+const OptionalLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>{label}</span>
-  );
+);
 
-  const AddingProducts = () => {
+const AddingProducts = () => {
 	const [form] = Form.useForm();
 
-	const inputStyle = { width: "60%" };
+	const inputStyle = { width: "50%" };
 	const sectionTitleStyle = { fontSize: "20px", fontWeight: "bold", marginTop: "2rem" };
 
 	return (
-	  <div style={{ padding: "2rem 0" }}>
-		<Form 
+		<div style={{ padding: "2rem 0" }}>
+			<Form 
 			layout="horizontal" 
 			form={form}
 			labelCol={{ span: 4 }}
 			wrapperCol={{ span: 20 }}
 			labelAlign="left"
 			colon={false}
-		>
+			>
 			{/* Flex Container chính */}
 			<div style={{ display: "flex", gap: "2rem" }}>
 
 				{/* Phần bên trái: Form fields */}
-				<div style={{ flex: 2 }}>
+				<div style={{ flex: 3 }}>
 
 					{/* General Information */}
 					<h3 style={sectionTitleStyle}>General Information</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="Brand" />} name="brand">
@@ -60,7 +85,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Performance */}
 					<h3 style={sectionTitleStyle}>Performance</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="CPU" />} name="cpu">
@@ -78,7 +103,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Display */}
 					<h3 style={sectionTitleStyle}>Display</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="Size" />} name="size">
@@ -96,7 +121,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Battery and Power */}
 					<h3 style={sectionTitleStyle}>Battery and Power</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="Battery Capacity" />} name="batteryCapacity">
@@ -108,7 +133,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Physical Dimensions and Weight */}
 					<h3 style={sectionTitleStyle}>Physical Dimensions and Weight</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="Width" />} name="width">
@@ -126,7 +151,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Connectivity and Ports */}
 					<h3 style={sectionTitleStyle}>Connectivity and Ports</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="USB-A Ports" />} name="usbAPorts">
@@ -194,7 +219,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Other features */}
 					<h3 style={sectionTitleStyle}>Other features</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<OptionalLabel label="Webcam" />} name="webcam">
@@ -203,7 +228,7 @@ const RequiredLabel = ({ label }) => (
 
 					{/* Price */}
 					<h3 style={sectionTitleStyle}>Price</h3>
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "70%" }}>
 						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
 					</div>
 					<Form.Item label={<RequiredLabel label="Price" />} name="price">
@@ -216,20 +241,29 @@ const RequiredLabel = ({ label }) => (
 					</Form.Item>
 				</div>
 
-				{/* Phần bên phải: Upload Pictures */}
-				<div style={{ flex: 1, textAlign: "center", marginTop: "4rem" }}>
-					<h3 style={sectionTitleStyle}>Add pictures</h3>
-					<div style={{ width: "100%" }}>
-						<Divider style={{ margin: "8px auto 24px auto", borderTopWidth: "2px" }} />
+				<div style={{ flex: 2 }}>
+
+				<Form.Item name="pictures">
+					<CustomUpload
+					action="/upload"
+					listType="picture-card"
+					>
+					<div style={{
+						width: "100%",
+						height: "100%",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						fontSize: "40px",
+					}}>
+						<PlusOutlined />
 					</div>
-					<Form.Item name="pictures">
-						<Upload action="/upload" listType="picture-card">
-							<div style={{ fontSize: "64px", padding: "80px 60px" }}>
-								<PlusOutlined />
-								<div style={{ marginTop: 12, fontSize: "18px" }}>Upload images</div>
-							</div>
-						</Upload>
-					</Form.Item>
+					</CustomUpload>
+					<span style={{ fontWeight: "bold", fontSize: "16px", marginTop: "8px" }}>
+					Add pictures
+					</span>
+				</Form.Item>
+
 				</div>
 			</div>
 		</Form>
