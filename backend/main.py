@@ -9,15 +9,14 @@ from db.session import *
 from schemas.laptops import *
 
 from services.firebase_auth import ExtendedUserCreate
-# Path to your downloaded service account JSON
-cred = credentials.Certificate("my_service_account.json")
-
-# Initialize the default Firebase app
-firebase_admin.initialize_app(cred)
+try :
+    cred = credentials.Certificate("secret/firebase-service-key.json")
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+except FileNotFoundError:
+    print("File not found. Therefore, firebase service is unavailable.")
 
 app = FastAPI()
-
-db = firestore.client()
 
 origins = [
     "http://localhost:3000",
