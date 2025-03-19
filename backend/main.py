@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 # Initialize Elasticsearch Client
-es = Elasticsearch("http://localhost:9200")
+es = Elasticsearch("http://elasticsearch:9200")
 ES_INDEX = "laptops"
 
 @app.get("/")
