@@ -1,37 +1,26 @@
 import React, { useState } from "react";
-import { Form, Input, InputNumber, Button, Upload, Row, Col, Layout, Typography, Breadcrumb, Tabs } from "antd";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import { Form, Input, InputNumber, Button, Layout, Typography, Breadcrumb, Tabs } from "antd";
 import { Divider } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import styled from "styled-components";
+import { CloseOutlined, EditOutlined } from "@ant-design/icons";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 
 const { Content } = Layout;
 const { Title } = Typography;
 
-const CustomUpload = styled(Upload)`
-  width: 100%;
-  height: 100%;
-  border-radius: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid rgb(136, 38, 38);
-  
-  // Optional: Style the inner div (the "Add pictures" area)
-  .ant-upload-select {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 40px;
-  }
+const sectionTitleStyle = { fontSize: "20px", fontWeight: "bold", marginTop: "2rem" };
 
-  &:hover,
-  &:focus {
-    border-color: #868e96;
-    background: #F5F7FF;
-  }
-`;
+const CustomDivider = ({ label }) => (
+	<>
+		<h3 style={sectionTitleStyle}>{label}</h3>
+		<div style={{ width: "50%" }}>
+			<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
+		</div>
+	</>
+);
 
 const RequiredLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>
@@ -43,11 +32,20 @@ const OptionalLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>{label}</span>
 );
 
-const AddingProducts = () => {
+const Detail = () => {
 	const [form] = Form.useForm();
 
-	const inputStyle = { width: "50%" };
-	const sectionTitleStyle = { fontSize: "20px", fontWeight: "bold", marginTop: "2rem" };
+	const [pictures, setPictures] = useState([]);
+
+  	const handleAddPicture = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			const newPicture = URL.createObjectURL(file);
+			setPictures((prev) => [...prev, newPicture]);
+		}
+	};
+
+	const inputStyle = { width: "40%" };
 
 	return (
 		<div style={{ padding: "2rem 0" }}>
@@ -63,13 +61,10 @@ const AddingProducts = () => {
 			<div style={{ display: "flex", gap: "2rem" }}>
 
 				{/* Phần bên trái: Form fields */}
-				<div style={{ flex: 3 }}>
+				<div style={{ flex: 2 }}>
 
 					{/* General Information */}
-					<h3 style={sectionTitleStyle}>General Information</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="General Information" />
 					<Form.Item label={<RequiredLabel label="Brand" />} name="brand">
 						<Input style={inputStyle}/>
 					</Form.Item>
@@ -84,10 +79,7 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Performance */}
-					<h3 style={sectionTitleStyle}>Performance</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Performance" />
 					<Form.Item label={<RequiredLabel label="CPU" />} name="cpu">
 						<Input style={inputStyle}/>
 					</Form.Item>
@@ -102,10 +94,7 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Display */}
-					<h3 style={sectionTitleStyle}>Display</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Display" />
 					<Form.Item label={<RequiredLabel label="Size" />} name="size">
 						<Input style={inputStyle}/>
 					</Form.Item>
@@ -120,10 +109,7 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Battery and Power */}
-					<h3 style={sectionTitleStyle}>Battery and Power</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Battery and Power" />
 					<Form.Item label={<RequiredLabel label="Battery Capacity" />} name="batteryCapacity">
 						<Input style={inputStyle}/>
 					</Form.Item>
@@ -132,10 +118,7 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Physical Dimensions and Weight */}
-					<h3 style={sectionTitleStyle}>Physical Dimensions and Weight</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Physical Dimensions and Weight" />
 					<Form.Item label={<RequiredLabel label="Width" />} name="width">
 						<Input style={inputStyle}/>
 					</Form.Item>
@@ -150,10 +133,7 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Connectivity and Ports */}
-					<h3 style={sectionTitleStyle}>Connectivity and Ports</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Connectivity and Ports" />
 					<Form.Item label={<RequiredLabel label="USB-A Ports" />} name="usbAPorts">
 						<InputNumber min={0} style={{ width: "60px", fontWeight: "bold", backgroundColor: "#d9d9d9" }} />
 					</Form.Item>
@@ -218,19 +198,13 @@ const AddingProducts = () => {
 					</Form.Item>
 
 					{/* Other features */}
-					<h3 style={sectionTitleStyle}>Other features</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Other features" />
 					<Form.Item label={<OptionalLabel label="Webcam" />} name="webcam">
 						<Input style={inputStyle}/>
 					</Form.Item>
 
 					{/* Price */}
-					<h3 style={sectionTitleStyle}>Price</h3>
-					<div style={{ width: "70%" }}>
-						<Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-					</div>
+					<CustomDivider label="Price" />
 					<Form.Item label={<RequiredLabel label="Price" />} name="price">
 						<InputNumber suffix="đ" style={inputStyle}/>
 					</Form.Item>
@@ -241,27 +215,37 @@ const AddingProducts = () => {
 					</Form.Item>
 				</div>
 
-				<div style={{ flex: 2 }}>
+				<div style={{ position: "absolute", right: "90px", top: "120px", flex: 1 }}>
 
 				<Form.Item name="pictures">
-					<CustomUpload
-					action="/upload"
-					listType="picture-card"
-					>
-					<div style={{
-						width: "100%",
-						height: "100%",
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center",
-						fontSize: "40px",
-					}}>
-						<PlusOutlined />
-					</div>
-					</CustomUpload>
-					<span style={{ fontWeight: "bold", fontSize: "16px", marginTop: "8px" }}>
-					Add pictures
-					</span>
+					<Swiper
+					modules={[Navigation]}
+					navigation
+					spaceBetween={40}
+					slidesPerView={1}
+					style={{ width: '500px', height: '400px', padding: '1rem'}}
+				>
+					{pictures.map((picture, index) => (
+					<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+						<img
+						src={picture}
+						alt={`Picture ${index + 1}`}
+						style={{ width: '500px', height: '400px', objectFit: 'cover', borderRadius: '0px' }}
+						/>
+					</SwiperSlide>
+					))}
+					<SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+					<label style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #aaa', borderRadius: '8px' }}>
+						Add picture
+						<input
+						type="file"
+						accept="image/*"
+						style={{ display: 'none' }}
+						onChange={handleAddPicture}
+						/>
+					</label>
+					</SwiperSlide>
+				</Swiper>
 				</Form.Item>
 
 				</div>
@@ -272,17 +256,111 @@ const AddingProducts = () => {
 };
 
 
-const DeletingProducts = () => (
-	<div>
-		
-	</div>
-);
-
-const Details = () => (
-	<div>
-
-	</div>
-);
+const DeletingProducts = () => {
+	const products = [
+	  { id: 1, name: "TEN MAY TINH", image: "path/to/image1.jpg" },
+	  { id: 2, name: "TEN MAY TINH", image: "path/to/image2.jpg" }
+	];
+  
+	return (
+	  <div style={{ padding: "2rem 0" }}>
+		<input 
+		  type="text" 
+		  placeholder="Search for item" 
+		  style={{
+			width: "50%",
+			padding: "0.5rem",
+			marginBottom: "1rem",
+			border: "1px solid #ddd",
+			borderRadius: "12px"
+		  }}
+		/>
+		{products.map((product) => (
+		  <div
+			key={product.id}
+			style={{
+			  display: "flex",
+			  alignItems: "center",
+			  padding: "1rem",
+			  borderBottom: "1px solid #ddd",
+			  width: "50%"
+			}}
+		  >
+			<img
+			  src={product.image}
+			  alt={product.name}
+			  style={{
+				width: "80px",
+				height: "80px",
+				objectFit: "cover",
+				marginRight: "1rem"
+			  }}
+			/>
+			<span style={{ flexGrow: 1, fontWeight: "bold", marginRight: "0.5rem" }}>
+			  {product.name}
+			</span>
+			<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+			  <button
+				style={{
+				  width: "32px",
+				  height: "32px",
+				  borderRadius: "50%",
+				  border: "none",
+				  background: "#f5f5f5",
+				  cursor: "pointer",
+				  color: "#a6a6a6",
+				  display: "flex",
+				  alignItems: "center",
+				  justifyContent: "center",
+				  transition: "background-color 0.3s, transform 0.3s"
+				}}
+				onMouseEnter={(e) => {
+				  e.currentTarget.style.backgroundColor = "#ddd";
+				  e.currentTarget.style.transform = "scale(1.1)";
+				  e.currentTarget.style.color = "#595959";
+				}}
+				onMouseLeave={(e) => {
+				  e.currentTarget.style.backgroundColor = "#f5f5f5";
+				  e.currentTarget.style.transform = "scale(1)";
+				  e.currentTarget.style.color = "#a6a6a6";
+				}}
+			  >
+				<CloseOutlined />
+			  </button>
+  
+			  <button
+				style={{
+				  width: "32px",
+				  height: "32px",
+				  borderRadius: "50%",
+				  border: "none",
+				  background: "#f5f5f5",
+				  cursor: "pointer",
+				  color: "#a6a6a6",
+				  display: "flex",
+				  alignItems: "center",
+				  justifyContent: "center",
+				  transition: "background-color 0.3s, transform 0.3s"
+				}}
+				onMouseEnter={(e) => {
+				  e.currentTarget.style.backgroundColor = "#ddd";
+				  e.currentTarget.style.transform = "scale(1.1)";
+				  e.currentTarget.style.color = "#595959";
+				}}
+				onMouseLeave={(e) => {
+				  e.currentTarget.style.backgroundColor = "#f5f5f5";
+				  e.currentTarget.style.transform = "scale(1)";
+				  e.currentTarget.style.color = "#a6a6a6";
+				}}
+			  >
+				<EditOutlined />
+			  </button>
+			</div>
+		  </div>
+		))}
+	  </div>
+	);
+  };
 
 const AdminTabs = ({ tabLabels, tabContents }) => {
 	const [activeTab, setActiveTab] = useState("0");
@@ -343,11 +421,10 @@ const AdministratorPage = () => {
 
         {/* Tabs Section */}
         <AdminTabs
-				 tabLabels={["Adding products", "Deleting products", "Details"]}
+				 tabLabels={["Detail", "Deleting products"]}
 				 tabContents = {[
-					AddingProducts(),
+					Detail(),
 					DeletingProducts(),
-					Details(),
 					]}
 				/>
       </Content>
