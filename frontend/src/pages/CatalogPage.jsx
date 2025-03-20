@@ -1,4 +1,5 @@
 import { Layout, Breadcrumb, Typography, Select, Pagination, Button, Collapse, Checkbox, Divider, Slider, InputNumber } from "antd";
+import { useState } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
@@ -48,12 +49,12 @@ const CustomButton = styled(Button)`
 
 
 const brands = [
-  { name: "asus", logo: "./public/brand-logo/asus-logo.png" },
-  { name: "lenovo", logo: "./public/brand-logo/lenovo-logo.png" },
-  { name: "acer", logo: "./public/brand-logo/acer-logo.png" },
-  { name: "dell", logo: "./public/brand-logo/dell-logo.png" },
-  { name: "hp", logo: "./public/brand-logo/hp-logo.png" },
-  { name: "msi", logo: "./public/brand-logo/msi-logo.png" },
+  { name: "asus", logo: "/public/brand-logo/asus-logo.png" },
+  { name: "lenovo", logo: "/public/brand-logo/lenovo-logo.png" },
+  { name: "acer", logo: "/public/brand-logo/acer-logo.png" },
+  { name: "dell", logo: "/public/brand-logo/dell-logo.png" },
+  { name: "hp", logo: "/public/brand-logo/hp-logo.png" },
+  { name: "msi", logo: "/public/brand-logo/msi-logo.png" },
 ];
 
 const BrandsSection = () => {
@@ -312,7 +313,9 @@ const FilterSection = () => {
 };
 
 
-const CatalogPage = () => {
+const CatalogPage = ({ inputBrand }) => {
+	const [brand, setBrand] = useState(inputBrand);
+
 	return (
 		<Layout>
 			<WebsiteHeader />
@@ -334,7 +337,7 @@ const CatalogPage = () => {
 					</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Title level={1}>ASUS Laptop</Title>
+				<Title level={1}>{brand} Laptop</Title>
 
 				<br></br>
 
