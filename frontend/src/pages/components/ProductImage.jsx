@@ -15,11 +15,13 @@ const imageSources = [
 const ProductImage = () => {
   return (
     <div style={{
+      position: "absolute",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       gap: "20px",
-      paddingRight: "8rem",
+      top: "300px",
+      right: "150px",
       paddingTop: "-2rem",
     }}>
       

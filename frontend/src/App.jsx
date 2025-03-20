@@ -1,38 +1,68 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import AdministratorPage from './pages/AdministratorPage';
+import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
+import AdministratorPage from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";
-import CustomerLoginPage from './pages/CustomerLoginPage';
+import CustomerLoginPage from "./pages/CustomerLoginPage";
 import HomePage from "./pages/HomePage";
 import ProductPage from "./pages/ProductPage";
-import RegisterPage from './pages/RegisterPage';
+import RegisterPage from "./pages/RegisterPage";
 import "./App.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: (
+      <>
+        <ScrollRestoration />
+        <HomePage />
+      </>
+    ),
   },
   {
     path: "/customer/login",
-    element: <CustomerLoginPage />,
+    element: (
+      <>
+        <ScrollRestoration />
+        <CustomerLoginPage />
+      </>
+    ),
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <>
+        <ScrollRestoration />
+        <RegisterPage />
+      </>
+    ),
   },
   {
     path: "admin",
-    element: <AdministratorPage />,
+    element: (
+      <>
+        <ScrollRestoration />
+        <AdministratorPage />
+      </>
+    ),
   },
   {
     path: "/laptops/",
-    element: <CatalogPage inputBrand="All" />,
+    element: (
+      <>
+        <ScrollRestoration />
+        <CatalogPage inputBrand="All" />
+      </>
+    ),
   },
   {
     path: "/product/:id",
-    element: <ProductPage />,
-  }
+    element: (
+      <>
+        <ScrollRestoration />
+        <ProductPage />
+      </>
+    ),
+  },
 ]);
 
 function App() {
@@ -40,7 +70,7 @@ function App() {
     <div>
       <RouterProvider router={router} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { data, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image} from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
@@ -31,65 +32,90 @@ const ProductHeader = ({ title, series }) => (
   </>
 );
 
-const ExtraInfo = () => (
-  <div style={{ marginTop: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+const ExtraInfo = ({productId}) => (
+  <div style={{ marginTop: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", paddingBottom: "50px" }}>
     <Text style={{ fontWeight: "bold" }}>
       Have a Question? <Link href="#" style={{ textDecoration: "underline" }}>Contact Us</Link>
     </Text>
-    <Text>SKU D5515AI</Text>
-    <div style={{ fontWeight: "bold", cursor: "pointer", marginTop: "4rem", marginBottom: "8rem" ,width: "100%" }}>
-      + MORE INFORMATION
-    </div>
+    <Text>VN-{productId}</Text>
   </div>
 );
 
-const AboutProduct = () => (
-  <div style={{ maxWidth: "100%", paddingLeft: "2%", paddingRight: "0%" }}>
-    <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
+const AboutProduct = ({ title, series, description, id }) => (
+  <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
+    <ProductHeader title={title} series={series} />
     <p style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.6" }}>
-    MSI MPG Trident 3 10SC-005AU Intel i7 10700F, 2060 SUPER, 16GB RAM, 512GB SSD, 2TB HDD, Windows 10 Home, Gaming Keyboard and Mouse 3 Years Warranty Gaming Desktop
+      {description}
     </p>
-    <ExtraInfo />
+    <ExtraInfo productId={id}/>
   </div>
 );
 
-const Details = () => (
-  <div style={{ maxWidth: "100%", paddingLeft: "2%", paddingRight: "0%" }}>
-    <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
-    <ul style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.8" }}>
-      <li>Intel Core i7-10700F</li>
-      <li>Intel H470</li>
-      <li>WiFi 6</li>
-      <li>NVIDIA MSI GeForce RTX 2080 SUPER 8GB GDDR6</li>
-      <li>2x DDR4 Slots (64GB Max)</li>
-      <li>512GB SSD (SATA) + 2TB HDD</li>
-      <li>Gaming Keyboard & Mouse</li>
-    </ul>
-    <ExtraInfo />
-  </div>
-);
-
-const Specs = () => (
-  <div style={{ maxWidth: "100%", paddingLeft: "2%", paddingRight: "0%" }}>
-    <ProductHeader title="MSI MPG Trident 3" series="MSI MPG Series" />
+const Specs = ({ data, id }) => (
+  <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
+    <ProductHeader title={data.name} series={data.brand} />
     <Table
       columns={[
         { title: "Category", dataIndex: "category", key: "category" },
         { title: "Details", dataIndex: "details", key: "details" }
       ]}
       dataSource={[
-        { key: "1", category: "CPU", details: "Intel Core i7-10700F" },
-        { key: "2", category: "RAM", details: "16GB DDR4" },
-        { key: "3", category: "Storage", details: "512GB SSD + 2TB HDD" }
+        { key: "1", category: "CPU", details: data.cpu },
+        { key: "2", category: "RAM", details: `${data.ram_amount}GB (${data.ram_type})` },
+        { key: "3", category: "Storage", details: `${data.storage_amount}GB ${data.storage_type}` },
+        { key: "4", category: "Screen Size", details: `${data.screen_size} inches` },
+        { key: "5", category: "Screen Resolution", details: data.screen_resolution },
+        { key: "6", category: "Screen Refresh Rate", details: `${data.screen_refresh_rate}Hz` },
+        { key: "7", category: "Battery Capacity", details: `${data.battery_capacity}Wh (${data.battery_cells} cells)` },
+        { key: "8", category: "Graphics Card (VGA)", details: data.vga },
+        { key: "9", category: "Operating System", details: data.default_os },
+        { key: "10", category: "Weight", details: `${data.weight} kg` },
+        { key: "11", category: "HDMI Ports", details: data.number_hdmi_ports },
+        { key: "12", category: "USB-C Ports", details: data.number_usb_c_ports },
+        { key: "13", category: "USB-A Ports", details: data.number_usb_a_ports },
+        { key: "14", category: "Ethernet Ports", details: data.number_ethernet_ports },
+        { key: "15", category: "Audio Jacks", details: data.number_audio_jacks },
+        { key: "16", category: "Webcam Resolution", details: data.webcam_resolution },
+        { key: "17", category: "Width", details: `${data.width} cm` },
+        { key: "18", category: "Depth", details: `${data.depth} cm` },
+        { key: "19", category: "Height", details: `${data.height} cm` },
+        { key: "20", category: "Warranty", details: `${data.warranty} months` },
       ]}
       pagination={false}
       bordered
     />
-    <ExtraInfo />
+    <ExtraInfo productId={id}/>
   </div>
 );
 
+const transformData = (data) => {
+  return {
+    ...data,
+    name: data["name"].toUpperCase(),
+    brand: data["brand"].toUpperCase(),
+    cpu: data["cpu"] ? data["cpu"].toUpperCase() : "N/A",
+    ram_type: data["ram_type"].toUpperCase(),
+    storage_type: data["storage_type"].toUpperCase(),
+    vga: data["vga"] ? data["vga"].toUpperCase() : "N/A",
+    default_os: data["default_os"]
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" "),
+  };
+};
+
 const ProductPage = () => {
+  const { id } = useParams();
+  const [productData, setProductData] = useState({});
+  useEffect(() => {
+    fetch(`http://localhost:8000/laptops/id/${id}`)
+      .then((response) => response.json())
+      .then((data) => transformData(data))
+      .then((data) => setProductData(data));
+  }, [id]);  
+
+  console.log(productData);
+
   return (
     <Layout>
       <WebsiteHeader />
@@ -102,15 +128,14 @@ const ProductPage = () => {
         height: "100%"
       }}>
 
-        <Purchase />
+        <Purchase price={productData.sale_price} />
         {/* Left Side: Product Tabs */}
         <div style={{ width: "70%", paddingLeft: "7%" }}>
           <ProductTabs
-            tabLabels={["About Product", "Details", "Specs"]}
+            tabLabels={["About Product", "Specs"]}
             tabContents={[
-              AboutProduct(),
-              Details(),
-              Specs()
+              AboutProduct({title:productData["name"], series:productData["brand"], description:productData["description"], id:id}),
+              Specs({data:productData, id:id})
             ]}
           />
         </div>
