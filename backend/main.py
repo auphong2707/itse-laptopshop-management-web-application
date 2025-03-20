@@ -127,15 +127,22 @@ def filter_laptops(
     if sub_brand:
         filter_query["bool"]["filter"].append({"terms": {"sub_brand.keyword": sub_brand}})
     if cpu:
-        filter_query["bool"]["filter"].append({"terms": {"cpu.keyword": cpu}})
+        filter_query["bool"]["filter"].append({"terms": {"cpu": cpu}})
     if vga:
-        filter_query["bool"]["filter"].append({"terms": {"vga.keyword": vga}})
+        filter_query["bool"]["filter"].append({"terms": {"vga": vga}})
     if ram:
-        filter_query["bool"]["filter"].append({"term": {"ram": ram}})
+        filter_query["bool"]["filter"].append({"term": {"ram_amount": ram}})
     if storage:
-        filter_query["bool"]["filter"].append({"term": {"storage": storage}})
+        filter_query["bool"]["filter"].append({"term": {"storage_amount": storage}})
     if screen_size:
-        filter_query["bool"]["filter"].append({"term": {"screen_size": screen_size}})
+        filter_query["bool"]["filter"].append({
+            "range": {
+                "screen_size": {
+                    "gte": screen_size,  # Allow small variation below
+                    "lte": screen_size + 0.6   # Allow small variation above
+                }
+            }
+        })
     if weight_min is not None or weight_max is not None:
         weight_filter = {"range": {"weight": {}}}
         if weight_min is not None:
@@ -144,11 +151,11 @@ def filter_laptops(
             weight_filter["range"]["weight"]["lte"] = weight_max
         filter_query["bool"]["filter"].append(weight_filter)
     if price_min is not None or price_max is not None:
-        price_filter = {"range": {"price": {}}}
+        price_filter = {"range": {"sale_price": {}}}
         if price_min is not None:
-            price_filter["range"]["price"]["gte"] = price_min
+            price_filter["range"]["sale_price"]["gte"] = price_min
         if price_max is not None:
-            price_filter["range"]["price"]["lte"] = price_max
+            price_filter["range"]["sale_price"]["lte"] = price_max
         filter_query["bool"]["filter"].append(price_filter)
 
     # Execute query in Elasticsearch
