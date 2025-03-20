@@ -2,13 +2,22 @@ from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+import firebase_admin
+from firebase_admin import credentials, auth, firestore
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
 
-app = FastAPI()
+from services.firebase_auth import ExtendedUserCreate
+try :
+    cred = credentials.Certificate("secret/firebase-service-key.json")
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+except FileNotFoundError:
+    print("File not found. Therefore, firebase service is unavailable.")
 
+app = FastAPI()
 
 origins = [
     "http://localhost:3000",
@@ -241,3 +250,47 @@ def get_posts(limit: int = Query(12)):
     '''
     results = es.search(index="posts", body={"query": {"match_all": {}}, "size": limit})
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+
+@app.post("/accounts")
+def create_account(user_data: ExtendedUserCreate):
+    """
+    Create a new Firebase user and store extended profile data in Firestore.
+    """
+    try:
+        # 1) Create user in Firebase Authentication
+        user_record = auth.create_user(
+            email=user_data.email,
+            password=user_data.password,
+            display_name=user_data.display_name,
+            phone_number=user_data.phone_number,
+        )
+
+        # 2) Store extra profile fields in Firestore, keyed by the user's UID
+        db.collection("users").document(user_record.uid).set({
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "company": user_data.company,   
+            "address": user_data.address,
+            "country": user_data.country,
+            "zip_code": user_data.zip_code,
+            # Add as many fields as you need
+        })
+
+        return {
+            "message": "Account and profile created successfully",
+            "uid": user_record.uid,
+            "email": user_record.email,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.delete("/accounts/{uid}")
+def delete_account(uid: str):
+    """
+    Delete the user from Firebase by UID.
+    """
+    try:
+        auth.delete_user(uid)
+        return {"message": f"Account with UID {uid} deleted successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
