@@ -45,6 +45,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - action.destructive_requires_name=false
     ports:
       - "9200:9200"  # Expose HTTP API
       - "9300:9300"  # Expose internal cluster communication
