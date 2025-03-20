@@ -103,25 +103,25 @@ const HomePage = () => {
       try {
         // Fetch general latest laptops (limit 20)
         const newProductRequest = axios.get(
-          'http://localhost:8000/laptops/latest?projection=product-card&limit=20'
-        ).then(response => transformLaptopData(response.data));
+          'http://localhost:8000/laptops/latest?limit=20'
+        ).then(response => transformLaptopData(response.data['results']));
   
         // Fetch brand-specific laptops
         const brandRequests = Object.entries(brands).flatMap(([brand, subBrands]) =>
           subBrands.map(subBrand =>
-            axios.get(`http://localhost:8000/laptops/latest?projection=product-card&brand=${brand}&subbrand=${subBrand}`)
-              .then(response => ({ brand, subBrand, data: transformLaptopData(response.data) }))
+            axios.get(`http://localhost:8000/laptops/latest?brand=${brand}&subbrand=${subBrand}`)
+              .then(response => ({ brand, subBrand, data: transformLaptopData(response.data['results']) }))
           )
         );
 
         // Fetch testimonials
         const testimonialRequest = axios.get(
           'http://localhost:8000/reviews?rating=5'
-        ).then(response => transformTestimonialData(response.data));
+        ).then(response => transformTestimonialData(response.data['results']));
 
         const postRequest = axios.get(
           'http://localhost:8000/posts?limit=18'
-        ).then(response => transformPostData(response.data));
+        ).then(response => transformPostData(response.data['results']));
   
         // Await all requests together
         const [newProductData, testimonialData, postData, ...brandResults] = await Promise.all([
