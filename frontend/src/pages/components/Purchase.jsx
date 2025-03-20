@@ -1,16 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Select, Typography, Flex } from "antd";
 
 const { Text } = Typography;
 
-const Purchase = () => {
+const formatPrice = ( price, quantity ) => {
+  if (isNaN(price) || price === null || price === undefined) {
+    return "N/A";
+  }
+  price = price * quantity;
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const Purchase = ({price}) => {
   const [quantity, setQuantity] = useState(1);
-  const price = 3299.0;
-  const totalPrice = price * quantity;
 
   const handleQuantityChange = (value) => {
     setQuantity(value);
   };
+
+  price = formatPrice(price, quantity);
 
   return (
     <div style={{ 
@@ -28,7 +36,7 @@ const Purchase = () => {
       <Flex style={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }} gap="16px">
         {/* Price Display */}
         <Text style={{ fontSize: "16px" }}>
-          On Sale from <strong>${totalPrice.toFixed(2)}</strong>
+          On Sale from <strong>{price}₫</strong>
         </Text>
 
         {/* Quantity Selector */}

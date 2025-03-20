@@ -35,7 +35,8 @@ const transformLaptopData = (data) => {
       imgSource: item.product_image_mini,
       inStock: item.quantity > 0,
       rate: item.rate,
-      salePrice: item.sale_price
+      salePrice: item.sale_price,
+      productId: item.id
     };
   });
 };
