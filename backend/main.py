@@ -41,16 +41,6 @@ def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_laptop)
 
-    # Index the laptop in Elasticsearch
-    es.index(index=ES_INDEX, id=new_laptop.id, body={
-        "brand": new_laptop.brand,
-        "model": new_laptop.model,
-        "ram": new_laptop.ram,
-        "storage": new_laptop.storage,
-        "price": new_laptop.price,
-        "inserted_at": str(new_laptop.inserted_at)
-    })
-
     return {"message": "Laptop added successfully", "laptop": new_laptop}
 
 @app.delete("/laptops/{laptop_id}")
@@ -64,9 +54,6 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
 
     db.delete(laptop)
     db.commit()
-
-    # Remove laptop from Elasticsearch
-    es.delete(index=ES_INDEX, id=laptop_id, ignore=[404])
 
     return {"message": "Laptop deleted successfully"}
 
@@ -85,9 +72,6 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
 
     db.commit()
     db.refresh(laptop)
-
-    # Update in Elasticsearch
-    es.update(index=ES_INDEX, id=laptop.id, body={"doc": update_data})
     
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
