@@ -25,7 +25,6 @@ app.add_middleware(
 
 # Initialize Elasticsearch Client
 es = Elasticsearch("http://elasticsearch:9200")
-ES_INDEX = "laptops"
 
 @app.get("/")
 def read_root():
@@ -75,7 +74,7 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
     
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
-@app.get("/search/")
+@app.get("/laptops/search/")
 def search_laptops(
     query: str = Query(..., description="Search query"),
     limit: int = Query(10, description="Number of results to return")
@@ -93,7 +92,7 @@ def search_laptops(
         }
     }
 
-    results = es.search(index=ES_INDEX, body={"query": search_query, "size": limit})  # Execute search
+    results = es.search(index="laptops", body={"query": search_query, "size": limit})  # Execute search
 
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}  # Return results
 
@@ -153,7 +152,7 @@ def filter_laptops(
         filter_query["bool"]["filter"].append(price_filter)
 
     # Execute query in Elasticsearch
-    results = es.search(index=ES_INDEX, body={"query": filter_query, "size": limit})
+    results = es.search(index="laptops", body={"query": filter_query, "size": limit})
 
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
