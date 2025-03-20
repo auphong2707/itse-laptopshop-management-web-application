@@ -93,3 +93,44 @@ CREATE TABLE IF NOT EXISTS posts (
     link TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add updated_at column to laptops table
+ALTER TABLE laptops ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Ensure updated_at updates on modification
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_laptops_updated_at
+BEFORE UPDATE ON laptops
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- Add updated_at column to reviews table
+ALTER TABLE reviews ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_reviews_updated_at
+BEFORE UPDATE ON reviews
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- Add updated_at column to newsletter_subscriptions table
+ALTER TABLE newsletter_subscriptions ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_newsletter_subscriptions_updated_at
+BEFORE UPDATE ON newsletter_subscriptions
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- Add updated_at column to posts table
+ALTER TABLE posts ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+CREATE TRIGGER set_posts_updated_at
+BEFORE UPDATE ON posts
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
