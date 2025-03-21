@@ -215,7 +215,7 @@ const Detail = () => {
 					</Form.Item>
 				</div>
 
-				<div style={{ position: "absolute", right: "90px", top: "120px", flex: 1 }}>
+				<div style={{ position: "absolute", right: "10px", top: "120px", flex: 1 }}>
 
 				<Form.Item name="pictures">
 					<Swiper
@@ -223,14 +223,14 @@ const Detail = () => {
 					navigation
 					spaceBetween={40}
 					slidesPerView={1}
-					style={{ width: '500px', height: '400px', padding: '1rem'}}
+					style={{ width: '650px', height: '400px', padding: '1rem'}}
 				>
 					{pictures.map((picture, index) => (
 					<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 						<img
 						src={picture}
 						alt={`Picture ${index + 1}`}
-						style={{ width: '500px', height: '400px', objectFit: 'cover', borderRadius: '0px' }}
+						style={{ width: '600px', height: '400px' }}
 						/>
 					</SwiperSlide>
 					))}
