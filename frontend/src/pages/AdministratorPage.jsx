@@ -226,7 +226,7 @@ const Detail = () => {
 					</Form.Item>
 				</div>
 
-				<div style={{ position: "absolute", right: "10px", top: "120px", flex: 1 }}>
+				<div style={{ position: "absolute", right: "-5px", top: "120px", flex: 1 }}>
 
 				<Form.Item name="pictures">
 					<Swiper
