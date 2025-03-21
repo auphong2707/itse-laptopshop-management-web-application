@@ -105,7 +105,7 @@ def search_laptops(
 
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}  # Return results
 
-@app.get("/filter/")
+@app.get("/laptops/filter")
 def filter_laptops(
     price_min: int = Query(None, description="Minimum Price"),
     price_max: int = Query(None, description="Maximum Price"),
@@ -118,16 +118,20 @@ def filter_laptops(
     screen_size: list[int] = Query([], description="Filter by Screen Sizes (13, 14, 15, 16, 17 inches)"),
     weight_min: float = Query(None, description="Minimum Weight"),
     weight_max: float = Query(None, description="Maximum Weight"),
-    limit: int = Query(10, description="Number of results to return")
+    limit: int = Query(None, description="Number of results to return (default: all)"),
+    page: int = Query(1, description="Page number for pagination (default: 1)"),
+    sort: str = Query("latest", description="Sort by 'latest' (default), 'price_asc', or 'price_desc'")
 ):
     """
     Filters laptops based on brand, CPU, VGA, RAM, storage, screen size, weight, and price.
+    Supports sorting by latest (default) or price.
+    Supports pagination if `limit` is specified.
     """
 
     filter_query = {"bool": {"filter": []}}
 
     # Apply filters dynamically based on user input
-    if brand:
+    if brand and "all" not in brand:
         filter_query["bool"]["filter"].append({"terms": {"brand.keyword": brand}})
     if sub_brand:
         filter_query["bool"]["filter"].append({"terms": {"sub_brand.keyword": sub_brand}})
@@ -172,10 +176,48 @@ def filter_laptops(
             price_filter["range"]["sale_price"]["lte"] = price_max
         filter_query["bool"]["filter"].append(price_filter)
 
-    # Execute query in Elasticsearch
-    results = es.search(index="laptops", body={"query": filter_query, "size": limit})
+    # Define sorting options
+    sort_options = {
+        "latest": [{"inserted_at": {"order": "desc"}}],
+        "price_asc": [{"sale_price": {"order": "asc"}}],
+        "price_desc": [{"sale_price": {"order": "desc"}}]
+    }
 
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+    # Get sorting method (default to latest)
+    sorting = sort_options.get(sort, sort_options["latest"])
+
+    # Pagination logic
+    if limit is not None:
+        from_value = (page - 1) * limit  # Calculate offset
+        query_body = {
+            "query": filter_query,
+            "size": limit,
+            "from": from_value,
+            "sort": sorting
+        }
+    else:
+        query_body = {
+            "query": filter_query,
+            "sort": sorting
+        }
+
+    # Execute query in Elasticsearch
+    results = es.search(
+        index="laptops", 
+        body=query_body,
+        track_total_hits=True
+    )
+
+    total_count = results["hits"]["total"]["value"]
+
+    return {
+        "sort": sort,
+        "page": page if limit is not None else None,
+        "limit": limit,
+        "total_count": total_count,
+        "results": [hit["_source"] for hit in results["hits"]["hits"]]
+    }
+
 
 @app.get("/laptops/latest")
 def get_latest_laptops(

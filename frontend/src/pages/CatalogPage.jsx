@@ -1,10 +1,12 @@
 import { Layout, Breadcrumb, Typography, Select, Pagination, Button, Collapse, Checkbox, Divider, Slider, InputNumber } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
 import { useParams } from "react-router-dom";
+import { transformLaptopData } from "../utils.js";
+import axios from "axios";
 
 
 const { Content } = Layout;
@@ -17,16 +19,6 @@ const contentStyle = {
   backgroundColor: 'white',
 	height: "100%",
 };
-
-const products = new Array(35).fill({
-	productName: "EX DISPLAY : MSI Pro 16 Flex-036AU 15.6 MULTITOUCH All-in-One",
-	originalPrice: 599.00,
-	salePrice: 499.00,
-	rate: 4,
-	numRate: 20,
-	inStock: true,
-	imgSource: "https://via.placeholder.com/150", // Replace with actual image
-});
 
 const CustomSelect = styled(Select)`
   .ant-select-selector {
@@ -338,7 +330,7 @@ const formatBrand = (brand) => {
 		asus: "ASUS",
 		lenovo: "Lenovo",
 		acer: "Acer",
-		dell: "Dell",
+		dell: "DELL",
 		hp: "HP",
 		msi: "MSI"
 	};
@@ -347,13 +339,32 @@ const formatBrand = (brand) => {
 
 const CatalogPage = () => {
 	const { brand } = useParams();
-
+	const [page, setPage] = useState(1);
+	const [quantityPerPage, setQuantityPerPage] = useState(35);
+	const [products, setProducts] = useState([]);
+	const [totalProducts, setTotalProducts] = useState(0);
 	if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
 		return <div>Not Found</div>;
 	}
 
 	const formatedBrand = formatBrand(brand);
 	
+	useEffect(() => {
+		console.log("fetching data");
+		console.log(`http://localhost:8000/laptops/filter?page=${page}&limit=${quantityPerPage}&brand=${brand}`);
+		axios.get(`http://localhost:8000/laptops/filter?page=${page}&limit=${quantityPerPage}&brand=${brand}`)
+			.then((response) => {
+				setTotalProducts(response.data.total_count);
+				return response.data.results;
+			})
+			.then((data) => transformLaptopData(data))
+			.then((data) => setProducts(data))
+			.catch((error) => console.log(error));
+	}, [brand, page, quantityPerPage]);
+
+	let from = (page - 1) * quantityPerPage + 1;
+	let to = Math.min(page * quantityPerPage, totalProducts);
+
 
 	return (
 		<Layout>
@@ -385,7 +396,7 @@ const CatalogPage = () => {
 
 					<div style={{width: "100%", backgroundColor: "white" }}>
 						<div style={{ marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-							<Text type="secondary">Items 1-35 of 61</Text>
+							<Text type="secondary">Items {from}-{to} of {totalProducts}</Text>
 
 							<div style={{ display: "flex", gap: 10 }}>
 								<CustomSelect defaultValue={"position"} style={{ width: 180, height: 50 }} >
@@ -399,7 +410,11 @@ const CatalogPage = () => {
 									</Option>
 								</CustomSelect>
 
-								<CustomSelect defaultValue={35} style={{ width: 180, height: 50 }}>
+								<CustomSelect
+									defaultValue={{ value: quantityPerPage }}
+									style={{ width: 180, height: 50 }} 
+									onChange={setQuantityPerPage}
+								>
 									<Option value={15}>
 										<Text type="secondary" strong>Show: </Text>
 										<Text strong>15 per page</Text>
@@ -420,7 +435,17 @@ const CatalogPage = () => {
 
 						<br></br>
 
-						<Pagination align="center" defaultCurrent={1} total={1400} pageSize={35} showSizeChanger={false}/>
+						<Pagination 
+							align="center"
+							current={page}
+							onChange={(page) => {
+								setPage(page);
+								window.scrollTo(0, 0);
+							}}
+							total={totalProducts}
+							pageSize={quantityPerPage}
+							showSizeChanger={false}
+						/>
 					</div>
 				</div>
 			</Content>
