@@ -135,7 +135,18 @@ const Detail = () => {
 					{/* Connectivity and Ports */}
 					<CustomDivider label="Connectivity and Ports" />
 					<Form.Item label={<RequiredLabel label="USB-A Ports" />} name="usbAPorts">
-						<InputNumber min={0} style={{ width: "60px", fontWeight: "bold", backgroundColor: "#d9d9d9" }} />
+					<InputNumber
+						min={0}
+						controls={true}
+						style={{
+						width: "60px",
+						fontWeight: "bold",
+						borderRadius: "4px",
+						backgroundColor: "#d9d9d9",
+						padding: "4px",
+						textAlign: "center",
+						}}
+					/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="USB-C Ports" />} name="usbCPorts" rules={[{ required: false }]}>
 					<InputNumber
