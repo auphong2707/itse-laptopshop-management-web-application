@@ -27,7 +27,7 @@ const Items = () => {
         gridTemplateColumns: "1.25fr 2fr 1fr 1fr 1fr 0.5fr",
         alignItems: "center",
         gap: "15px",
-        padding: "10px 0",
+        padding: "25px 0",
         borderBottom: "1px solid #eee",
       }}
     >
@@ -82,7 +82,12 @@ const Items = () => {
 // Component chính (bảng hiển thị danh mục + Items)
 const ShoppingItemsTable = () => {
   return (
-    <Card style={{ padding: "20px", borderRadius: "8px", width: "55%" }} bordered={false}>
+    <div style={{ paddingTop: "0px",
+                  paddingBottom: "20px",
+                  paddingLeft: "20px",
+                  paddingRight: "20px", 
+                  borderRadius: "8px" }} 
+                  bordered={false}>
       {/* Header */}
       <div
         style={{
@@ -91,7 +96,7 @@ const ShoppingItemsTable = () => {
           fontWeight: "bold",
           paddingTop:"10px",
           paddingBottom: "15px",
-          borderBottom: "2px solid #ddd",
+          borderBottom: "1.5px solid #ddd",
           gap: "15px"
         }}
       >
@@ -106,7 +111,7 @@ const ShoppingItemsTable = () => {
       {/* Danh sách sản phẩm */}
       <Items />
       <Items />
-    </Card>
+    </div>
   );
 };
 
