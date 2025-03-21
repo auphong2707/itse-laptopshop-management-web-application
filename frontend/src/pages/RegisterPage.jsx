@@ -50,7 +50,7 @@ const RegisterPage = () => {
         </div>
 
         <Row gutter={32}>
-          <Col xs={24} md={{ span: 14, offset: 3 }}> 
+          <Col xs={24} md={{ span: 14, offset: 3 }} style={{ paddingLeft: "5px" }}> 
             <Form layout="vertical" form={form} onFinish={handleSignIn}>
               {current === 0 && (
                 <>
