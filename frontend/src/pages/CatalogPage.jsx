@@ -4,6 +4,7 @@ import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
+import { useParams } from "react-router-dom";
 
 
 const { Content } = Layout;
@@ -49,38 +50,57 @@ const CustomButton = styled(Button)`
 
 
 const brands = [
-  { name: "asus", logo: "/public/brand-logo/asus-logo.png" },
-  { name: "lenovo", logo: "/public/brand-logo/lenovo-logo.png" },
-  { name: "acer", logo: "/public/brand-logo/acer-logo.png" },
-  { name: "dell", logo: "/public/brand-logo/dell-logo.png" },
-  { name: "hp", logo: "/public/brand-logo/hp-logo.png" },
-  { name: "msi", logo: "/public/brand-logo/msi-logo.png" },
+  { name: "asus", logo: "/brand-logo/asus-logo.png", link: "/laptops/asus" },
+  { name: "lenovo", logo: "/brand-logo/lenovo-logo.png", link: "/laptops/lenovo" },
+  { name: "acer", logo: "/brand-logo/acer-logo.png", link: "/laptops/acer" },
+  { name: "dell", logo: "/brand-logo/dell-logo.png", link: "/laptops/dell" },
+  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/laptops/hp" },
+  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/laptops/msi" }
 ];
 
 const BrandsSection = () => {
   return (
     <div style={{ width: "100%", textAlign: "center", background: "#F5F7FF", paddingTop: 16, paddingBottom: 1 }}>
 
-			{/* Title */}
-			<Text strong style={{ fontSize: 20, display: "block" }}>Brands</Text>
+		{/* Title */}
+		<Text strong style={{ fontSize: 20, display: "block" }}>Brands</Text>
 
-			<br></br>
+		<br></br>
       
-      {/* Button */}
-      <CustomButton type="default" style={{ width: "90%", height: 40, fontSize: 16, display: "block", margin: "0 auto" }}>
-        All brands
-      </CustomButton>
+		<CustomButton 
+		  type="default" 
+		  style={{ width: "90%", height: 40, fontSize: 16, display: "block", margin: "0 auto" }}
+		  onClick={() => window.location.href = "/laptops/all"}
+		>
+		  All brands
+		</CustomButton>
 
-			<br></br>
+		<br></br>
 
-      {/* Grid Container */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1, height: "auto", padding: "0px 1px" }}>
-        {brands.map((brand, index) => (
-          <div key={index} style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "white", height: 75, padding: 15 }}>
-            <img src={brand.logo} alt={brand.name} style={{ maxWidth: "100%", filter: "grayscale(100%)" }} />
-          </div>
-        ))}
-      </div>
+		{/* Grid Container */}
+		<div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1, height: "auto", padding: "0px 1px" }}>
+			{brands.map((brand, index) => (
+			<div 
+				key={index}
+				onClick={() => window.location.href = brand.link}
+				style={{ 
+					display: "flex", 
+					justifyContent: "center",
+					alignItems: "center",
+					background: "white",
+					height: 75,
+					padding: 15,
+					cursor: "pointer"
+				}}
+			>
+				<img 
+					src={brand.logo} 
+					alt={brand.name} 
+					style={{ maxWidth: "100%", filter: "grayscale(100%)" }}
+				/>
+			</div>
+			))}
+		</div>
     </div>
   );
 };
@@ -312,9 +332,28 @@ const FilterSection = () => {
 	);
 };
 
+const formatBrand = (brand) => {
+	const brandMap = {
+		all: "All",
+		asus: "ASUS",
+		lenovo: "Lenovo",
+		acer: "Acer",
+		dell: "Dell",
+		hp: "HP",
+		msi: "MSI"
+	};
+	return brandMap[brand] || brand;
+};
 
-const CatalogPage = ({ inputBrand }) => {
-	const [brand, setBrand] = useState(inputBrand);
+const CatalogPage = () => {
+	const { brand } = useParams();
+
+	if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
+		return <div>Not Found</div>;
+	}
+
+	const formatedBrand = formatBrand(brand);
+	
 
 	return (
 		<Layout>
@@ -330,14 +369,10 @@ const CatalogPage = ({ inputBrand }) => {
 				<Breadcrumb>
 					<Breadcrumb.Item>Home</Breadcrumb.Item>
 					<Breadcrumb.Item>Laptops</Breadcrumb.Item>
-					<Breadcrumb.Item>Everyday Use Notebooks</Breadcrumb.Item>
-					<Breadcrumb.Item>MSI Prestige Series</Breadcrumb.Item>
-					<Breadcrumb.Item style={{ color: "#d9d9d9", cursor: "default" }}>
-						MSI WS Series
-					</Breadcrumb.Item>
+					<Breadcrumb.Item>{formatedBrand}</Breadcrumb.Item>
 				</Breadcrumb>
 
-				<Title level={1}>{brand} Laptop</Title>
+				<Title level={1}>{formatedBrand} Laptop</Title>
 
 				<br></br>
 

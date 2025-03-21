@@ -181,10 +181,12 @@ def filter_laptops(
 def get_latest_laptops(
     brand: str = Query("all"),
     subbrand: str = Query("all"),
-    limit: int = Query(10)
+    limit: int = Query(35),
+    page: int = Query(1)
 ):
     """
     Get latest laptops from Elasticsearch, optionally filtering by brand and sub-brand.
+    Supports pagination.
     """
     filter_query = {"bool": {"filter": []}}
 
@@ -192,9 +194,12 @@ def get_latest_laptops(
     if brand.lower() != "all":
         filter_query["bool"]["filter"].append({"term": {"brand.keyword": brand}})
     
-    # Filter by sub_brand if not "all"
+    # Filter by sub-brand if not "all"
     if subbrand.lower() != "all":
         filter_query["bool"]["filter"].append({"term": {"sub_brand.keyword": subbrand}})
+    
+    # Calculate the starting point for pagination
+    from_value = (page - 1) * limit
 
     # Execute query and return results
     results = es.search(
@@ -202,11 +207,13 @@ def get_latest_laptops(
         body={
             "query": filter_query,
             "sort": [{"inserted_at": {"order": "desc"}}],
-            "size": limit
+            "size": limit,
+            "from": from_value
         }
     )
 
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+    return {"page": page, "limit": limit, "results": [hit["_source"] for hit in results["hits"]["hits"]]}
+
 
 @app.get("/laptops/id/{laptop_id}")
 def get_laptop(laptop_id: int):
