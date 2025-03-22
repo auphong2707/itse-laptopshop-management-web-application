@@ -6,7 +6,7 @@ import styled from "styled-components";
 import ProductCard from "./components/ProductCard";
 import { useParams } from "react-router-dom";
 import { transformLaptopData } from "../utils.js";
-import axios from "axios";
+import axios, { all } from "axios";
 
 
 const { Content } = Layout;
@@ -97,23 +97,40 @@ const BrandsSection = () => {
   );
 };
 
-const FilterSection = () => {
+const subbrands = {
+	asus: ["ROG", "TUF", "Zenbook", "Vivobook"],
+	lenovo: ["Legion", "LoQ", "ThinkPad", "ThinkBook", "Yoga", "IdeaPad"],
+	acer: ["Predator", "Nitro", "Swift", "Aspire"],
+	dell: ["Alienware", "G Series", "XPS", "Inspiron", "Latitude", "Precision"],
+	hp: ["OMEN", "Victus", "Spectre", "ENVY", "Pavilion", "EliteBook"],
+	msi: ["Stealth", "Katana", "Creator", "Modern"],
+	all: [
+		"ASUS ROG", "ASUS TUF", "ASUS Zenbook", "ASUS Vivobook",
+		"Lenovo Legion", "Lenovo LoQ", "Lenovo ThinkPad", "Lenovo ThinkBook", "Lenovo Yoga", "Lenovo IdeaPad",
+		"Acer Predator", "Acer Nitro", "Acer Swift", "Acer Aspire",
+		"Dell Alienware", "Dell G Series", "Dell XPS", "Dell Inspiron", "Dell Latitude", "Dell Precision",
+		"HP OMEN", "HP Victus", "HP Spectre", "HP ENVY", "HP Pavilion", "HP EliteBook",
+		"MSI Stealth", "MSI Katana", "MSI Creator", "MSI Modern"
+	]
+};
+
+const FilterSection = ({ brand }) => {
 	const StyledCollapse = styled(Collapse)`
-  .ant-collapse-header {
-    font-weight: bold;
-    font-size: 16px;
-		text-align: left;
-		display: flex;
-		align-items: center;
-		flex-direction: row-reverse;
-  }
-	.ant-collapse-content-box {
-		padding-top: 0
+	.ant-collapse-header {
+		font-weight: bold;
+		font-size: 16px;
+			text-align: left;
+			display: flex;
+			align-items: center;
+			flex-direction: row-reverse;
 	}
-	.ant-collapse-content {
-		border: none;
-		padding-top: 0;
-	}
+		.ant-collapse-content-box {
+			padding-top: 0
+		}
+		.ant-collapse-content {
+			border: none;
+			padding-top: 0;
+		}
 	`;
 
 	const CheckboxFilter = ({ title, options }) => {
@@ -214,17 +231,10 @@ const FilterSection = () => {
 				{/* Filter by Sub-brand */}
 				<CheckboxFilter
 					title="Sub-brand"
-					options={[
-						{ name: "ROG" },
-						{ name: "TUF" },
-						{ name: "ZENBOOK" },
-						{ name: "VIVOBOOK" }
-					]}
+					options={subbrands[brand].map((item) => ({ name: item }))}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
-
-				{/* Filter by Processor */}
 				<CheckboxFilter
 					title="Processor"
 					options={[
@@ -391,7 +401,7 @@ const CatalogPage = () => {
 					<div style={{width: 260, backgroundColor: "white"}}>
 						<BrandsSection />
 						<br></br>
-						<FilterSection />
+						<FilterSection brand={brand} />
 					</div>
 
 					<div style={{width: "100%", backgroundColor: "white" }}>
