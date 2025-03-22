@@ -97,7 +97,7 @@ const BrandsSection = () => {
   );
 };
 
-const subbrands = {
+const subBrands = {
 	asus: ["ROG", "TUF", "Zenbook", "Vivobook"],
 	lenovo: ["Legion", "LoQ", "ThinkPad", "ThinkBook", "Yoga", "IdeaPad"],
 	acer: ["Predator", "Nitro", "Swift", "Aspire"],
@@ -114,7 +114,7 @@ const subbrands = {
 	]
 };
 
-const FilterSection = ({ brand }) => {
+const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilters }) => {
 	const StyledCollapse = styled(Collapse)`
 	.ant-collapse-header {
 		font-weight: bold;
@@ -133,7 +133,21 @@ const FilterSection = ({ brand }) => {
 		}
 	`;
 
-	const CheckboxFilter = ({ title, options }) => {
+	const CheckboxFilter = ({ title, category, options }) => {
+		const handleCheckboxChange = (value) => {
+			updateFilters({
+				selectedFilters: {
+					...filters.selectedFilters,
+					[category]: filters.selectedFilters[category].includes(value)
+						? filters.selectedFilters[category].filter((item) => item !== value)
+						: [...filters.selectedFilters[category], value]
+				}
+			});
+			console.log(category);
+			console.log(value);
+			console.log(filters.selectedFilters[category]);
+		};
+
 		return (
 			<StyledCollapse defaultActiveKey={["1"]} ghost>
 				<Panel header={title} key="1" style={{}}>
@@ -141,6 +155,8 @@ const FilterSection = ({ brand }) => {
 						{options.map((option, index) => (
 							<Checkbox
 								key={index}
+								checked={filters.selectedFilters[category].includes(option.name)}
+								onChange={() => handleCheckboxChange(option.name)}
 							>
 								<Text style={{ fontSize: "14px" }}>{option.name}</Text>
 							</Checkbox>
@@ -170,7 +186,7 @@ const FilterSection = ({ brand }) => {
 								min={min}
 								max={max}
 								value={value[0]}
-								onChange={(val) => onChange([val || min, value[1]])}
+								onChange={(val) => onChange([(parseFloat(val) || min), value[1]])}
 								formatter={(val) => `${val.toLocaleString()} ${unit}`}
 							/>
 							<span>—</span>
@@ -178,7 +194,7 @@ const FilterSection = ({ brand }) => {
 								min={min}
 								max={max}
 								value={value[1]}
-								onChange={(val) => onChange([value[0], val || max])}
+								onChange={(val) => onChange([value[0], (parseFloat(val) || max)])}
 								formatter={(val) => `${val.toLocaleString()} ${unit}`}
 							/>
 						</div>
@@ -207,126 +223,111 @@ const FilterSection = ({ brand }) => {
 
 			<br></br>
       
-      {/* Button */}
-      <CustomButton type="default" style={{ width: "90%", height: 40, fontSize: 16, display: "block", margin: "0 auto" }}>
-        Clear Filters
-      </CustomButton>
+			<Button
+				type="default"
+				onClick={clearFilters}
+				style={{ width: "90%", height: 40, fontSize: 16, display: "block", margin: "0 auto" }}
+			>
+				Clear Filters
+			</Button>
 
 			<div style={{ margin: "0% 5%" }}>
 				<Divider style={{ marginBottom: 0, marginRight: 5 }}/>
 
-				{/* Filter by Price */}
+				{/* Price Filter */}
 				<SliderFilter
 					title="Price"
-					min={5000000}
+					min={3000000}
 					max={180000000}
 					step={1000000}
-					value={[5000000, 180000000]}
+					value={filters.priceRange}
 					unit="đ"
-					onChange={(value) => console.log(value)}
+					onChange={(value) => updateFilters({ priceRange: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 
-				{/* Filter by Sub-brand */}
+				{/* Sub-brand Filter */}
 				<CheckboxFilter
 					title="Sub-brand"
-					options={subbrands[brand].map((item) => ({ name: item }))}
+					category="subBrand"
+					options={subBrands[brand].map((item) => ({ name: item }))}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
+
+				{/* Processor Filter */}
 				<CheckboxFilter
 					title="Processor"
+					category="cpu"
 					options={[
-						{ name: "AMD Ryzen 3" },
-						{ name: "AMD Ryzen 5" },
-						{ name: "AMD Ryzen 7" },
-						{ name: "AMD Ryzen 9" },
-						{ name: "Intel Core i3" },
-						{ name: "Intel Core i5" },
-						{ name: "Intel Core i7" },
-						{ name: "Intel Core i9" },
-						{ name: "Apple M1" },
-						{ name: "Apple M2" },
-						{ name: "Apple M3" },
-						{ name: "Apple M4" }
+						{ name: "AMD Ryzen 3" }, { name: "AMD Ryzen 5" }, { name: "AMD Ryzen 7" }, { name: "AMD Ryzen 9" },
+						{ name: "Intel Core i3" }, { name: "Intel Core i5" }, { name: "Intel Core i7" }, { name: "Intel Core i9" },
+						{ name: "Apple M1" }, { name: "Apple M2" }, { name: "Apple M3" }, { name: "Apple M4" }
 					]}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 
-				{/* Filter by VGA */}
+				{/* Graphics Card Filter */}
 				<CheckboxFilter
 					title="Graphics Card"
+					category="vga"
 					options={[
-						{ name: "NVIDIA MX" },
-						{ name: "NVIDIA GTX" },
-						{ name: "NVIDIA RTX 20 Series" },
-						{ name: "NVIDIA RTX 30 Series" },
-						{ name: "NVIDIA RTX 40 Series" },
-						{ name: "NVIDIA Quadro" },
-						{ name: "AMD Radeon RX 5000M" },
-						{ name: "AMD Radeon RX 6000M" },
-						{ name: "AMD Radeon RX 7000M" },
-						{ name: "AMD Radeon Pro" }
+						{ name: "NVIDIA MX" }, { name: "NVIDIA GTX" }, { name: "NVIDIA RTX 20 Series" },
+						{ name: "NVIDIA RTX 30 Series" }, { name: "NVIDIA RTX 40 Series" }, { name: "NVIDIA Quadro" },
+						{ name: "AMD Radeon RX 5000M" }, { name: "AMD Radeon RX 6000M" },
+						{ name: "AMD Radeon RX 7000M" }, { name: "AMD Radeon Pro" }
 					]}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 				
-				{/* Filter by RAM Amount */}
+				{/* RAM Amount Filter */}
 				<CheckboxFilter
 					title="RAM Amount"
-					options={[
-						{ name: "8 GB" },
-						{ name: "16 GB" },
-						{ name: "32 GB" },
-						{ name: "64 GB" },
-					]}
+					category="ramAmount"
+					options={[{ name: "8 GB" }, { name: "16 GB" }, { name: "32 GB" }, { name: "64 GB" }]}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 
-				{/* Filter by Storage Amount */}
+				{/* Storage Amount Filter */}
 				<CheckboxFilter
 					title="Storage Amount"
-					options={[
-						{ name: "256 GB" },
-						{ name: "512 GB" },
-						{ name: "1 TB" }
-					]}
+					category="storageAmount"
+					options={[{ name: "256 GB" }, { name: "512 GB" }, { name: "1 TB" }]}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 
-				{/* Filter by Screen Size */}
+				{/* Screen Size Filter */}
 				<CheckboxFilter
 					title="Screen Size"
-					options={[
-						{ name: "13 inch" },
-						{ name: "14 inch" },
-						{ name: "15 inch" },
-						{ name: "16 inch" },
-						{ name: "17 inch" }
-					]}
+					category="screenSize"
+					options={[{ name: "13 inch" }, { name: "14 inch" }, { name: "15 inch" }, { name: "16 inch" }, { name: "17 inch" }]}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
 
-				{/* Filter by Weight */}
+				{/* Weight Filter */}
 				<SliderFilter
 					title="Weight"
 					min={0.5}
 					max={5}
 					step={0.1}
-					value={[0.5, 5]}
+					value={filters.weightRange}
 					unit="kg"
-					onChange={(value) => console.log(value)}
+					onChange={(value) => updateFilters({ weightRange: value })}
 				/>
 
 			</div>
 
-			<Button type="primary" style={{ width: "90%", height: 40, fontSize: 18, display: "block", margin: "0 auto", borderRadius: 25, fontWeight: "bold" }}>
+			<Button 
+				type="primary" 
+				style={{ width: "90%", height: 40, fontSize: 18, display: "block", margin: "0 auto", borderRadius: 25, fontWeight: "bold" }}
+				onClick={applyFilters}
+			>
 				Apply Filters
 			</Button>
 
@@ -347,12 +348,153 @@ const formatBrand = (brand) => {
 	return brandMap[brand] || brand;
 };
 
+const convertToQueryString = (brand, page, quantityPerPage, filters) => {
+	let query = `?page=${page}&limit=${quantityPerPage}&brand=${brand}`;
+
+	// Sub-brand
+	if (filters.selectedFilters.subBrand.length > 0) {
+		filters.selectedFilters.subBrand.forEach((subBrand) => {
+			if (brand === "all") {
+				subBrand = subBrand.split(" ").slice(1).join(" ");
+			}
+			subBrand = subBrand.toLowerCase().replace(" ", "+");
+			query += `&sub_brand=${subBrand}`;
+		})
+	}
+
+	// Ram Amount
+	if (filters.selectedFilters.ramAmount.length > 0) {
+		filters.selectedFilters.ramAmount.forEach((ramAmount) => {
+			ramAmount = ramAmount.split(" ")[0];
+			query += `&ram_amount=${ramAmount}`;
+		})
+	}
+
+	// Storage Amount
+	if (filters.selectedFilters.storageAmount.length > 0) {
+		filters.selectedFilters.storageAmount.forEach((storageAmount) => {
+			storageAmount = storageAmount === "1 TB" ? 1024 : storageAmount.split(" ")[0];
+			query += `&storage_amount=${storageAmount}`;
+		})
+	}
+
+	// Screen Size
+	if (filters.selectedFilters.screenSize.length > 0) {
+		filters.selectedFilters.screenSize.forEach((screenSize) => {
+			screenSize = screenSize.split(" ")[0];
+			query += `&screen_size=${screenSize}`;
+		})
+	}
+
+	// CPU
+	if (filters.selectedFilters.cpu.length > 0) {
+		filters.selectedFilters.cpu.forEach((cpu) => {
+			cpu = cpu.startsWith("Apple") ? cpu.split(" ").pop() : cpu.split(" ").slice(-2).join(" ");
+			cpu = cpu.toLowerCase().replace(" ", "+");
+			query += `&cpu=${cpu}`;
+		})
+	}
+
+	// VGA
+	if (filters.selectedFilters.vga.length > 0) {
+		filters.selectedFilters.vga.forEach((vga) => {
+			if (vga.includes("NVIDIA MX")) vga = "mx";
+			if (vga.includes("NVIDIA GTX")) vga = "gtx";
+			if (vga.includes("NVIDIA RTX 20")) vga = "rtx+20";
+			if (vga.includes("NVIDIA RTX 30")) vga = "rtx+30";
+			if (vga.includes("NVIDIA RTX 40")) vga = "rtx+40";
+			if (vga.includes("NVIDIA Quadro")) vga = "quadro";
+			if (vga.includes("AMD Radeon RX 5000M")) vga = "rx+5";
+			if (vga.includes("AMD Radeon RX 6000M")) vga = "rx+6";
+			if (vga.includes("AMD Radeon RX 7000M")) vga = "rx+7";
+			if (vga.includes("AMD Radeon Pro")) vga = "rad+pro";
+			
+			query += `&vga=${vga}`;
+		});
+	}
+	
+	// Price Range
+	query += `&price_min=${filters.priceRange[0]}&price_max=${filters.priceRange[1]}`;
+
+	// Weight Range
+	query += `&weight_min=${filters.weightRange[0]}&weight_max=${filters.weightRange[1]}`;
+
+	return query ? `${query}` : "";
+};
+
 const CatalogPage = () => {
 	const { brand } = useParams();
 	const [page, setPage] = useState(1);
 	const [quantityPerPage, setQuantityPerPage] = useState(35);
 	const [products, setProducts] = useState([]);
 	const [totalProducts, setTotalProducts] = useState(0);
+
+	// Filter
+	const [filters, setFilters] = useState({
+		priceRange: [3000000, 180000000],
+		weightRange: [0.5, 5],
+		selectedFilters: {
+			subBrand: [],
+			cpu: [],
+			vga: [],
+			ramAmount: [],
+			storageAmount: [],
+			screenSize: []
+		}
+	});
+
+	console.log(filters);
+
+	// Function to update filters state
+	const updateFilters = (newFilters) => {
+		setFilters({ ...filters, ...newFilters });
+	};
+
+	// Function to apply the filters
+	const applyFilters = () => {
+		axios.get(`http://localhost:8000/laptops/filter${query}`)
+			.then((response) => {
+				setTotalProducts(response.data.total_count);
+				return response.data.results;
+			}
+			)
+			.then((data) => transformLaptopData(data))
+			.then((data) => setProducts(data))
+			.catch((error) => console.log(error));
+		
+		window.scrollTo(0, 0);
+	};
+
+	// Function to clear all the filters
+	const clearFilters = () => {
+		setFilters({
+			priceRange: [3000000, 180000000],
+			weightRange: [0.5, 5],
+			selectedFilters: {
+				subBrand: [],
+				cpu: [],
+				vga: [],
+				ramAmount: [],
+				storageAmount: [],
+				screenSize: []
+			}
+		});
+
+		axios.get(`http://localhost:8000/laptops/filter?brand=${brand}&page=${page}&limit=${quantityPerPage}`)
+			.then((response) => {
+				setTotalProducts(response.data.total_count);
+				return response.data.results;
+			}
+			)
+			.then((data) => transformLaptopData(data))
+			.then((data) => setProducts(data))
+			.catch((error) => console.log(error));
+	};
+
+	const query = convertToQueryString(brand, page, quantityPerPage, filters);
+
+	
+
 	if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
 		return <div>Not Found</div>;
 	}
@@ -361,8 +503,8 @@ const CatalogPage = () => {
 	
 	useEffect(() => {
 		console.log("fetching data");
-		console.log(`http://localhost:8000/laptops/filter?page=${page}&limit=${quantityPerPage}&brand=${brand}`);
-		axios.get(`http://localhost:8000/laptops/filter?page=${page}&limit=${quantityPerPage}&brand=${brand}`)
+		console.log(`http://localhost:8000/laptops/filter${query}`);
+		axios.get(`http://localhost:8000/laptops/filter${query}`)
 			.then((response) => {
 				setTotalProducts(response.data.total_count);
 				return response.data.results;
@@ -375,6 +517,7 @@ const CatalogPage = () => {
 	let from = (page - 1) * quantityPerPage + 1;
 	let to = Math.min(page * quantityPerPage, totalProducts);
 
+	console.log(query)
 
 	return (
 		<Layout>
@@ -401,7 +544,13 @@ const CatalogPage = () => {
 					<div style={{width: 260, backgroundColor: "white"}}>
 						<BrandsSection />
 						<br></br>
-						<FilterSection brand={brand} />
+						<FilterSection 
+							brand={brand}
+							filters={filters}
+							updateFilters={updateFilters}
+							clearFilters={clearFilters}
+							applyFilters={applyFilters}
+						/>
 					</div>
 
 					<div style={{width: "100%", backgroundColor: "white" }}>
