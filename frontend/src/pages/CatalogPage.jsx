@@ -558,7 +558,7 @@ const CatalogPage = () => {
 							<CustomSelect 
 								value={sortBy} 
 								onChange={(value) => setSortBy(value)}
-								style={{ width: 180, height: 50 }}
+								style={{ width: 250, height: 50 }}
 							>
 								<Option value="latest">
 									<Text type="secondary" strong>Sort by: </Text>
@@ -571,10 +571,6 @@ const CatalogPage = () => {
 								<Option value="price-high">
 									<Text type="secondary" strong>Sort by: </Text>
 									<Text strong> Price (High to Low)</Text>
-								</Option>
-								<Option value="sale">
-									<Text type="secondary" strong>Sort by: </Text>
-									<Text strong> Sale</Text>
 								</Option>
 							</CustomSelect>
 

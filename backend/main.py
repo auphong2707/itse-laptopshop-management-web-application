@@ -190,14 +190,7 @@ def filter_laptops(
     sort_options = {
         "latest": [{"inserted_at": {"order": "desc"}}],
         "price_asc": [{"sale_price": {"order": "asc"}}],
-        "price_desc": [{"sale_price": {"order": "desc"}}],
-        "sale": [{"_script": {  # Custom sorting by sale percentage
-            "type": "number",
-            "script": {
-                "source": "doc['original_price'].value > 0 ? doc['sale_price'].value / doc['original_price'].value : 1",
-                "order": "asc"  # Lower ratio means bigger discount
-            }
-        }}]
+        "price_desc": [{"sale_price": {"order": "desc"}}]
     }
     sorting = sort_options.get(sort, sort_options["latest"])
 
