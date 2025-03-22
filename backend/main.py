@@ -151,8 +151,6 @@ def filter_laptops(
             {"wildcard": {"vga.keyword": f"*{v.lower()}*"}} for v in vga if isinstance(v, str)
         ])
 
-    print(vga)
-
     # Screen size: allow a range (e.g., 15 → 15 - 15.6)
     if screen_size:
         filter_query["bool"]["filter"].append({
@@ -192,7 +190,14 @@ def filter_laptops(
     sort_options = {
         "latest": [{"inserted_at": {"order": "desc"}}],
         "price_asc": [{"sale_price": {"order": "asc"}}],
-        "price_desc": [{"sale_price": {"order": "desc"}}]
+        "price_desc": [{"sale_price": {"order": "desc"}}],
+        "sale": [{"_script": {  # Custom sorting by sale percentage
+            "type": "number",
+            "script": {
+                "source": "doc['original_price'].value > 0 ? doc['sale_price'].value / doc['original_price'].value : 1",
+                "order": "asc"  # Lower ratio means bigger discount
+            }
+        }}]
     }
     sorting = sort_options.get(sort, sort_options["latest"])
 

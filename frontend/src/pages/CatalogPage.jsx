@@ -143,9 +143,6 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 						: [...filters.selectedFilters[category], value]
 				}
 			});
-			console.log(category);
-			console.log(value);
-			console.log(filters.selectedFilters[category]);
 		};
 
 		return (
@@ -348,8 +345,14 @@ const formatBrand = (brand) => {
 	return brandMap[brand] || brand;
 };
 
-const convertToQueryString = (brand, page, quantityPerPage, filters) => {
+const convertToQueryString = (brand, page, quantityPerPage, filters, sortBy) => {
 	let query = `?page=${page}&limit=${quantityPerPage}&brand=${brand}`;
+
+	// Sort By
+	if (sortBy === "latest") query += "&sort=latest";
+	if (sortBy === "price-low") query += "&sort=price_asc";
+	if (sortBy === "price-high") query += "&sort=price_desc";
+	if (sortBy === "sale") query += "&sort=sale";
 
 	// Sub-brand
 	if (filters.selectedFilters.subBrand.length > 0) {
@@ -428,6 +431,7 @@ const CatalogPage = () => {
 	const [quantityPerPage, setQuantityPerPage] = useState(35);
 	const [products, setProducts] = useState([]);
 	const [totalProducts, setTotalProducts] = useState(0);
+	const [sortBy, setSortBy] = useState("latest"); // Default: Latest
 
 	// Filter
 	const [filters, setFilters] = useState({
@@ -442,8 +446,6 @@ const CatalogPage = () => {
 			screenSize: []
 		}
 	});
-
-	console.log(filters);
 
 	// Function to update filters state
 	const updateFilters = (newFilters) => {
@@ -491,9 +493,7 @@ const CatalogPage = () => {
 			.catch((error) => console.log(error));
 	};
 
-	const query = convertToQueryString(brand, page, quantityPerPage, filters);
-
-	
+	const query = convertToQueryString(brand, page, quantityPerPage, filters, sortBy);
 
 	if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
 		return <div>Not Found</div>;
@@ -502,7 +502,6 @@ const CatalogPage = () => {
 	const formatedBrand = formatBrand(brand);
 	
 	useEffect(() => {
-		console.log("fetching data");
 		console.log(`http://localhost:8000/laptops/filter${query}`);
 		axios.get(`http://localhost:8000/laptops/filter${query}`)
 			.then((response) => {
@@ -512,12 +511,10 @@ const CatalogPage = () => {
 			.then((data) => transformLaptopData(data))
 			.then((data) => setProducts(data))
 			.catch((error) => console.log(error));
-	}, [brand, page, quantityPerPage]);
+	}, [brand, page, quantityPerPage, sortBy]);
 
 	let from = (page - 1) * quantityPerPage + 1;
 	let to = Math.min(page * quantityPerPage, totalProducts);
-
-	console.log(query)
 
 	return (
 		<Layout>
@@ -558,16 +555,28 @@ const CatalogPage = () => {
 							<Text type="secondary">Items {from}-{to} of {totalProducts}</Text>
 
 							<div style={{ display: "flex", gap: 10 }}>
-								<CustomSelect defaultValue={"position"} style={{ width: 180, height: 50 }} >
-									<Option value="position">
-											<Text type="secondary" strong>Sort by: </Text>
-											<Text strong> Position</Text>
-									</Option>
-									<Option value="price">
-											<Text type="secondary" strong>Sort by: </Text>
-											<Text strong> Price</Text>
-									</Option>
-								</CustomSelect>
+							<CustomSelect 
+								value={sortBy} 
+								onChange={(value) => setSortBy(value)}
+								style={{ width: 180, height: 50 }}
+							>
+								<Option value="latest">
+									<Text type="secondary" strong>Sort by: </Text>
+									<Text strong> Latest</Text>
+								</Option>
+								<Option value="price-low">
+									<Text type="secondary" strong>Sort by: </Text>
+									<Text strong> Price (Low to High)</Text>
+								</Option>
+								<Option value="price-high">
+									<Text type="secondary" strong>Sort by: </Text>
+									<Text strong> Price (High to Low)</Text>
+								</Option>
+								<Option value="sale">
+									<Text type="secondary" strong>Sort by: </Text>
+									<Text strong> Sale</Text>
+								</Option>
+							</CustomSelect>
 
 								<CustomSelect
 									defaultValue={{ value: quantityPerPage }}
