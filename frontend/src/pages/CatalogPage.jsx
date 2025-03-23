@@ -1,11 +1,12 @@
 import { Layout, Breadcrumb, Typography, Select, Pagination, Button, Collapse, Checkbox, Divider, Slider, InputNumber } from "antd";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
 import { useParams, useSearchParams } from "react-router-dom";
 import { transformLaptopData } from "../utils.js";
+import { debounce } from "lodash";
 import axios from "axios";
 
 
@@ -171,46 +172,82 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 		border: 1px solid #d9d9d9;
 	`;
 
-	const SliderFilter = ({ title, min, max, step, unit, value, onChange }) => {
-		return (
-			<StyledCollapse defaultActiveKey={["1"]} ghost>
-				<Panel header={title} key="1">
-					<div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", height: "auto" }}>
-						
-						{/* Input Fields for Min and Max Values */}
-						<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-							<StyledInput
-								min={min}
-								max={max}
-								value={value[0]}
-								onChange={(val) => onChange([(parseFloat(val) || min), value[1]])}
-								formatter={(val) => `${val.toLocaleString()} ${unit}`}
-							/>
-							<span>—</span>
-							<StyledInput
-								min={min}
-								max={max}
-								value={value[1]}
-								onChange={(val) => onChange([value[0], (parseFloat(val) || max)])}
-								formatter={(val) => `${val.toLocaleString()} ${unit}`}
-							/>
-						</div>
-	
-						{/* Slider Component */}
-						<Slider
-							range
-							min={min}
-							max={max}
-							step={step}
-							value={value}
-							onChange={onChange}
-						/>
-	
-					</div>
-				</Panel>
-			</StyledCollapse>
+	const SliderFilter = ({ title, min, max, step = 1, unit, value, onChange }) => {
+		const [minValue, setMinValue] = useState(value[0]);
+		const [maxValue, setMaxValue] = useState(value[1]);
+	  
+		// Sync external value changes (if value prop updates)
+		useEffect(() => {
+		  setMinValue(value[0]);
+		  setMaxValue(value[1]);
+		}, [value]);
+	  
+		// Debounced callback for smooth updates
+		const debouncedOnChange = useCallback(
+		  debounce((newValue) => onChange(newValue), 300),
+		  []
 		);
-	};
+	  
+		// Handle input changes
+		const handleMinChange = (val) => {
+		  const newMin = Math.max(min, Math.min(val || min, maxValue));
+		  setMinValue(newMin);
+		  debouncedOnChange([newMin, maxValue]);
+		};
+	  
+		const handleMaxChange = (val) => {
+		  const newMax = Math.min(max, Math.max(val || max, minValue));
+		  setMaxValue(newMax);
+		  debouncedOnChange([minValue, newMax]);
+		};
+	  
+		// Handle smooth slider updates
+		const handleSliderChange = (newValue) => {
+		  setMinValue(newValue[0]);
+		  setMaxValue(newValue[1]);
+		  debouncedOnChange(newValue);
+		};
+	  
+		return (
+		  <StyledCollapse defaultActiveKey={["1"]} ghost>
+			<Panel header={title} key="1">
+			  <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%" }}>
+				
+				{/* Input Fields for Min and Max */}
+				<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+				  <InputNumber
+					min={min}
+					max={max}
+					value={minValue}
+					onChange={handleMinChange}
+					formatter={(val) => `${val.toLocaleString()} ${unit}`}
+					style={{ width: "40%" }}
+				  />
+				  <span>—</span>
+				  <InputNumber
+					min={min}
+					max={max}
+					value={maxValue}
+					onChange={handleMaxChange}
+					formatter={(val) => `${val.toLocaleString()} ${unit}`}
+					style={{ width: "40%" }}
+				  />
+				</div>
+	  
+				{/* Smooth Slider */}
+				<Slider
+				  range
+				  min={min}
+				  max={max}
+				  step={step}
+				  value={[minValue, maxValue]}
+				  onChange={handleSliderChange}
+				/>
+			  </div>
+			</Panel>
+		  </StyledCollapse>
+		);
+	  };
 
 	return (
 		<div style={{ width: 260, textAlign: "center", background: "#F5F7FF", paddingTop: 16, paddingBottom: 10 }}>
@@ -431,6 +468,7 @@ const convertToQueryString = (brand, page, quantityPerPage, filters, sortBy) => 
 };
 
 const CatalogPage = () => {
+	console.log("Rendering CatalogPage");
 	const { brand } = useParams();
 
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -472,6 +510,7 @@ const CatalogPage = () => {
 
 		newParams.set("priceRange", pendingFilters.priceRange.join(","));
 		newParams.set("weightRange", pendingFilters.weightRange.join(","));
+		newParams.delete("page");
 
 		// Remove existing selected filters to avoid duplication
 		Object.keys(pendingFilters.selectedFilters).forEach((key) => {
