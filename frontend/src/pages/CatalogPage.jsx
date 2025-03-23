@@ -115,7 +115,7 @@ const subBrands = {
 	]
 };
 
-const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilters, applyFilters }) => {
+const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilters, applyFilters, collapseState, updateCollapseState }) => {
 	const StyledCollapse = styled(Collapse)`
 	.ant-collapse-header {
 		font-weight: bold;
@@ -147,7 +147,7 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 		};
 
 		return (
-			<StyledCollapse defaultActiveKey={["1"]} ghost>
+			<StyledCollapse defaultActiveKey={["1"]} ghost activeKey={collapseState[category] ? ["1"] : []} onChange={() => updateCollapseState(category)}>
 				<Panel header={title} key="1" style={{}}>
 					<div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%", height: "auto" }}>
 						{options.map((option, index) => (
@@ -164,15 +164,8 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 			</StyledCollapse>
 		);
 	};
-	
-	const StyledInput = styled(InputNumber)`
-		width: 100px;
-		text-align: center;
-		border-radius: 6px;
-		border: 1px solid #d9d9d9;
-	`;
 
-	const SliderFilter = ({ title, min, max, step = 1, unit, value, onChange }) => {
+	const SliderFilter = ({ title, min, max, step = 1, unit, value, onChange, category }) => {
 		const [minValue, setMinValue] = useState(value[0]);
 		const [maxValue, setMaxValue] = useState(value[1]);
 	  
@@ -209,7 +202,7 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 		};
 	  
 		return (
-		  <StyledCollapse defaultActiveKey={["1"]} ghost>
+		  <StyledCollapse defaultActiveKey={["1"]} ghost activeKey={collapseState[category] ? ["1"] : []} onChange={() => updateCollapseState(category)}>
 			<Panel header={title} key="1">
 			  <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%" }}>
 				
@@ -277,6 +270,7 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 					value={pendingFilters.priceRange}
 					unit="đ"
 					onChange={(value) => updatePendingFilters({ priceRange: value })}
+					category="priceRange"
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -358,6 +352,7 @@ const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilte
 					value={pendingFilters.weightRange}
 					unit="kg"
 					onChange={(value) => updatePendingFilters({ weightRange: value })}
+					category="weightRange"
 				/>
 
 			</div>
@@ -568,6 +563,22 @@ const CatalogPage = () => {
 	}
 
 	const formatedBrand = formatBrand(brand);
+
+	// Additional state
+	const [collapseState, setCollapseState] = useState({
+		priceRange: 1,
+		subBrand: 1,
+		cpu: 1,
+		vga: 1,
+		ramAmount: 1,
+		storageAmount: 1,
+		screenSize: 1,
+		weightRange: 1
+	});
+
+	const updateCollapseState = (key) => {
+		setCollapseState({ ...collapseState, [key]: !collapseState[key] });
+	}
 	
 	useEffect(() => {
 		console.log(`http://localhost:8000/laptops/filter${query}`);
@@ -615,6 +626,8 @@ const CatalogPage = () => {
 							updatePendingFilters={updatePendingFilters}
 							clearFilters={clearFilters}
 							applyFilters={applyFilters}
+							collapseState={collapseState}
+							updateCollapseState={updateCollapseState}
 						/>
 					</div>
 
