@@ -1,12 +1,12 @@
 import { Layout, Breadcrumb, Typography, Select, Pagination, Button, Collapse, Checkbox, Divider, Slider, InputNumber } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { transformLaptopData } from "../utils.js";
-import axios, { all } from "axios";
+import axios from "axios";
 
 
 const { Content } = Layout;
@@ -114,7 +114,7 @@ const subBrands = {
 	]
 };
 
-const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilters }) => {
+const FilterSection = ({ brand, pendingFilters, updatePendingFilters, clearFilters, applyFilters }) => {
 	const StyledCollapse = styled(Collapse)`
 	.ant-collapse-header {
 		font-weight: bold;
@@ -135,12 +135,12 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 
 	const CheckboxFilter = ({ title, category, options }) => {
 		const handleCheckboxChange = (value) => {
-			updateFilters({
+			updatePendingFilters({
 				selectedFilters: {
-					...filters.selectedFilters,
-					[category]: filters.selectedFilters[category].includes(value)
-						? filters.selectedFilters[category].filter((item) => item !== value)
-						: [...filters.selectedFilters[category], value]
+					...pendingFilters.selectedFilters,
+					[category]: pendingFilters.selectedFilters[category].includes(value)
+						? pendingFilters.selectedFilters[category].filter((item) => item !== value)
+						: [...pendingFilters.selectedFilters[category], value]
 				}
 			});
 		};
@@ -152,7 +152,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 						{options.map((option, index) => (
 							<Checkbox
 								key={index}
-								checked={filters.selectedFilters[category].includes(option.name)}
+								checked={pendingFilters.selectedFilters[category].includes(option.name)}
 								onChange={() => handleCheckboxChange(option.name)}
 							>
 								<Text style={{ fontSize: "14px" }}>{option.name}</Text>
@@ -237,9 +237,9 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					min={3000000}
 					max={180000000}
 					step={1000000}
-					value={filters.priceRange}
+					value={pendingFilters.priceRange}
 					unit="đ"
-					onChange={(value) => updateFilters({ priceRange: value })}
+					onChange={(value) => updatePendingFilters({ priceRange: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -249,6 +249,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					title="Sub-brand"
 					category="subBrand"
 					options={subBrands[brand].map((item) => ({ name: item }))}
+					handleCheckboxChange={(value) => updatePendingFilters({ subBrand: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -276,6 +277,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 						{ name: "AMD Radeon RX 5000M" }, { name: "AMD Radeon RX 6000M" },
 						{ name: "AMD Radeon RX 7000M" }, { name: "AMD Radeon Pro" }
 					]}
+					handleCheckboxChange={(value) => updatePendingFilters({ vga: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -285,6 +287,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					title="RAM Amount"
 					category="ramAmount"
 					options={[{ name: "8 GB" }, { name: "16 GB" }, { name: "32 GB" }, { name: "64 GB" }]}
+					handleCheckboxChange={(value) => updatePendingFilters({ ramAmount: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -294,6 +297,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					title="Storage Amount"
 					category="storageAmount"
 					options={[{ name: "256 GB" }, { name: "512 GB" }, { name: "1 TB" }]}
+					handleCheckboxChange={(value) => updatePendingFilters({ storageAmount: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -303,6 +307,7 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					title="Screen Size"
 					category="screenSize"
 					options={[{ name: "13 inch" }, { name: "14 inch" }, { name: "15 inch" }, { name: "16 inch" }, { name: "17 inch" }]}
+					handleCheckboxChange={(value) => updatePendingFilters({ screenSize: value })}
 				/>
 
 				<Divider style={{ marginBottom: 0, marginTop: 3 }}/>
@@ -313,9 +318,9 @@ const FilterSection = ({ brand, filters, updateFilters, clearFilters, applyFilte
 					min={0.5}
 					max={5}
 					step={0.1}
-					value={filters.weightRange}
+					value={pendingFilters.weightRange}
 					unit="kg"
-					onChange={(value) => updateFilters({ weightRange: value })}
+					onChange={(value) => updatePendingFilters({ weightRange: value })}
 				/>
 
 			</div>
@@ -427,49 +432,71 @@ const convertToQueryString = (brand, page, quantityPerPage, filters, sortBy) => 
 
 const CatalogPage = () => {
 	const { brand } = useParams();
-	const [page, setPage] = useState(1);
-	const [quantityPerPage, setQuantityPerPage] = useState(35);
-	const [products, setProducts] = useState([]);
-	const [totalProducts, setTotalProducts] = useState(0);
-	const [sortBy, setSortBy] = useState("latest"); // Default: Latest
 
-	// Filter
-	const [filters, setFilters] = useState({
-		priceRange: [3000000, 180000000],
-		weightRange: [0.5, 5],
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	// Immediately updating parameters
+	const page = parseInt(searchParams.get("page")) || 1;
+	const quantityPerPage = parseInt(searchParams.get("quantityPerPage")) || 35;
+	const sortBy = searchParams.get("sortBy") || "latest";
+
+	const updateImmediateParams = (key, value) => {
+		const newParams = new URLSearchParams(searchParams);
+		newParams.set(key, value);
+		setSearchParams(newParams);
+	};
+
+	// Applied filters (from URL)
+	const appliedFilters = useMemo(() => ({
+		priceRange: searchParams.get("priceRange")?.split(",").map(Number) || [3000000, 180000000],
+		weightRange: searchParams.get("weightRange")?.split(",").map(Number) || [0.5, 5],
 		selectedFilters: {
-			subBrand: [],
-			cpu: [],
-			vga: [],
-			ramAmount: [],
-			storageAmount: [],
-			screenSize: []
+			subBrand: searchParams.getAll("subBrand"),
+			cpu: searchParams.getAll("cpu"),
+			vga: searchParams.getAll("vga"),
+			ramAmount: searchParams.getAll("ramAmount").map(Number),
+			storageAmount: searchParams.getAll("storageAmount").map(Number),
+			screenSize: searchParams.getAll("screenSize").map(Number)
 		}
-	});
+	}), [searchParams]); 
 
-	// Function to update filters state
-	const updateFilters = (newFilters) => {
-		setFilters({ ...filters, ...newFilters });
+	// Pending filters (modified but not applied yet)
+	const [pendingFilters, setPendingFilters] = useState(appliedFilters);
+	
+	const updatePendingFilters = (newPendingFilters) => {
+		setPendingFilters({ ...pendingFilters, ...newPendingFilters });
 	};
 
-	// Function to apply the filters
 	const applyFilters = () => {
-		axios.get(`http://localhost:8000/laptops/filter${query}`)
-			.then((response) => {
-				setTotalProducts(response.data.total_count);
-				return response.data.results;
-			}
-			)
-			.then((data) => transformLaptopData(data))
-			.then((data) => setProducts(data))
-			.catch((error) => console.log(error));
-		
-		window.scrollTo(0, 0);
+		const newParams = new URLSearchParams(searchParams);
+
+		newParams.set("priceRange", pendingFilters.priceRange.join(","));
+		newParams.set("weightRange", pendingFilters.weightRange.join(","));
+
+		// Remove existing selected filters to avoid duplication
+		Object.keys(pendingFilters.selectedFilters).forEach((key) => {
+			newParams.delete(key);
+			pendingFilters.selectedFilters[key].forEach((value) => {
+				newParams.append(key, value);
+			});
+		});
+
+		setSearchParams(newParams);
 	};
 
-	// Function to clear all the filters
 	const clearFilters = () => {
-		setFilters({
+		const newParams = new URLSearchParams(searchParams);
+	
+		// Remove all filter-related parameters
+		newParams.delete("priceRange");
+		newParams.delete("weightRange");
+	
+		Object.keys(appliedFilters.selectedFilters).forEach((key) => {
+			newParams.delete(key);
+		});
+	
+		// Reset filters in state safely
+		setPendingFilters({
 			priceRange: [3000000, 180000000],
 			weightRange: [0.5, 5],
 			selectedFilters: {
@@ -481,19 +508,21 @@ const CatalogPage = () => {
 				screenSize: []
 			}
 		});
-
-		axios.get(`http://localhost:8000/laptops/filter?brand=${brand}&page=${page}&limit=${quantityPerPage}`)
-			.then((response) => {
-				setTotalProducts(response.data.total_count);
-				return response.data.results;
-			}
-			)
-			.then((data) => transformLaptopData(data))
-			.then((data) => setProducts(data))
-			.catch((error) => console.log(error));
+	
+		// Reset page to 1 when clearing filters
+		newParams.set("page", "1");
+	
+		// Update the URL
+		setSearchParams(newParams);
 	};
+	
 
-	const query = convertToQueryString(brand, page, quantityPerPage, filters, sortBy);
+	
+	// Data state
+	const [products, setProducts] = useState([]);
+	const [totalProducts, setTotalProducts] = useState(0);
+
+	const query = convertToQueryString(brand, page, quantityPerPage, appliedFilters, sortBy);
 
 	if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
 		return <div>Not Found</div>;
@@ -511,7 +540,7 @@ const CatalogPage = () => {
 			.then((data) => transformLaptopData(data))
 			.then((data) => setProducts(data))
 			.catch((error) => console.log(error));
-	}, [brand, page, quantityPerPage, sortBy]);
+	}, [brand, page, quantityPerPage, sortBy, appliedFilters]);
 
 	let from = (page - 1) * quantityPerPage + 1;
 	let to = Math.min(page * quantityPerPage, totalProducts);
@@ -543,8 +572,8 @@ const CatalogPage = () => {
 						<br></br>
 						<FilterSection 
 							brand={brand}
-							filters={filters}
-							updateFilters={updateFilters}
+							pendingFilters={pendingFilters}
+							updatePendingFilters={updatePendingFilters}
 							clearFilters={clearFilters}
 							applyFilters={applyFilters}
 						/>
@@ -555,29 +584,29 @@ const CatalogPage = () => {
 							<Text type="secondary">Items {from}-{to} of {totalProducts}</Text>
 
 							<div style={{ display: "flex", gap: 10 }}>
-							<CustomSelect 
-								value={sortBy} 
-								onChange={(value) => setSortBy(value)}
-								style={{ width: 250, height: 50 }}
-							>
-								<Option value="latest">
-									<Text type="secondary" strong>Sort by: </Text>
-									<Text strong> Latest</Text>
-								</Option>
-								<Option value="price-low">
-									<Text type="secondary" strong>Sort by: </Text>
-									<Text strong> Price (Low to High)</Text>
-								</Option>
-								<Option value="price-high">
-									<Text type="secondary" strong>Sort by: </Text>
-									<Text strong> Price (High to Low)</Text>
-								</Option>
-							</CustomSelect>
+								<CustomSelect 
+									value={sortBy} 
+									onChange={(value) => {updateImmediateParams("sortBy", value)}}
+									style={{ width: 250, height: 50 }}
+								>
+									<Option value="latest">
+										<Text type="secondary" strong>Sort by: </Text>
+										<Text strong> Latest</Text>
+									</Option>
+									<Option value="price-low">
+										<Text type="secondary" strong>Sort by: </Text>
+										<Text strong> Price (Low to High)</Text>
+									</Option>
+									<Option value="price-high">
+										<Text type="secondary" strong>Sort by: </Text>
+										<Text strong> Price (High to Low)</Text>
+									</Option>
+								</CustomSelect>
 
 								<CustomSelect
 									defaultValue={{ value: quantityPerPage }}
 									style={{ width: 180, height: 50 }} 
-									onChange={setQuantityPerPage}
+									onChange={(value) => {updateImmediateParams("quantityPerPage", value)}}
 								>
 									<Option value={15}>
 										<Text type="secondary" strong>Show: </Text>
@@ -602,10 +631,7 @@ const CatalogPage = () => {
 						<Pagination 
 							align="center"
 							current={page}
-							onChange={(page) => {
-								setPage(page);
-								window.scrollTo(0, 0);
-							}}
+							onChange={(page) => {updateImmediateParams("page", page)}}
 							total={totalProducts}
 							pageSize={quantityPerPage}
 							showSizeChanger={false}
