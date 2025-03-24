@@ -487,9 +487,9 @@ const CatalogPage = () => {
 			subBrand: searchParams.getAll("subBrand"),
 			cpu: searchParams.getAll("cpu"),
 			vga: searchParams.getAll("vga"),
-			ramAmount: searchParams.getAll("ramAmount").map(Number),
-			storageAmount: searchParams.getAll("storageAmount").map(Number),
-			screenSize: searchParams.getAll("screenSize").map(Number)
+			ramAmount: searchParams.getAll("ramAmount"),
+			storageAmount: searchParams.getAll("storageAmount"),
+			screenSize: searchParams.getAll("screenSize")
 		}
 	}), [searchParams]); 
 
