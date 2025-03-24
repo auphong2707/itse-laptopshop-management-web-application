@@ -46,11 +46,11 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/laptops/",
+    path: "/laptops/:brand",
     element: (
       <>
         <ScrollRestoration />
-        <CatalogPage inputBrand="All" />
+        <CatalogPage />
       </>
     ),
   },

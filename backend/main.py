@@ -105,7 +105,7 @@ def search_laptops(
 
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}  # Return results
 
-@app.get("/filter/")
+@app.get("/laptops/filter")
 def filter_laptops(
     price_min: int = Query(None, description="Minimum Price"),
     price_max: int = Query(None, description="Maximum Price"),
@@ -113,50 +113,57 @@ def filter_laptops(
     sub_brand: list[str] = Query([], description="Filter by sub-brands (e.g., ROG, TUF, ZenBook, VivoBook)"),
     cpu: list[str] = Query([], description="Filter by CPUs (AMD Ryzen, Intel Core, Apple M1, M2, etc.)"),
     vga: list[str] = Query([], description="Filter by VGAs (Nvidia GTX, RTX, AMD Radeon RX, etc.)"),
-    ram: list[int] = Query([], description="Filter by RAM (8GB, 16GB, 32GB, 64GB)"),
-    storage: list[int] = Query([], description="Filter by Storage (256GB, 512GB, 1024GB)"),
+    ram_amount: list[int] = Query([], description="Filter by RAM (8GB, 16GB, 32GB, 64GB)"),
+    storage_amount: list[int] = Query([], description="Filter by Storage (256GB, 512GB, 1024GB)"),
     screen_size: list[int] = Query([], description="Filter by Screen Sizes (13, 14, 15, 16, 17 inches)"),
     weight_min: float = Query(None, description="Minimum Weight"),
     weight_max: float = Query(None, description="Maximum Weight"),
-    limit: int = Query(10, description="Number of results to return")
+    limit: int = Query(None, description="Number of results to return (default: all)"),
+    page: int = Query(1, description="Page number for pagination (default: 1)"),
+    sort: str = Query("latest", description="Sort by 'latest' (default), 'price_asc', or 'price_desc'")
 ):
     """
     Filters laptops based on brand, CPU, VGA, RAM, storage, screen size, weight, and price.
+    Supports sorting by latest (default) or price.
+    Supports pagination if `limit` is specified.
     """
 
     filter_query = {"bool": {"filter": []}}
+    should_query = {"bool": {"should": []}}
 
-    # Apply filters dynamically based on user input
-    if brand:
+    # Apply strict filters
+    if brand and "all" not in brand:
         filter_query["bool"]["filter"].append({"terms": {"brand.keyword": brand}})
     if sub_brand:
         filter_query["bool"]["filter"].append({"terms": {"sub_brand.keyword": sub_brand}})
+    if ram_amount:
+        filter_query["bool"]["filter"].append({"terms": {"ram_amount": ram_amount}})
+    if storage_amount:
+        filter_query["bool"]["filter"].append({"terms": {"storage_amount": storage_amount}})
+
+    # Make CPU and VGA flexible (wildcard matching)
     if cpu:
-        filter_query["bool"]["filter"].append({"terms": {"cpu": cpu}})
+        should_query["bool"]["should"].extend([
+            {"wildcard": {"cpu.keyword": f"*{c.lower()}*"}} for c in cpu if isinstance(c, str)
+        ])
     if vga:
-        filter_query["bool"]["filter"].append({"terms": {"vga": vga}})
-    if ram:
-        filter_query["bool"]["filter"].append({"terms": {"ram_amount": ram}})
-    if storage:
-        filter_query["bool"]["filter"].append({"terms": {"storage_amount": storage}})
+        should_query["bool"]["should"].extend([
+            {"wildcard": {"vga.keyword": f"*{v.lower()}*"}} for v in vga if isinstance(v, str)
+        ])
+
+    # Screen size: allow a range (e.g., 15 → 15 - 15.6)
     if screen_size:
-        screen_size_filters = {
+        filter_query["bool"]["filter"].append({
             "bool": {
                 "should": [
-                    {
-                        "range": {
-                            "screen_size": {
-                                "gte": size - 0.6,
-                                "lte": size + 0.6
-                            }
-                        }
-                    }
+                    {"range": {"screen_size": {"gte": size, "lte": size + 0.6}}}
                     for size in screen_size
                 ],
                 "minimum_should_match": 1
             }
-        }
-        filter_query["bool"]["filter"].append(screen_size_filters)
+        })
+
+    # Weight filter
     if weight_min is not None or weight_max is not None:
         weight_filter = {"range": {"weight": {}}}
         if weight_min is not None:
@@ -164,6 +171,8 @@ def filter_laptops(
         if weight_max is not None:
             weight_filter["range"]["weight"]["lte"] = weight_max
         filter_query["bool"]["filter"].append(weight_filter)
+
+    # Price filter
     if price_min is not None or price_max is not None:
         price_filter = {"range": {"sale_price": {}}}
         if price_min is not None:
@@ -172,16 +181,53 @@ def filter_laptops(
             price_filter["range"]["sale_price"]["lte"] = price_max
         filter_query["bool"]["filter"].append(price_filter)
 
-    # Execute query in Elasticsearch
-    results = es.search(index="laptops", body={"query": filter_query, "size": limit})
+    # Merge should_query into filter_query (if there are CPU/VGA conditions)
+    if should_query["bool"]["should"]:
+        should_query["bool"]["minimum_should_match"] = 1  # Ensure at least one match
+        filter_query["bool"]["filter"].append(should_query)
 
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+    # Sorting options
+    sort_options = {
+        "latest": [{"inserted_at": {"order": "desc"}}],
+        "price_asc": [{"sale_price": {"order": "asc"}}],
+        "price_desc": [{"sale_price": {"order": "desc"}}]
+    }
+    sorting = sort_options.get(sort, sort_options["latest"])
+
+    # Pagination
+    query_body = {
+        "query": filter_query,
+        "sort": sorting
+    }
+    if limit is not None:
+        query_body.update({
+            "size": limit,
+            "from": (page - 1) * limit
+        })
+
+    # Execute Elasticsearch query
+    results = es.search(
+        index="laptops",
+        body=query_body,
+        track_total_hits=True
+    )
+
+    total_count = results["hits"]["total"]["value"]
+
+    return {
+        "sort": sort,
+        "page": page if limit is not None else None,
+        "limit": limit,
+        "total_count": total_count,
+        "results": [hit["_source"] for hit in results["hits"]["hits"]]
+    }
+
 
 @app.get("/laptops/latest")
 def get_latest_laptops(
     brand: str = Query("all"),
     subbrand: str = Query("all"),
-    limit: int = Query(10)
+    limit: int = Query(35)
 ):
     """
     Get latest laptops from Elasticsearch, optionally filtering by brand and sub-brand.
@@ -192,7 +238,7 @@ def get_latest_laptops(
     if brand.lower() != "all":
         filter_query["bool"]["filter"].append({"term": {"brand.keyword": brand}})
     
-    # Filter by sub_brand if not "all"
+    # Filter by sub-brand if not "all"
     if subbrand.lower() != "all":
         filter_query["bool"]["filter"].append({"term": {"sub_brand.keyword": subbrand}})
 
