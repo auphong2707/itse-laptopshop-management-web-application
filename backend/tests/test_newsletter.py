@@ -14,7 +14,6 @@ def test_subscribe_success():
     assert response.json()["email"] == "test@example.com"
 
 def test_subscribe_duplicate():
-    # Insert once
     client.post("/newsletter/subscribe", json={"email": "duplicate@example.com"})
 
     response = client.post("/newsletter/subscribe", json={"email": "duplicate@example.com"})
@@ -23,4 +22,4 @@ def test_subscribe_duplicate():
 
 def test_invalid_email_format():
     response = client.post("/newsletter/subscribe", json={"email": "invalid-email"})
-    assert response.status_code == 422  # FastAPI validation error
+    assert response.status_code == 422 
