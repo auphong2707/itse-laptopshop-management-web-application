@@ -5,7 +5,7 @@ import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
 import { useParams, useSearchParams } from "react-router-dom";
-import { transformLaptopData } from "../utils.js";
+import { transformLaptopData } from "../utils/transformData";
 import { debounce } from "lodash";
 import axios from "axios";
 
