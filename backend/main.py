@@ -8,6 +8,7 @@ from firebase_admin import credentials, auth, firestore
 from db.models import *
 from db.session import *
 from schemas.laptops import *
+from schemas.newsletter import *
 
 from services.firebase_auth import ExtendedUserCreate
 try :
@@ -340,3 +341,18 @@ def delete_account(uid: str):
         return {"message": f"Account with UID {uid} deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+@app.post("/newsletter/subscribe")
+def subscribe_to_newsletter(newsletter: NewsletterCreate):
+    """
+    Subscribe to the newsletter.
+    """
+    existing = db.query(NewsletterSubscription).filter(NewsletterSubscription.email == newsletter.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already subscribed")
+    
+    subscription = NewsletterSubscription(email=newsletter.email)
+    db.add(subscription)
+    db.commit()
+    db.refresh(subscription)
+    return {"message": "Subscribed successfully", "email": subscription.email}
