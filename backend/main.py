@@ -343,15 +343,15 @@ def delete_account(uid: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 @app.post("/newsletter/subscribe")
-def subscribe_to_newsletter(newsletter: NewsletterCreate):
+def subscribe_to_newsletter(data: NewsletterCreate, db: Session = Depends(get_db)):
     """
-    Subscribe to the newsletter.
+    Subscribe an email to the newsletter
     """
-    existing = db.query(NewsletterSubscription).filter(NewsletterSubscription.email == newsletter.email).first()
+    existing = db.query(NewsletterSubscription).filter_by(email=data.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already subscribed")
-    
-    subscription = NewsletterSubscription(email=newsletter.email)
+
+    subscription = NewsletterSubscription(email=data.email)
     db.add(subscription)
     db.commit()
     db.refresh(subscription)
