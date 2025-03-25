@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from './components/WebsiteFooter';
 
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/firebase";
+
 const { Content } = Layout;
 const { Text, Title } = Typography;
 
@@ -11,14 +14,41 @@ const contentStyle = {
     backgroundColor: "#fff",
     padding: "2rem",
   };
+
+const login = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User:", user);
+
+    // Get the Firebase Auth ID token
+    const token = await user.getIdToken();
+
+    // Send token to FastAPI backend
+    const response = await fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    console.log("Backend response:", data);
+  } catch (error) {
+    console.error("Error signing in:", error);
+  }
+};
   
 const CustomerLoginPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const handleSignIn = (values) => {
+  const handleSignIn = async (values) => {
     // Handle sign-in logic
     console.log("Sign-in form values:", values);
+    const { email, password } = values;
+    await login(email, password);
   };
 
   return (
@@ -63,7 +93,6 @@ const CustomerLoginPage = () => {
                 onFinish={handleSignIn}
                 layout="vertical"
                 style={{ marginTop: "1rem" }}
-                hideRequiredMark
               >
                 <Form.Item
                     label={

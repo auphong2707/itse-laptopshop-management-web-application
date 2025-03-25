@@ -2,20 +2,12 @@ from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import firebase_admin
-from firebase_admin import credentials, auth, firestore
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
 
-from services.firebase_auth import ExtendedUserCreate
-try :
-    cred = credentials.Certificate("secret/firebase-service-key.json")
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-except FileNotFoundError:
-    print("File not found. Therefore, firebase service is unavailable.")
+from services.firebase_auth import *
 
 app = FastAPI()
 
@@ -340,3 +332,8 @@ def delete_account(uid: str):
         return {"message": f"Account with UID {uid} deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+@app.post("/login")
+def login_user(user_data=Depends(verify_firebase_token)):
+    # user_data contains info like uid, email, etc.
+    return {"message": "Login successful", "user": user_data}
