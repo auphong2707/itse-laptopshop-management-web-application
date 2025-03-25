@@ -77,3 +77,11 @@ class Post(Base):
     description = Column(String, nullable=False)  # Post description
     link = Column(String, nullable=True)  # Optional URL link
     created_at = Column(DateTime, server_default=func.current_timestamp())
+
+
+class NewsletterSubscription(Base):
+    __tablename__ = "newsletter_subscriptions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    email = Column(String, unique=True, nullable=False)
+    subscribed_at = Column(TIMESTAMP, server_default=func.now())
