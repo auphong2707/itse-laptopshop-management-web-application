@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import { useParams } from "react-router-dom";
 import 'swiper/css';
 import axios from "axios";
 import { Form, Input, InputNumber, Button, Layout, Typography, Breadcrumb, Tabs } from "antd";
@@ -69,24 +70,28 @@ const transformFormData = (values) => {
 	};
   };
 
-  const handleSubmit = async (form) => {
-	const values = form.getFieldsValue();
-	const transformedData = transformFormData(values);
-  
-	console.log("Transformed Data:", JSON.stringify(transformedData, null, 2));
-  
-	try {
-	  const response = await axios.post("http://localhost:8000/laptops/", transformedData);
-	  console.log("Laptop added successfully:", response.data);
-	  alert("Laptop added successfully!");
-	} catch (error) {
-	  console.error("Error adding laptop:", error.response?.data || error);
-	  alert("Failed to add laptop.");
-	}
-  };
-
 const Detail = () => {
 	const [form] = Form.useForm();
+	const { id } = useParams();
+	const [productData, setProductData] = useState({});
+	
+	useEffect(() => {
+		if (id) {
+			// Fetch laptop data if ID is present
+			axios.get(`http://localhost:8000/laptops/id/${id}`)
+				.then((response) => {
+					setProductData(response.data);
+					form.setFieldsValue(response.data); // Populate form with fetched data
+				})
+				.catch(() => {
+					setProductData({});
+					form.resetFields(); // Clear form if fetch fails
+				});
+		} else {
+			// Clear form if no ID is present
+			form.resetFields();
+		}
+	}, [id]);
 
 	const [pictures, setPictures] = useState([]);
 
@@ -97,6 +102,28 @@ const Detail = () => {
 			setPictures((prev) => [...prev, newPicture]);
 		}
 	};
+
+	const handleSubmit = async (form) => {
+		const formData = form.getFieldsValue();
+	
+		try {
+			if (id) {
+				// Update existing laptop
+				await axios.put(`http://localhost:8000/laptops/${id}`, formData);
+				console.log("Update Success");
+			} else {
+				const transformedData = transformFormData(formData);
+				console.log("Transformed Data:", JSON.stringify(transformedData, null, 2));
+				// Insert new laptop
+				await axios.post('http://localhost:8000/laptops/', transformedData);
+				console.log("Insert Success");
+				form.resetFields();
+			}
+		} catch (error) {
+			console.log("Error submitting form:", error);
+		}
+	  };
+	
 
 	const inputStyle = { width: "40%" };
 
@@ -288,7 +315,9 @@ const Detail = () => {
 
 					{/* Submit button */}
 					<Form.Item wrapperCol={{ offset: 4 }}>
-					<Button type="primary" onClick={() => handleSubmit(form)}> Submit </Button>
+					<Button type="primary" onClick={() => handleSubmit(form)}>
+						{id ? 'Update Laptop' : 'Add Laptop'} 
+					</Button>
 					</Form.Item>
 				</div>
 
@@ -334,110 +363,136 @@ const Detail = () => {
 
 
 const DeletingProducts = () => {
-	const products = [
-	  { id: 1, name: "TEN MAY TINH", image: "path/to/image1.jpg" },
-	  { id: 2, name: "TEN MAY TINH", image: "path/to/image2.jpg" }
-	];
+	const [query, setQuery] = useState("");
+	const [products, setProducts] = useState([]);
+
+	const handleSearch = async (e) => {
+		const searchQuery = e.target.value;
+		setQuery(searchQuery);
+	
+		if (searchQuery.trim() === "") {
+		  setProducts([]); // Clear results if input is empty
+		  return;
+		}
+	
+		try {
+		  const response = await axios.get(`http://localhost:8000/laptops/search/`, {
+			params: { query: searchQuery, limit: 10 },
+		  });
+		  setProducts(response.data.results);
+		} catch (error) {
+		  console.error("Error searching for products:", error);
+		  setProducts([]); // Clear results on error
+		}
+	  };
   
-	return (
-	  <div style={{ padding: "2rem 0" }}>
-		<input 
-		  type="text" 
-		  placeholder="Search for item" 
-		  style={{
-			width: "50%",
-			padding: "0.5rem",
-			marginBottom: "1rem",
-			border: "1px solid #ddd",
-			borderRadius: "12px"
-		  }}
-		/>
-		{products.map((product) => (
-		  <div
-			key={product.id}
+	  return (
+		<div style={{ padding: "2rem 0" }}>
+		  <input
+			type="text"
+			value={query}
+			onChange={handleSearch}
+			placeholder="Search for item"
 			style={{
-			  display: "flex",
-			  alignItems: "center",
-			  padding: "1rem",
-			  borderBottom: "1px solid #ddd",
-			  width: "50%"
+			  width: "50%",
+			  padding: "0.5rem",
+			  marginBottom: "1rem",
+			  border: "1px solid #ddd",
+			  borderRadius: "12px",
 			}}
-		  >
-			<img
-			  src={product.image}
-			  alt={product.name}
+		  />
+		  {products.map((product, index) => (
+			<div
+			  key={index}
 			  style={{
-				width: "80px",
-				height: "80px",
-				objectFit: "cover",
-				marginRight: "1rem"
+				display: "flex",
+				alignItems: "center",
+				padding: "1rem",
+				borderBottom: "1px solid #ddd",
+				width: "50%",
 			  }}
-			/>
-			<span style={{ flexGrow: 1, fontWeight: "bold", marginRight: "0.5rem" }}>
-			  {product.name}
-			</span>
-			<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-			  <button
+			>
+			  <img
+				src={product.product_image_mini}
+				alt={product.name}
 				style={{
-				  width: "32px",
-				  height: "32px",
-				  borderRadius: "50%",
-				  border: "none",
-				  background: "#f5f5f5",
-				  cursor: "pointer",
-				  color: "#a6a6a6",
-				  display: "flex",
-				  alignItems: "center",
-				  justifyContent: "center",
-				  transition: "background-color 0.3s, transform 0.3s"
+				  width: "80px",
+				  height: "80px",
+				  objectFit: "cover",
+				  marginRight: "1rem",
 				}}
-				onMouseEnter={(e) => {
-				  e.currentTarget.style.backgroundColor = "#ddd";
-				  e.currentTarget.style.transform = "scale(1.1)";
-				  e.currentTarget.style.color = "#595959";
-				}}
-				onMouseLeave={(e) => {
-				  e.currentTarget.style.backgroundColor = "#f5f5f5";
-				  e.currentTarget.style.transform = "scale(1)";
-				  e.currentTarget.style.color = "#a6a6a6";
+			  />
+			  <span
+				style={{
+				  flexGrow: 1,
+				  fontWeight: "bold",
+				  marginRight: "0.5rem",
 				}}
 			  >
-				<CloseOutlined />
-			  </button>
-  
-			  <button
-				style={{
-				  width: "32px",
-				  height: "32px",
-				  borderRadius: "50%",
-				  border: "none",
-				  background: "#f5f5f5",
-				  cursor: "pointer",
-				  color: "#a6a6a6",
-				  display: "flex",
-				  alignItems: "center",
-				  justifyContent: "center",
-				  transition: "background-color 0.3s, transform 0.3s"
-				}}
-				onMouseEnter={(e) => {
-				  e.currentTarget.style.backgroundColor = "#ddd";
-				  e.currentTarget.style.transform = "scale(1.1)";
-				  e.currentTarget.style.color = "#595959";
-				}}
-				onMouseLeave={(e) => {
-				  e.currentTarget.style.backgroundColor = "#f5f5f5";
-				  e.currentTarget.style.transform = "scale(1)";
-				  e.currentTarget.style.color = "#a6a6a6";
-				}}
-			  >
-				<EditOutlined />
-			  </button>
+				{product.name}
+			  </span>
+			  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+				<button
+				  style={{
+					width: "32px",
+					height: "32px",
+					borderRadius: "50%",
+					border: "none",
+					background: "#f5f5f5",
+					cursor: "pointer",
+					color: "#a6a6a6",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					transition: "background-color 0.3s, transform 0.3s",
+				  }}
+				  onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = "#ddd";
+					e.currentTarget.style.transform = "scale(1.1)";
+					e.currentTarget.style.color = "#595959";
+				  }}
+				  onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = "#f5f5f5";
+					e.currentTarget.style.transform = "scale(1)";
+					e.currentTarget.style.color = "#a6a6a6";
+				  }}
+				>
+				  <CloseOutlined />
+				</button>
+	
+				<button
+				  style={{
+					width: "32px",
+					height: "32px",
+					borderRadius: "50%",
+					border: "none",
+					background: "#f5f5f5",
+					cursor: "pointer",
+					color: "#a6a6a6",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					transition: "background-color 0.3s, transform 0.3s",
+				  }}
+				  onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = "#ddd";
+					e.currentTarget.style.transform = "scale(1.1)";
+					e.currentTarget.style.color = "#595959";
+				  }}
+				  onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = "#f5f5f5";
+					e.currentTarget.style.transform = "scale(1)";
+					e.currentTarget.style.color = "#a6a6a6";
+				  }}
+				>
+				  <EditOutlined />
+				</button>
+			  </div>
 			</div>
-		  </div>
-		))}
-	  </div>
-	);
-  };
+		  ))}
+		</div>
+	  );
+	};
 
 const AdminTabs = ({ tabLabels, tabContents }) => {
 	const [activeTab, setActiveTab] = useState("0");
@@ -512,3 +567,4 @@ const AdministratorPage = () => {
 };
 
 export default AdministratorPage;
+export { Detail, DeletingProducts };
