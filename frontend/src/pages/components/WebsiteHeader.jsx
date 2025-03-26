@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar } from "antd";
 import { useNavigate, Link } from 'react-router-dom';
 import { FacebookFilled, InstagramFilled, ShoppingCartOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import logo from '/vite.svg';
 
 const { Text } = Typography;
@@ -19,52 +20,65 @@ const headerStyle = {
 
 const AccountMenu = () => {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, [auth]);
 
   const handleMenuClick = (e) => {
-    console.log("Clicked menu item:", e.key);
     setOpen(false);
+    if (e.key === "logout") {
+      signOut(auth).then(() => {
+        console.log("User signed out");
+        navigate("/customer/login");
+      });
+    } else if (e.key === "account") {
+      // navigate("/my-account"); // Route to the user's account page
+    }
   };
 
   const menu = (
-	<Menu
-		onClick={handleMenuClick}
-		style={{
-			minWidth: "165px"
-		}}
-	>
-	  <Menu.Item key="account" style={{ fontWeight: "bold" }}>My Account</Menu.Item>
-	  <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
-	  <Menu.Item key="compare" style={{ fontWeight: "bold" }}>Compare (0)</Menu.Item>
-	  <Menu.Divider />
-	  <Menu.Item
-      key="signin" 
-      style={{ fontWeight: "bold" }} 
-      onClick={() => navigate("/register")}
-      >Create an Account
-    </Menu.Item>
-	  <Menu.Item 
-      key="signin" 
-      style={{ fontWeight: "bold" }} 
-      onClick={() => navigate("/customer/login")}
-      >Sign In
-    </Menu.Item>
-	</Menu>
+    <Menu onClick={handleMenuClick} style={{ minWidth: "165px" }}>
+      {user ? (
+        <>
+          <Menu.Item key="account" style={{ fontWeight: "bold" }}>My Account</Menu.Item>
+          <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
+          <Menu.Item key="compare" style={{ fontWeight: "bold" }}>Compare (0)</Menu.Item>
+          <Menu.Divider />
+          <Menu.Item key="logout" style={{ fontWeight: "bold", color: "red" }}>Logout</Menu.Item>
+        </>
+      ) : (
+        <>
+          <Menu.Item key="signup" style={{ fontWeight: "bold" }} onClick={() => navigate("/register")}>
+            Create an Account
+          </Menu.Item>
+          <Menu.Item key="signin" style={{ fontWeight: "bold" }} onClick={() => navigate("/customer/login")}>
+            Sign In
+          </Menu.Item>
+        </>
+      )}
+    </Menu>
   );
-  
 
   return (
     <Dropdown 
-			overlay={menu}
-			trigger={["click"]} 
-			open={open} 
-			onOpenChange={setOpen}
-			placement="bottomCenter"
-			overlayStyle={{ paddingRight: "145px"}}
-		>
+      overlay={menu}
+      trigger={["click"]}
+      open={open}
+      onOpenChange={setOpen}
+      placement="bottomCenter"
+      overlayStyle={{ paddingRight: "145px" }}
+    >
       <Avatar 
         icon={<UserOutlined />} 
         style={{ cursor: "pointer" }} 
+        src={user?.photoURL || null} 
       />
     </Dropdown>
   );

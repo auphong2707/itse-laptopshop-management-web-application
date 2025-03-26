@@ -1,5 +1,5 @@
-import React from 'react';
-import { Row, Col, Form, Typography, Input, Button, Layout, Breadcrumb } from 'antd';
+import React, { useState } from 'react';
+import { Row, Col, Form, Typography, Input, Button, Layout, Breadcrumb, Alert } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from './components/WebsiteFooter';
@@ -37,18 +37,26 @@ const login = async (email, password) => {
     console.log("Backend response:", data);
   } catch (error) {
     console.error("Error signing in:", error);
+    throw error;
   }
 };
   
 const CustomerLoginPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState("");
 
   const handleSignIn = async (values) => {
-    // Handle sign-in logic
-    console.log("Sign-in form values:", values);
     const { email, password } = values;
-    await login(email, password);
+
+    try {
+      setLoginError(""); // clear any previous error
+      await login(email, password);
+      navigate("/"); // redirect to home
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError("Invalid email or password.");
+    }
   };
 
   return (
@@ -122,6 +130,17 @@ const CustomerLoginPage = () => {
                 >
                   <Input.Password placeholder="Your Name" />
                 </Form.Item>
+
+                {loginError && (
+                  <Form.Item>
+                    <Alert
+                      message={loginError}
+                      type="error"
+                      showIcon
+                      style={{ marginBottom: "1rem", borderRadius: "8px" }}
+                    />
+                  </Form.Item>
+                )}
 
                 <Form.Item>
                   <Button
