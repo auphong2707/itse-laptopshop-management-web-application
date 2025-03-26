@@ -33,47 +33,50 @@ const OptionalLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>{label}</span>
 );
 
-const handleSubmit = async (form) => {
-	const values = form.getFieldsValue(); // Get form values
-  
-	const json = {
-	  brand: values.brand || null,
-	  sub_brand: values.sub_brand || null,
-	  name: values.name || null,
-	  cpu: values.cpu || null,
-	  vga: values.vga || null,
-	  ram_amount: values.ram_amount || null,
-	  ram_type: values.ram_type || null,
-	  storage_amount: values.storage_amount || null,
-	  storage_type: values.storage_type || null,
-	  webcam_resolution: values.webcam_resolution || null,
-	  screen_size: values.screen_size || null,
-	  screen_resolution: values.screen_resolution || null,
-	  screen_refresh_rate: values.screen_refresh_rate || null,
-	  screen_brightness: values.screen_brightness || null,
-	  battery_capacity: values.battery_capacity || null,
-	  battery_cells: values.battery_cells || null,
-	  weight: values.weight || null,
-	  default_os: values.default_os || null,
-	  warranty: values.warranty || null,
-	  width: values.width || null,
-	  depth: values.depth || null,
-	  height: values.height || null,
-	  number_usb_a_ports: values.number_usb_a_ports || null,
-	  number_usb_c_ports: values.number_usb_c_ports || null,
-	  number_hdmi_ports: values.number_hdmi_ports || null,
-	  number_ethernet_ports: values.number_ethernet_ports || null,
-	  number_audio_jacks: values.number_audio_jacks || null,
-	  product_image_mini: values.product_image_mini || null,
-	  quantity: values.quantity || null,
-	  original_price: values.original_price || null,
-	  sale_price: values.sale_price || null,
+const transformFormData = (values) => {
+	return {
+	  brand: values.brand || "",
+	  sub_brand: values.sub_brand || "",
+	  name: values.name || "",
+	  cpu: values.cpu || "",
+	  vga: values.vga || "",
+	  ram_amount: values.ram_amount ? parseInt(values.ram_amount, 10) : 0,
+	  ram_type: values.ram_type || "",
+	  storage_amount: values.storage_amount ? parseInt(values.storage_amount, 10) : 0,
+	  storage_type: values.storage_type || "",
+	  webcam_resolution: values.webcam_resolution || "",
+	  screen_size: values.screen_size ? parseFloat(values.screen_size) : 0,
+	  screen_resolution: values.screen_resolution || "",
+	  screen_refresh_rate: values.screen_refresh_rate ? parseInt(values.screen_refresh_rate, 10) : 0,
+	  screen_brightness: values.screen_brightness ? parseInt(values.screen_brightness, 10) : 0,
+	  battery_capacity: values.battery_capacity ? parseFloat(values.battery_capacity) : 0,
+	  battery_cells: values.battery_cells ? parseInt(values.battery_cells, 10) : 0,
+	  weight: values.weight ? parseFloat(values.weight) : 0,
+	  default_os: values.default_os || "",
+	  warranty: values.warranty ? parseInt(values.warranty, 10) : 0,
+	  width: values.width ? parseFloat(values.width) : 0,
+	  depth: values.depth ? parseFloat(values.depth) : 0,
+	  height: values.height ? parseFloat(values.height) : 0,
+	  number_usb_a_ports: values.number_usb_a_ports ? parseInt(values.number_usb_a_ports, 10) : 0,
+	  number_usb_c_ports: values.number_usb_c_ports ? parseInt(values.number_usb_c_ports, 10) : 0,
+	  number_hdmi_ports: values.number_hdmi_ports ? parseInt(values.number_hdmi_ports, 10) : 0,
+	  number_ethernet_ports: values.number_ethernet_ports ? parseInt(values.number_ethernet_ports, 10) : 0,
+	  number_audio_jacks: values.number_audio_jacks ? parseInt(values.number_audio_jacks, 10) : 0,
+	  product_image_mini: values.product_image_mini || "",
+	  quantity: values.quantity ? parseInt(values.quantity, 10) : 0,
+	  original_price: values.original_price ? parseInt(values.original_price, 10) : 0,
+	  sale_price: values.sale_price ? parseInt(values.sale_price, 10) : 0,
 	};
+  };
+
+  const handleSubmit = async (form) => {
+	const values = form.getFieldsValue();
+	const transformedData = transformFormData(values);
   
-	console.log("Generated JSON:", JSON.stringify(json, null, 2));
+	console.log("Transformed Data:", JSON.stringify(transformedData, null, 2));
   
 	try {
-	  const response = await axios.post("http://localhost:8000/laptops/", json);
+	  const response = await axios.post("http://localhost:8000/laptops/", transformedData);
 	  console.log("Laptop added successfully:", response.data);
 	  alert("Laptop added successfully!");
 	} catch (error) {
@@ -137,13 +140,13 @@ const Detail = () => {
 						<Input style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="RAM Amount" />} name="ram_amount">
-						<Input style={inputStyle}/>
+						<InputNumber style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="RAM Type" />} name="ram_type">
 						<Input style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="Storage Amount" />} name="storage_amount">
-						<Input style={inputStyle}/>
+						<InputNumber style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="Storage Type" />} name="storage_type">
 						<Input style={inputStyle}/>
@@ -159,10 +162,10 @@ const Detail = () => {
 						<Input style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="Refresh Rate" />} name="screen_refresh_rate">
-						<Input style={inputStyle}/>
+						<InputNumber style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="Brightness" />} name="screen_brightness">
-						<Input style={inputStyle}/>
+						<InputNumber style={inputStyle}/>
 					</Form.Item>
 
 					{/* Battery and Power */}
