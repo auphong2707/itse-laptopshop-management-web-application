@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
+import axios from "axios";
 import { Form, Input, InputNumber, Button, Layout, Typography, Breadcrumb, Tabs } from "antd";
 import { Divider } from "antd";
 import { CloseOutlined, EditOutlined } from "@ant-design/icons";
@@ -31,6 +32,55 @@ const RequiredLabel = ({ label }) => (
 const OptionalLabel = ({ label }) => (
 	<span style={{ fontWeight: "bold" }}>{label}</span>
 );
+
+const handleSubmit = async (form) => {
+	const values = form.getFieldsValue(); // Get form values
+  
+	const json = {
+	  brand: values.brand || null,
+	  sub_brand: values.sub_brand || null,
+	  name: values.name || null,
+	  cpu: values.cpu || null,
+	  vga: values.vga || null,
+	  ram_amount: values.ram_amount || null,
+	  ram_type: values.ram_type || null,
+	  storage_amount: values.storage_amount || null,
+	  storage_type: values.storage_type || null,
+	  webcam_resolution: values.webcam_resolution || null,
+	  screen_size: values.screen_size || null,
+	  screen_resolution: values.screen_resolution || null,
+	  screen_refresh_rate: values.screen_refresh_rate || null,
+	  screen_brightness: values.screen_brightness || null,
+	  battery_capacity: values.battery_capacity || null,
+	  battery_cells: values.battery_cells || null,
+	  weight: values.weight || null,
+	  default_os: values.default_os || null,
+	  warranty: values.warranty || null,
+	  width: values.width || null,
+	  depth: values.depth || null,
+	  height: values.height || null,
+	  number_usb_a_ports: values.number_usb_a_ports || null,
+	  number_usb_c_ports: values.number_usb_c_ports || null,
+	  number_hdmi_ports: values.number_hdmi_ports || null,
+	  number_ethernet_ports: values.number_ethernet_ports || null,
+	  number_audio_jacks: values.number_audio_jacks || null,
+	  product_image_mini: values.product_image_mini || null,
+	  quantity: values.quantity || null,
+	  original_price: values.original_price || null,
+	  sale_price: values.sale_price || null,
+	};
+  
+	console.log("Generated JSON:", JSON.stringify(json, null, 2));
+  
+	try {
+	  const response = await axios.post("http://localhost:8000/laptops/", json);
+	  console.log("Laptop added successfully:", response.data);
+	  alert("Laptop added successfully!");
+	} catch (error) {
+	  console.error("Error adding laptop:", error.response?.data || error);
+	  alert("Failed to add laptop.");
+	}
+  };
 
 const Detail = () => {
 	const [form] = Form.useForm();
@@ -71,7 +121,7 @@ const Detail = () => {
 					<Form.Item label={<RequiredLabel label="Name" />} name="name">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Operating System" />} name="operatingSystem">
+					<Form.Item label={<RequiredLabel label="Operating System" />} name="default_os">
 						<Input style={inputStyle}/>
 					</Form.Item>
 					<Form.Item label={<RequiredLabel label="Warranty" />} name="warranty">
@@ -83,37 +133,44 @@ const Detail = () => {
 					<Form.Item label={<RequiredLabel label="CPU" />} name="cpu">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="GPU" />} name="gpu">
+					<Form.Item label={<OptionalLabel label="GPU" />} name="vga">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="RAM" />} name="ram">
+					<Form.Item label={<RequiredLabel label="RAM Amount" />} name="ram_amount">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Storage" />} name="storage">
+					<Form.Item label={<RequiredLabel label="RAM Type" />} name="ram_type">
+						<Input style={inputStyle}/>
+					</Form.Item>
+					<Form.Item label={<RequiredLabel label="Storage Amount" />} name="storage_amount">
+						<Input style={inputStyle}/>
+					</Form.Item>
+					<Form.Item label={<RequiredLabel label="Storage Type" />} name="storage_type">
 						<Input style={inputStyle}/>
 					</Form.Item>
 
+
 					{/* Display */}
 					<CustomDivider label="Display" />
-					<Form.Item label={<RequiredLabel label="Size" />} name="size">
+					<Form.Item label={<RequiredLabel label="Size" />} name="screen_size">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Resolution" />} name="resolution">
+					<Form.Item label={<RequiredLabel label="Resolution" />} name="screen_resolution">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Refresh Rate" />} name="refreshRate">
+					<Form.Item label={<RequiredLabel label="Refresh Rate" />} name="screen_refresh_rate">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Brightness" />} name="brightness">
+					<Form.Item label={<RequiredLabel label="Brightness" />} name="screen_brightness">
 						<Input style={inputStyle}/>
 					</Form.Item>
 
 					{/* Battery and Power */}
 					<CustomDivider label="Battery and Power" />
-					<Form.Item label={<RequiredLabel label="Battery Capacity" />} name="batteryCapacity">
+					<Form.Item label={<RequiredLabel label="Battery Capacity" />} name="battery_capacity">
 						<Input style={inputStyle}/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="Battery Cells" />} name="batteryCells">
+					<Form.Item label={<RequiredLabel label="Battery Cells" />} name="battery_cells">
 						<Input style={inputStyle}/>
 					</Form.Item>
 
@@ -134,7 +191,7 @@ const Detail = () => {
 
 					{/* Connectivity and Ports */}
 					<CustomDivider label="Connectivity and Ports" />
-					<Form.Item label={<RequiredLabel label="USB-A Ports" />} name="usbAPorts">
+					<Form.Item label={<RequiredLabel label="USB-A Ports" />} name="number_usb_a_ports">
 					<InputNumber
 						min={0}
 						controls={true}
@@ -148,22 +205,7 @@ const Detail = () => {
 						}}
 					/>
 					</Form.Item>
-					<Form.Item label={<RequiredLabel label="USB-C Ports" />} name="usbCPorts" rules={[{ required: false }]}>
-					<InputNumber
-						min={0}
-						controls={true}
-						style={{
-						width: "60px",
-						fontWeight: "bold",
-						borderRadius: "4px",
-						backgroundColor: "#d9d9d9",
-						padding: "4px",
-						textAlign: "center",
-						}}
-					/>
-					</Form.Item>
-
-					<Form.Item label={<RequiredLabel label="HDMI Ports" />} name="hdmiPorts" rules={[{ required: false }]}>
+					<Form.Item label={<RequiredLabel label="USB-C Ports" />} name="number_usb_c_ports" rules={[{ required: false }]}>
 					<InputNumber
 						min={0}
 						controls={true}
@@ -178,7 +220,7 @@ const Detail = () => {
 					/>
 					</Form.Item>
 
-					<Form.Item label={<RequiredLabel label="Ethernet Ports" />} name="ethernetPorts" rules={[{ required: false }]}>
+					<Form.Item label={<RequiredLabel label="HDMI Ports" />} name="number_hdmi_ports" rules={[{ required: false }]}>
 					<InputNumber
 						min={0}
 						controls={true}
@@ -193,7 +235,22 @@ const Detail = () => {
 					/>
 					</Form.Item>
 
-					<Form.Item label={<RequiredLabel label="Audio Jacks" />} name="audioJacks" rules={[{ required: false }]}>
+					<Form.Item label={<RequiredLabel label="Ethernet Ports" />} name="number_ethernet_ports" rules={[{ required: false }]}>
+					<InputNumber
+						min={0}
+						controls={true}
+						style={{
+						width: "60px",
+						fontWeight: "bold",
+						borderRadius: "4px",
+						backgroundColor: "#d9d9d9",
+						padding: "4px",
+						textAlign: "center",
+						}}
+					/>
+					</Form.Item>
+
+					<Form.Item label={<RequiredLabel label="Audio Jacks" />} name="number_audio_jacks" rules={[{ required: false }]}>
 					<InputNumber
 						min={0}
 						controls={true}
@@ -210,19 +267,25 @@ const Detail = () => {
 
 					{/* Other features */}
 					<CustomDivider label="Other features" />
-					<Form.Item label={<OptionalLabel label="Webcam" />} name="webcam">
+					<Form.Item label={<OptionalLabel label="Webcam" />} name="webcam_resolution">
 						<Input style={inputStyle}/>
 					</Form.Item>
 
 					{/* Price */}
-					<CustomDivider label="Price" />
-					<Form.Item label={<RequiredLabel label="Price" />} name="price">
+					<CustomDivider label="Retail information" />
+					<Form.Item label={<RequiredLabel label="Quantity" />} name="quantity">
+						<InputNumber style = {inputStyle} />
+					</Form.Item>
+					<Form.Item label={<RequiredLabel label="Original Price" />} name="original_price">
+						<InputNumber suffix="đ" style={inputStyle}/>
+					</Form.Item>
+					<Form.Item label={<OptionalLabel label="Sales Price" />} name="sale_price">
 						<InputNumber suffix="đ" style={inputStyle}/>
 					</Form.Item>
 
 					{/* Submit button */}
 					<Form.Item wrapperCol={{ offset: 4 }}>
-						<Button type="primary">Submit</Button>
+					<Button type="primary" onClick={() => handleSubmit(form)}> Submit </Button>
 					</Form.Item>
 				</div>
 
