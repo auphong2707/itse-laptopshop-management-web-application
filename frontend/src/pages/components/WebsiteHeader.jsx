@@ -25,11 +25,20 @@ const AccountMenu = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const tokenResult = await currentUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+        console.log("Role:", role);
+        setUser({ ...currentUser, role });
+      } else {
+        setUser(null);
+      }
     });
+  
     return () => unsubscribe();
   }, [auth]);
+  
 
   const handleMenuClick = (e) => {
     setOpen(false);
@@ -48,8 +57,18 @@ const AccountMenu = () => {
       {user ? (
         <>
           <Menu.Item key="account" style={{ fontWeight: "bold" }}>My Account</Menu.Item>
-          <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
-          <Menu.Item key="compare" style={{ fontWeight: "bold" }}>Compare (0)</Menu.Item>
+  
+          {user.role === "admin" ? (
+            <Menu.Item key="dashboard" style={{ fontWeight: "bold" }} onClick={() => navigate("/admin/dashboard")}>
+              Dashboard
+            </Menu.Item>
+          ) : (
+            <>
+              <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>My Wish List (0)</Menu.Item>
+              <Menu.Item key="compare" style={{ fontWeight: "bold" }}>Compare (0)</Menu.Item>
+            </>
+          )}
+  
           <Menu.Divider />
           <Menu.Item key="logout" style={{ fontWeight: "bold", color: "red" }}>Logout</Menu.Item>
         </>
@@ -65,6 +84,7 @@ const AccountMenu = () => {
       )}
     </Menu>
   );
+  
 
   return (
     <Dropdown 
