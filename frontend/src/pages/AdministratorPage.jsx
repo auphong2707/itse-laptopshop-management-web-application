@@ -128,7 +128,7 @@ const Detail = () => {
 	const inputStyle = { width: "40%" };
 
 	return (
-		<div style={{ padding: "2rem 0" }}>
+		<div style={{ padding: "0rem 0" }}>
 			<Form 
 			layout="horizontal" 
 			form={form}
@@ -321,7 +321,7 @@ const Detail = () => {
 					</Form.Item>
 				</div>
 
-				<div style={{ position: "absolute", right: "-5px", top: "120px", flex: 1 }}>
+				<div style={{ position: "absolute", right: "215px", top: "325px", flex: 1 }}>
 
 				<Form.Item name="pictures">
 					<Swiper
@@ -515,14 +515,7 @@ const AdminTabs = () => {
 	};
 
 	return (
-		<div style={{ 
-			width: "100%", 
-			display: "flex", 
-			justifyContent: "start", 
-			alignItems: "center", 
-			padding: "0.75rem 0%", 
-			borderBottom: "2px solid #ddd"
-		}}>
+		<div>
 			<Tabs
 				activeKey={getActiveKey()}
 				onChange={handleTabChange}
