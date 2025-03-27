@@ -103,6 +103,10 @@ const Detail = () => {
 		}
 	};
 
+	const handleDeletePicture = (indexToDelete) => {
+		setPictures(prevPictures => prevPictures.filter((_, index) => index !== indexToDelete));
+	};
+
 	const handleSubmit = async (form) => {
 		const formData = form.getFieldsValue();
 	
@@ -325,35 +329,59 @@ const Detail = () => {
 
 				<Form.Item name="pictures">
 					<Swiper
-					modules={[Navigation]}
-					navigation
-					spaceBetween={40}
-					slidesPerView={1}
-					style={{ width: '650px', height: '400px', padding: '1rem'}}
-				>
-					{pictures.map((picture, index) => (
-					<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-						<img
-						src={picture}
-						alt={`Picture ${index + 1}`}
-						style={{ width: '600px', height: '400px' }}
-						/>
-					</SwiperSlide>
-					))}
-					<SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-					<label style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #aaa', borderRadius: '8px' }}>
-						Add picture
-						<input
-						type="file"
-						accept="image/*"
-						style={{ display: 'none' }}
-						onChange={handleAddPicture}
-						/>
-					</label>
-					</SwiperSlide>
-				</Swiper>
-				</Form.Item>
-
+						modules={[Navigation]}
+						navigation
+						spaceBetween={40}
+						slidesPerView={1}
+						style={{ width: '650px', height: '400px', padding: '1rem' }}
+					>
+						{pictures.map((picture, index) => (
+						<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+							<img
+							src={picture}
+							alt={`Picture ${index + 1}`}
+							style={{ width: '600px', height: '400px' }}
+							/>
+							{/* Delete Button */}
+							<button
+							onClick={() => handleDeletePicture(index)}
+							style={{
+								position: 'absolute',
+								top: '-12px',  // Moves it above the image
+								right: '10px', // Slightly to the right
+								background: '#b0b0b0', // Gray background
+								border: 'none',
+								cursor: 'pointer',
+								fontSize: '14px', // Smaller font size
+								color: 'red', // Red CloseOutlined icon
+								borderRadius: '50%',
+								width: '22px', // Smaller button
+								height: '24px',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								transition: 'background 0.3s ease',
+							}}
+							onMouseEnter={(e) => (e.target.style.background = '#8a8a8a')} // Darker gray on hover
+							onMouseLeave={(e) => (e.target.style.background = '#b0b0b0')}
+							>
+							<CloseOutlined />
+							</button>
+						</SwiperSlide>
+						))}
+						<SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+						<label style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #aaa', borderRadius: '8px' }}>
+							Add picture
+							<input
+							type="file"
+							accept="image/*"
+							style={{ display: 'none' }}
+							onChange={handleAddPicture}
+							/>
+						</label>
+						</SwiperSlide>
+					</Swiper>
+					</Form.Item>
 				</div>
 			</div>
 		</Form>
@@ -365,139 +393,149 @@ const DeletingProducts = () => {
 	const [query, setQuery] = useState("");
 	const [products, setProducts] = useState([]);
 	const navigate = useNavigate();
-
+  
 	const handleSearch = async (e) => {
-		const searchQuery = e.target.value;
-		setQuery(searchQuery);
-	
-		if (searchQuery.trim() === "") {
-		  setProducts([]); // Clear results if input is empty
-		  return;
-		}
-	
-		try {
-		  const response = await axios.get(`http://localhost:8000/laptops/search/`, {
-			params: { query: searchQuery, limit: 10 },
-		  });
-		  setProducts(response.data.results);
-		} catch (error) {
-		  console.error("Error searching for products:", error);
-		  setProducts([]); // Clear results on error
-		}
-	  };
-
-	  const handleEdit = (productId) => {
-		navigate(`/admin/detail/${productId}`);
+	  const searchQuery = e.target.value;
+	  setQuery(searchQuery);
+  
+	  if (searchQuery.trim() === "") {
+		setProducts([]); // Clear results if input is empty
+		return;
+	  }
+  
+	  try {
+		const response = await axios.get(`http://localhost:8000/laptops/search/`, {
+		  params: { query: searchQuery, limit: 10 },
+		});
+		setProducts(response.data.results);
+	  } catch (error) {
+		console.error("Error searching for products:", error);
+		setProducts([]); // Clear results on error
+	  }
 	};
   
-	  return (
-		<div style={{ padding: "2rem 0" }}>
-		  <input
-			type="text"
-			value={query}
-			onChange={handleSearch}
-			placeholder="Search for item"
+	const handleDelete = async (productId) => {
+	  try {
+		await axios.delete(`http://localhost:8000/laptops/${productId}`);
+		setProducts(products.filter((product) => product.id !== productId)); // Remove from state
+	  } catch (error) {
+		console.error("Error deleting product:", error);
+	  }
+	};
+  
+	const handleEdit = (productId) => {
+	  navigate(`/admin/detail/${productId}`);
+	};
+  
+	return (
+	  <div style={{ padding: "2rem 0" }}>
+		<input
+		  type="text"
+		  value={query}
+		  onChange={handleSearch}
+		  placeholder="Search for item"
+		  style={{
+			width: "50%",
+			padding: "0.5rem",
+			marginBottom: "1rem",
+			border: "1px solid #ddd",
+			borderRadius: "12px",
+		  }}
+		/>
+		{products.map((product) => (
+		  <div
+			key={product.id}
 			style={{
+			  display: "flex",
+			  alignItems: "center",
+			  padding: "1rem",
+			  borderBottom: "1px solid #ddd",
 			  width: "50%",
-			  padding: "0.5rem",
-			  marginBottom: "1rem",
-			  border: "1px solid #ddd",
-			  borderRadius: "12px",
 			}}
-		  />
-		  {products.map((product, index) => (
-			<div
-			  key={index}
+		  >
+			<img
+			  src={product.product_image_mini}
+			  alt={product.name}
 			  style={{
-				display: "flex",
-				alignItems: "center",
-				padding: "1rem",
-				borderBottom: "1px solid #ddd",
-				width: "50%",
+				width: "80px",
+				height: "80px",
+				objectFit: "cover",
+				marginRight: "1rem",
+			  }}
+			/>
+			<span
+			  style={{
+				flexGrow: 1,
+				fontWeight: "bold",
+				marginRight: "0.5rem",
 			  }}
 			>
-			  <img
-				src={product.product_image_mini}
-				alt={product.name}
+			  {product.name}
+			</span>
+			<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+			  <button
 				style={{
-				  width: "80px",
-				  height: "80px",
-				  objectFit: "cover",
-				  marginRight: "1rem",
+				  width: "32px",
+				  height: "32px",
+				  borderRadius: "50%",
+				  border: "none",
+				  background: "#f5f5f5",
+				  cursor: "pointer",
+				  color: "#a6a6a6",
+				  display: "flex",
+				  alignItems: "center",
+				  justifyContent: "center",
+				  transition: "background-color 0.3s, transform 0.3s",
 				}}
-			  />
-			  <span
-				style={{
-				  flexGrow: 1,
-				  fontWeight: "bold",
-				  marginRight: "0.5rem",
+				onClick={() => handleDelete(product.id)}
+				onMouseEnter={(e) => {
+				  e.currentTarget.style.backgroundColor = "#ddd";
+				  e.currentTarget.style.transform = "scale(1.1)";
+				  e.currentTarget.style.color = "#595959";
+				}}
+				onMouseLeave={(e) => {
+				  e.currentTarget.style.backgroundColor = "#f5f5f5";
+				  e.currentTarget.style.transform = "scale(1)";
+				  e.currentTarget.style.color = "#a6a6a6";
 				}}
 			  >
-				{product.name}
-			  </span>
-			  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-				<button
-				  style={{
-					width: "32px",
-					height: "32px",
-					borderRadius: "50%",
-					border: "none",
-					background: "#f5f5f5",
-					cursor: "pointer",
-					color: "#a6a6a6",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					transition: "background-color 0.3s, transform 0.3s",
-				  }}
-				  onMouseEnter={(e) => {
-					e.currentTarget.style.backgroundColor = "#ddd";
-					e.currentTarget.style.transform = "scale(1.1)";
-					e.currentTarget.style.color = "#595959";
-				  }}
-				  onMouseLeave={(e) => {
-					e.currentTarget.style.backgroundColor = "#f5f5f5";
-					e.currentTarget.style.transform = "scale(1)";
-					e.currentTarget.style.color = "#a6a6a6";
-				  }}
-				>
-				  <CloseOutlined />
-				</button>
-	
-				<button
-				  style={{
-					width: "32px",
-					height: "32px",
-					borderRadius: "50%",
-					border: "none",
-					background: "#f5f5f5",
-					cursor: "pointer",
-					color: "#a6a6a6",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					transition: "background-color 0.3s, transform 0.3s",
-				  }}
-				  onClick={() => handleEdit(product.id)}
-				  onMouseEnter={(e) => {
-					e.currentTarget.style.backgroundColor = "#ddd";
-					e.currentTarget.style.transform = "scale(1.1)";
-					e.currentTarget.style.color = "#595959";
-				  }}
-				  onMouseLeave={(e) => {
-					e.currentTarget.style.backgroundColor = "#f5f5f5";
-					e.currentTarget.style.transform = "scale(1)";
-					e.currentTarget.style.color = "#a6a6a6";
-				  }}
-				>
-				  <EditOutlined />
-				</button>
-			  </div>
+				<CloseOutlined />
+			  </button>
+  
+			  <button
+				style={{
+				  width: "32px",
+				  height: "32px",
+				  borderRadius: "50%",
+				  border: "none",
+				  background: "#f5f5f5",
+				  cursor: "pointer",
+				  color: "#a6a6a6",
+				  display: "flex",
+				  alignItems: "center",
+				  justifyContent: "center",
+				  transition: "background-color 0.3s, transform 0.3s",
+				}}
+				onClick={() => handleEdit(product.id)}
+				onMouseEnter={(e) => {
+				  e.currentTarget.style.backgroundColor = "#ddd";
+				  e.currentTarget.style.transform = "scale(1.1)";
+				  e.currentTarget.style.color = "#595959";
+				}}
+				onMouseLeave={(e) => {
+				  e.currentTarget.style.backgroundColor = "#f5f5f5";
+				  e.currentTarget.style.transform = "scale(1)";
+				  e.currentTarget.style.color = "#a6a6a6";
+				}}
+			  >
+				<EditOutlined />
+			  </button>
 			</div>
-		  ))}
-		</div>
-	  );
-	};
+		  </div>
+		))}
+	  </div>
+	);
+  };
 
 const AdminTabs = () => {
 	const navigate = useNavigate();
