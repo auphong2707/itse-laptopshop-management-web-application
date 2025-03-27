@@ -134,3 +134,9 @@ CREATE TRIGGER set_posts_updated_at
 BEFORE UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE delete_log (
+    id UUID PRIMARY KEY,
+    table_name TEXT,
+    deleted_at TIMESTAMP DEFAULT NOW()
+);

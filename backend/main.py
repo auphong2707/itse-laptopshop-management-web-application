@@ -53,17 +53,28 @@ def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
 
 @app.delete("/laptops/{laptop_id}")
 def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
-    '''
-    Delete laptop from database
-    '''
+    """
+    Delete a laptop from the database and log the deletion.
+    """
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
-    if laptop is None:
+    if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    db.delete(laptop)
-    db.commit()
+    try:
+        # Log the deletion in the delete_log table
+        db.execute(
+            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())",
+            {"id": laptop_id}
+        )
 
-    return {"message": "Laptop deleted successfully"}
+        # Delete the laptop
+        db.delete(laptop)
+        db.commit()
+        return {"message": "Laptop deleted successfully"}
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Database error: " + str(e))
 
 @app.put("/laptops/{laptop_id}")
 def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)):
