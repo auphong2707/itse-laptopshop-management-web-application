@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import { useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import 'swiper/css';
 import axios from "axios";
 import { Form, Input, InputNumber, Button, Layout, Typography, Breadcrumb, Tabs } from "antd";
@@ -361,10 +361,10 @@ const Detail = () => {
 	);
 };
 
-
 const DeletingProducts = () => {
 	const [query, setQuery] = useState("");
 	const [products, setProducts] = useState([]);
+	const navigate = useNavigate();
 
 	const handleSearch = async (e) => {
 		const searchQuery = e.target.value;
@@ -385,6 +385,10 @@ const DeletingProducts = () => {
 		  setProducts([]); // Clear results on error
 		}
 	  };
+
+	  const handleEdit = (productId) => {
+		navigate(`/admin/detail/${productId}`);
+	};
   
 	  return (
 		<div style={{ padding: "2rem 0" }}>
@@ -474,6 +478,7 @@ const DeletingProducts = () => {
 					justifyContent: "center",
 					transition: "background-color 0.3s, transform 0.3s",
 				  }}
+				  onClick={() => handleEdit(product.id)}
 				  onMouseEnter={(e) => {
 					e.currentTarget.style.backgroundColor = "#ddd";
 					e.currentTarget.style.transform = "scale(1.1)";
@@ -494,12 +499,24 @@ const DeletingProducts = () => {
 	  );
 	};
 
-const AdminTabs = ({ tabLabels, tabContents }) => {
-	const [activeTab, setActiveTab] = useState("0");
+const AdminTabs = () => {
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	const getActiveKey = () => {
+		if (location.pathname.includes("/admin/detail")) return "0";
+		if (location.pathname.includes("/admin/delete")) return "1";
+		return "0"; // Default to "Detail"
+	};
+
+	const handleTabChange = (key) => {
+		if (key === "0") navigate("/admin/detail");
+		if (key === "1") navigate("/admin/delete");
+	};
 
 	return (
 		<div style={{ 
-			width: "100%",
+			width: "100%", 
 			display: "flex", 
 			justifyContent: "start", 
 			alignItems: "center", 
@@ -507,64 +524,45 @@ const AdminTabs = ({ tabLabels, tabContents }) => {
 			borderBottom: "2px solid #ddd"
 		}}>
 			<Tabs
-				activeKey={activeTab}
-				onChange={(key) => setActiveTab(key)}
+				activeKey={getActiveKey()}
+				onChange={handleTabChange}
 				tabBarGutter={80}
-				tabBarStyle={{borderBottom: "none", paddingBottom: "1rem" }}
+				tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
 				style={{ width: "100%" }}
 			>
-				{tabLabels.map((label, index) => (
-					<Tabs.TabPane 
-						key={index.toString()} 
-						tab={<span style={{fontWeight: activeTab === index.toString() ? "bold" : "normal" }}>{label}</span>}
-					>
-						{tabContents[index]}
-					</Tabs.TabPane>
-				))}
+				<Tabs.TabPane key="0" tab="Detail" />
+				<Tabs.TabPane key="1" tab="Deleting Products" />
 			</Tabs>
-
-			<div style={{
-				position: "absolute",
-				top: "300px",
-				left: "0",
-				width: "100vw",
-				height: "1px", 
-				backgroundColor: "#ddd", 
-				zIndex: "10",
-			}}></div>
 		</div>
 	);
 };
 
+
 const AdministratorPage = () => {
+	return (
+		<Layout>
+			<WebsiteHeader />
 
-  return (
-    <Layout>
-      <WebsiteHeader />
+			<Content style={{ padding: "1.5rem 12%", backgroundColor: "#fff" }}>
+				<Breadcrumb separator=">" style={{ marginBottom: "1rem", fontSize: "14px" }}>
+					<Breadcrumb.Item>Home</Breadcrumb.Item>
+					<Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
+				</Breadcrumb>
 
-      <Content style={{ padding: "1.5rem 12%", backgroundColor: "#fff" }}>
-        <Breadcrumb separator=">" style={{ marginBottom: "1rem", fontSize: "14px" }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
-        </Breadcrumb>
+				<Title level={2} style={{ fontWeight: "bold" }}>Administrator Page</Title>
 
-        {/* Page title */}
-        <Title level={2} style={{ fontWeight: "bold" }}>Administrator page</Title>
+				{/* Tabs for Navigation */}
+				<AdminTabs />
 
-        {/* Tabs Section */}
-        <AdminTabs
-				 tabLabels={["Detail", "Deleting products"]}
-				 tabContents = {[
-					Detail(),
-					DeletingProducts(),
-					]}
-				/>
-      </Content>
+				{/* Outlet for Rendering Child Components */}
+				<Outlet />
+			</Content>
 
-      <WebsiteFooter />
-    </Layout>
-  );
+			<WebsiteFooter />
+		</Layout>
+	);
 };
+	
 
 export default AdministratorPage;
 export { Detail, DeletingProducts };
