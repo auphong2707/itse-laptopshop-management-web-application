@@ -1,8 +1,11 @@
-import { Row, Col, Typography, Layout, Input, Button } from "antd";
+import { Row, Col, Typography, Layout, Input, Button, message } from "antd";
 import { CustomerServiceOutlined, UserOutlined, TagOutlined, FacebookOutlined, InstagramOutlined } from "@ant-design/icons";
-
+import { useState, useRef } from "react";
 const { Title, Text, Paragraph, Link } = Typography;
 const { Footer } = Layout;
+
+const API_URL = "http://localhost:8000/newsletter/subscribe"; 
+const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
 const features = [
   {
@@ -22,7 +25,7 @@ const features = [
   },
 ];
 
-const CustomInput = () => {
+const CustomInput = ({ value, onChange }) => {
   return (
     <div>
       <style>
@@ -35,6 +38,8 @@ const CustomInput = () => {
       </style>
 
       <Input
+        value={value}
+        onChange={onChange}
         placeholder="Your Email"
         className="custom-input"
         style={{
@@ -52,6 +57,7 @@ const CustomInput = () => {
   );
 };
 
+
 const footerStyle = {
   borderBottom: "1px solid #f0f0f0",
   height: "100px",
@@ -63,6 +69,50 @@ const footerStyle = {
 };
 
 const WebsiteFooter = () => {
+
+  const [email, setEmail] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [isError, setIsError] = useState(false);
+
+  const handleSubscribe = async () => {
+    if (!email || !isValidEmail(email)) {
+      setMessageText("Please enter a valid email.");
+      setIsError(true);
+      return;
+    }
+  
+    const currentEmail = email; // preserve before clearing
+    setEmail(""); // instantly clear input
+  
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: currentEmail }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.status === 200) {
+        setMessageText("Subscribed successfully!");
+        setIsError(false);
+      } else if (response.status === 400) {
+        setMessageText(data.detail || "Email already subscribed");
+        setIsError(true);
+      } else {
+        setMessageText("Something went wrong. Please try again.");
+        setIsError(true);
+      }
+    } catch (error) {
+      setMessageText("Unable to reach server. Please try again later.");
+      setIsError(true);
+    }
+  };
+  
+  
+
   return (
     <Footer style={footerStyle}>
 			<div style={{ textAlign: "center", background: "#fff", paddingTop: 70, paddingBottom: 30, display: "flex", justifyContent: "space-evenly" }} className="responsive-padding">
@@ -100,24 +150,39 @@ const WebsiteFooter = () => {
 							Be the first to hear about the latest offers.
 						</Text>
 					</Col>
-					<Col xs={24} md={12} style={{ display: "flex", justifyContent: "flex-end" }}>
-						<CustomInput />
-						<Button 
-							style={{ 
-								borderRadius: 30,
-								height: 45,
-								width: 160,
-								marginLeft: 20,
-								backgroundColor: "#0156FF",
-								color: "white",
-								border: "none",
-								fontWeight: "bold",
-								fontSize: 18
-							}}
-						>
-							Subscribe
-						</Button>
-					</Col>
+					<Col xs={24} md={12} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+            <div style={{ display: "flex" }}>
+              <CustomInput 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button 
+                onClick={handleSubscribe}
+                style={{ 
+                  borderRadius: 30,
+                  height: 45,
+                  width: 160,
+                  marginLeft: 20,
+                  backgroundColor: "#0156FF",
+                  color: "white",
+                  border: "none",
+                  fontWeight: "bold",
+                  fontSize: 18
+                }}
+              >
+                Subscribe
+              </Button>
+            </div>
+            {/* ✅ Reserve space for message here */}
+            <div style={{ minHeight: 24, marginTop: 10 }}>
+              {messageText && (
+                <Text style={{ color: isError ? "#ff4d4f" : "#52c41a", fontSize: 16 }}>
+                  {messageText}
+                </Text>
+              )}
+            </div>
+          </Col>
+
 				</Row>
 
 				<hr style={{ border: "0.5px solid #222" }} />
