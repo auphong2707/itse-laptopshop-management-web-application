@@ -101,6 +101,7 @@ const CustomerLoginPage = () => {
                 onFinish={handleSignIn}
                 layout="vertical"
                 style={{ marginTop: "1rem" }}
+                requiredMark={false}
               >
                 <Form.Item
                     label={
