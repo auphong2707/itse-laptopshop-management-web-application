@@ -7,7 +7,7 @@ import TabProductSlider from './components/TabProductSlider';
 import PostCardGridLayout from './components/PostCardGridLayout';
 import TestimonialSlider from './components/TestimonialSlider';
 import WebsiteFooter from './components/WebsiteFooter';
-import { transformLaptopData } from '../utils.js';
+import { transformLaptopData } from '../utils/transformData';
 
 import axios from 'axios';
 
