@@ -10,6 +10,14 @@ from db.session import *
 from schemas.laptops import *
 
 from services.firebase_auth import ExtendedUserCreate
+from fastapi.staticfiles import StaticFiles
+from fastapi import UploadFile, File
+from PIL import Image, ImageDraw, ImageFont
+
+import os
+import json
+import shutil
+
 try :
     cred = credentials.Certificate("secret/firebase-service-key.json")
     firebase_admin.initialize_app(cred)
@@ -31,6 +39,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize Elasticsearch Client
 es = Elasticsearch("http://elasticsearch:9200")
@@ -340,3 +350,46 @@ def delete_account(uid: str):
         return {"message": f"Account with UID {uid} deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+@app.post("/laptops/{laptop_id}/upload_images")
+def upload_images_to_laptop(
+    laptop_id: int,
+    files: list[UploadFile] = File(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Upload multiple images for a laptop, save them to disk,
+    write laptop ID on each image, and store URLs in product_image_mini.
+    """
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if not laptop:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    image_urls = []
+
+    os.makedirs("static/laptop_images", exist_ok=True)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 28)
+    except:
+        font = ImageFont.load_default()
+
+    for i, file in enumerate(files):
+        filename = f"{laptop_id}_img{i+1}.jpg"
+        filepath = os.path.join("static/laptop_images", filename)
+
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        with Image.open(filepath) as img:
+            draw = ImageDraw.Draw(img)
+            draw.text((10, 10), f"ID: {laptop_id}", fill="white", font=font)
+            img.save(filepath)
+
+        image_url = f"/static/laptop_images/{filename}"
+        image_urls.append(image_url)
+
+    laptop.product_image_mini = json.dumps(image_urls)
+    db.commit()
+
+    return {"message": "Images uploaded successfully", "image_urls": image_urls}
