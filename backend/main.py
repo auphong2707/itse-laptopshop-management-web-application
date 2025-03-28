@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 
@@ -60,21 +61,18 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    try:
-        # Log the deletion in the delete_log table
-        db.execute(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())",
-            {"id": laptop_id}
-        )
+    # Log the deletion in the delete_log table
+    db.execute(
+        text("INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())"),
+        {"id": laptop_id}
+    )
 
-        # Delete the laptop
-        db.delete(laptop)
-        db.commit()
-        return {"message": "Laptop deleted successfully"}
+    # Delete the laptop
+    db.delete(laptop)
 
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail="Database error: " + str(e))
+    # Commit both operations together
+    db.commit()
+    return {"message": "Laptop deleted successfully"}
 
 @app.put("/laptops/{laptop_id}")
 def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)):

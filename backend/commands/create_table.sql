@@ -71,21 +71,6 @@ AFTER INSERT OR UPDATE OR DELETE ON reviews
 FOR EACH ROW
 EXECUTE FUNCTION update_laptop_rating();
 
-CREATE OR REPLACE VIEW laptop_card_view AS
-    SELECT 
-        id,
-        inserted_at,
-        brand,
-        sub_brand,
-        quantity,
-        product_image_mini,
-        rate,
-        num_rate,
-        name,
-        original_price,
-        sale_price
-    FROM laptops;
-
 CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     image_url TEXT,
@@ -136,7 +121,8 @@ FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE delete_log (
-    id UUID PRIMARY KEY,
+    id INTEGER,
     table_name TEXT,
-    deleted_at TIMESTAMP DEFAULT NOW()
+    deleted_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (id, table_name)
 );
