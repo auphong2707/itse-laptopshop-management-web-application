@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func, TIMESTAMP
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.dialects.postgresql import JSON
 
 Base = declarative_base()
 
@@ -35,7 +36,7 @@ class Laptop(Base):
     number_hdmi_ports = Column(Integer)
     number_ethernet_ports = Column(Integer)
     number_audio_jacks = Column(Integer)
-    product_image_mini = Column(String)
+    product_image_mini = Column(JSON)
     quantity = Column(Integer, nullable=False)
     original_price = Column(Integer, nullable=False)
     sale_price = Column(Integer, nullable=False)
