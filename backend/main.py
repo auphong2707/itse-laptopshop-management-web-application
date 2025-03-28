@@ -1,24 +1,20 @@
+import os
 from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends, HTTPException, Query
+from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import firebase_admin
-from firebase_admin import credentials, auth, firestore
 
 from db.models import *
 from db.session import *
 from schemas.laptops import *
 from schemas.newsletter import *
 
-from services.firebase_auth import ExtendedUserCreate
-try :
-    cred = credentials.Certificate("secret/firebase-service-key.json")
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-except FileNotFoundError:
-    print("File not found. Therefore, firebase service is unavailable.")
+from services.firebase_auth import *
 
 app = FastAPI()
+
+load_dotenv()
 
 origins = [
     "http://localhost:3000",
@@ -300,11 +296,17 @@ def get_posts(limit: int = Query(12)):
 
 @app.post("/accounts")
 def create_account(user_data: ExtendedUserCreate):
-    """
-    Create a new Firebase user and store extended profile data in Firestore.
-    """
     try:
-        # 1) Create user in Firebase Authentication
+        # 1. Role validation
+        if user_data.role not in ["admin", "customer"]:
+            raise HTTPException(status_code=400, detail="Invalid role.")
+
+        # 2. If admin, require secret key
+        if user_data.role == "admin":
+            if user_data.secret_key != os.getenv('ADMIN_CREATION_SECRET'):
+                raise HTTPException(status_code=403, detail="Unauthorized to create admin account.")
+
+        # 3. Create Firebase user
         user_record = auth.create_user(
             email=user_data.email,
             password=user_data.password,
@@ -312,22 +314,26 @@ def create_account(user_data: ExtendedUserCreate):
             phone_number=user_data.phone_number,
         )
 
-        # 2) Store extra profile fields in Firestore, keyed by the user's UID
+        # 4. Set custom claim
+        auth.set_custom_user_claims(user_record.uid, {"role": user_data.role})
+
+        # 5. Store extended profile in Firestore
         db.collection("users").document(user_record.uid).set({
             "first_name": user_data.first_name,
             "last_name": user_data.last_name,
-            "company": user_data.company,   
+            "company": user_data.company,
             "address": user_data.address,
             "country": user_data.country,
             "zip_code": user_data.zip_code,
-            # Add as many fields as you need
+            "role": user_data.role,
         })
 
         return {
-            "message": "Account and profile created successfully",
+            "message": f"{user_data.role.capitalize()} account created successfully",
             "uid": user_record.uid,
             "email": user_record.email,
         }
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -341,6 +347,17 @@ def delete_account(uid: str):
         return {"message": f"Account with UID {uid} deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+@app.post("/login")
+def login_user(user_data=Depends(verify_firebase_token)):
+    # user_data contains info like uid, email, etc.
+    return {"message": "Login successful", "user": user_data}
+
+@app.get("/admin/dashboard")
+def admin_dashboard(user=Depends(verify_firebase_token)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    return {"message": "Welcome Admin!"}
 
 @app.post("/newsletter/subscribe")
 def subscribe_to_newsletter(data: NewsletterCreate, db: Session = Depends(get_db)):
