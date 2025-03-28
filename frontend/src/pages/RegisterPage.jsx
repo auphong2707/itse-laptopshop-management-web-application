@@ -19,9 +19,47 @@ const RegisterPage = () => {
   const [current, setCurrent] = useState(0);
 
   const handleSignIn = async (values) => {
-    console.log("Sign-in form values:", values);
+    console.log("Form values to send:", values);
+  
+    const userData = {
+      email: values.email,
+      password: values.password, 
+      display_name: `${values.firstName} ${values.lastName}`,
+      phone_number: values.phoneNumber,
+      first_name: values.firstName,
+      last_name: values.lastName,
+      company: values.company,
+      address: values.address,
+      country: values.country,
+      zip_code: values.zipPostalCode,
+      role: "customer",
+      secret_key: "",
+    };
+  
+    try {
+      const response = await fetch("http://localhost:8000/accounts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+  
+      const data = await response.json();
+      console.log("Backend response:", data);
+  
+      if (response.ok) {
+        alert("Account created successfully!");
+        // Optionally redirect user
+      } else {
+        alert(data.detail || "Registration failed.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
-
+  
   const nextStep = async () => {
     try {
       await form.validateFields(); 
