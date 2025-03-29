@@ -1,6 +1,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
 import AdministratorPage from "./pages/AdministratorPage";
+import { DeletingProducts, Detail } from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import HomePage from "./pages/HomePage";
@@ -37,13 +38,27 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "admin",
+    path: "/admin",
     element: (
       <>
         <ScrollRestoration />
         <AdministratorPage />
       </>
     ),
+    children: [
+      {
+        path: "detail",
+        element: <Detail />,
+      },
+      {
+        path: "detail/:id",
+        element: <Detail />,
+      },
+      {
+        path: "delete",
+        element: <DeletingProducts />,
+      },
+    ],
   },
   {
     path: "/laptops/:brand",

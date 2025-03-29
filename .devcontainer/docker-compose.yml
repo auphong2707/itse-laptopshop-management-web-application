@@ -23,7 +23,9 @@ services:
       - app-network
 
   db:
-    image: postgres:latest
+    build:
+      context: ..
+      dockerfile: .devcontainer/DockerfilePostgres
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
