@@ -4,6 +4,9 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
+import firebase_admin
+from firebase_admin import credentials, auth, firestore
 
 from db.models import *
 from db.session import *
@@ -50,16 +53,24 @@ def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
 
 @app.delete("/laptops/{laptop_id}")
 def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
-    '''
-    Delete laptop from database
-    '''
+    """
+    Delete a laptop from the database and log the deletion.
+    """
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
-    if laptop is None:
+    if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    db.delete(laptop)
-    db.commit()
+    # Log the deletion in the delete_log table
+    db.execute(
+        text("INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())"),
+        {"id": laptop_id}
+    )
 
+    # Delete the laptop
+    db.delete(laptop)
+
+    # Commit both operations together
+    db.commit()
     return {"message": "Laptop deleted successfully"}
 
 @app.put("/laptops/{laptop_id}")
