@@ -2,6 +2,7 @@ import json
 import random
 import os
 from datetime import datetime, timedelta
+from PIL import Image, ImageDraw, ImageFont
 
 NUM_LAPTOPS = 0
 
@@ -111,7 +112,10 @@ def generate_laptop_insert_queries(json_data_directory='./backend/data/',
                 convert_value(laptop['number_hdmi_ports']),
                 convert_value(laptop['number_ethernet_ports']),
                 convert_value(laptop['number_audio_jacks']),
-                'NULL',
+                convert_value(json.dumps([
+        f"/static/laptop_images/{NUM_LAPTOPS}_img1.jpg",
+        f"/static/laptop_images/{NUM_LAPTOPS}_img2.jpg",
+        f"/static/laptop_images/{NUM_LAPTOPS}_img3.jpg"])),
                 str(random.randint(0, 20)),
                 convert_value(laptop['price']),
                 convert_value(laptop['price'] - random.randint(0, 20)/100 * laptop['price'])
@@ -255,10 +259,38 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
 
     print(f"INSERT post queries successfully written to {sql_output_path}")
 
+def generate_images(template_dir='./backend/static/templates',
+                    output_dir='./backend/static/laptop_images'):
+    global NUM_LAPTOPS
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 150)
+    except:
+        font = ImageFont.load_default()
+
+    for laptop_id in range(1, NUM_LAPTOPS + 1):
+        for i in range(1, 4):  # 3 images per laptop
+            src_path = os.path.join(template_dir, f'laptop{i}.jpg')
+            dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
+
+            if not os.path.exists(src_path):
+                print(f"[WARN] Template image {src_path} not found, skipping")
+                continue
+
+            with Image.open(src_path) as img:
+                draw = ImageDraw.Draw(img)
+                draw.text((30, 30), f"ID: {laptop_id}", font=font, fill="black", stroke_fill="white", stroke_width=3)
+                img.save(dest_path)
+
+    print(f"Generated mock images for {NUM_LAPTOPS} laptops.")
+
 if __name__ == "__main__":
-    # Clear the existing content of the SQL file
     clear_old_commands()
     generate_laptop_insert_queries()
+    generate_images()
     generate_reviews()
     generate_subscriptions()
     generate_posts()

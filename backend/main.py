@@ -370,7 +370,7 @@ def upload_images_to_laptop(
     os.makedirs("static/laptop_images", exist_ok=True)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 28)
+        font = ImageFont.truetype("arial.ttf", 128)
     except:
         font = ImageFont.load_default()
 
