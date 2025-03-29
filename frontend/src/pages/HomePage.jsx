@@ -7,6 +7,7 @@ import TabProductSlider from './components/TabProductSlider';
 import PostCardGridLayout from './components/PostCardGridLayout';
 import TestimonialSlider from './components/TestimonialSlider';
 import WebsiteFooter from './components/WebsiteFooter';
+import { transformLaptopData } from '../utils/transformData';
 
 import axios from 'axios';
 
@@ -26,20 +27,6 @@ const contentStyle = {
   backgroundColor: 'white',
 };
 
-const transformLaptopData = (data) => {
-  return data.map(item => {
-    return {
-      productName: item.name.toUpperCase(),
-      numRate: item.num_rate,
-      originalPrice: item.original_price,
-      imgSource: item.product_image_mini,
-      inStock: item.quantity > 0,
-      rate: item.rate,
-      salePrice: item.sale_price,
-      productId: item.id
-    };
-  });
-};
 
 const transformTestimonialData = (data) => {
   return data.map(item => {
@@ -178,7 +165,7 @@ const HomePage = () => {
               New Products
             </Text>
 
-            <Link href={"/laptops/"} underline>
+            <Link href={"/laptops/all"} underline>
               See All New Products
             </Link>
           </div>
