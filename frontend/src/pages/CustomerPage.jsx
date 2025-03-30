@@ -31,8 +31,12 @@ const StyledTabs = styled(Tabs)`
     height: 3px;
     left: 0;
   }
+  .ant-tabs-nav {
+    width: 100%;
+  }
   .ant-tabs-content-holder {
     display: none !important;
+    width: 0;
   }
   .ant-tabs-tab:nth-child(5),
   .ant-tabs-tab:nth-child(9) {
@@ -97,7 +101,7 @@ const CustomerPage = () => {
             </Col>
           </Row>
       
-          <div style={{ borderBottom: "1px solid #ccc", marginTop: "10px", marginBottom: "10px" }}></div>
+          <div style={{ borderBottom: "1px solid #ccc", marginTop: "10px", marginBottom: "10px", width: "100%" }}></div>
       
           <Row gutter={[16, 16]}>
             <Col span={12}>
@@ -179,26 +183,25 @@ const CustomerPage = () => {
         </Breadcrumb>
         <Title level={2}>My Dashboard</Title>
         <Row gutter={16}>
-        <Sidebar span={5}>
-          <StyledTabs activeKey={selectedTab} onChange={setSelectedTab} tabPosition="left">
-            {tabs.map((tab) => (
-              <Tabs.TabPane tab={tab.label} key={tab.key} />
-            ))}
-          </StyledTabs>
+          <Sidebar flex="1">
+            <StyledTabs activeKey={selectedTab} onChange={setSelectedTab} tabPosition="left">
+              {tabs.map((tab) => (
+                <Tabs.TabPane tab={tab.label} key={tab.key} />
+              ))}
+            </StyledTabs>
 
-          <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%" }}>
-            <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>Compare Products</Text>
-            <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items to compare.</p>
-          </div>
+            <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%" }}>
+              <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>Compare Products</Text>
+              <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items to compare.</p>
+            </div>
 
-          <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%", position: "relative" }}>
-            <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>My Wish List</Text>
-            <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items in your wish list.</p>
-          </div>
-
-        </Sidebar>
+            <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%", position: "relative" }}>
+              <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>My Wish List</Text>
+              <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items in your wish list.</p>
+            </div>
+          </Sidebar>
           
-          <Col span={14}>
+          <Col flex="3">
             {tabs.find((tab) => tab.key === selectedTab)?.content}
           </Col>
         </Row>
