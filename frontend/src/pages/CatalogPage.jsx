@@ -600,8 +600,8 @@ const CatalogPage = () => {
 			<WebsiteHeader />
 			<Content className="responsive-padding" style={contentStyle}>
 				<img
-					src="https://via.placeholder.com/1920x400"
-					style={{ width: "100%", height: "100px", display: "block" }}
+					src="/catalog_page_advertisement_1.png"
+					style={{ width: "100%", height: "auto", display: "block" }}
 				/>
 
 				<br></br>
