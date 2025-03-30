@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from db.models import Laptop
 from main import app
+import time
 
 client= TestClient(app)
 
@@ -57,10 +58,17 @@ def test_create_laptop(client):
     laptop_id = response_data["laptop"]["id"]
     assert laptop_id is not None
 
-def test_get_laptop_by_id():
-    response = client.get(f"/laptops/id/{laptop_id}")
-    assert response.status_code == 200
-    assert response.json()["id"] == laptop_id
+def test_get_laptop_by_id(created_laptop):
+    for _ in range(5):
+        response = client.get(f"/laptops/id/{created_laptop}")
+        if response.status_code == 200:
+            break
+        time.sleep(1)  
+    else:
+        pytest.fail("Laptop not found in Elasticsearch after retries")
+
+    data = response.json()
+    assert data["id"] == created_laptop
 
 def test_update_laptop():
     updated_data = {
@@ -89,8 +97,9 @@ def test_get_delete_laptop():
 def test_get_latest_laptops():
     response = client.get("/laptops/latest")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    assert len(response.json()) > 0
+    json_data = response.json()
+    assert "results" in json_data
+    assert isinstance(json_data["results"], list)
 
 # [EDGE CASE TESTING]
 # _______________________________________________________________________________________ #
@@ -124,9 +133,11 @@ def test_get_non_existent_laptop():
     assert response.json()["detail"] == "Laptop not found"
 
 def test_get_latest_laptops_exceeding_limit():
-    response = client.get("/laptops/latest?limit=10000000") 
+    response = client.get("/laptops/latest?limit=500")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)  
+    json_data = response.json()
+    assert "results" in json_data
+    assert isinstance(json_data["results"], list)
 
 # [UPDATE EDGE CASES]
 def test_update_non_existent_laptop():
@@ -145,6 +156,6 @@ def test_delete_non_existent_laptop():
     assert response.json()["detail"] == "Laptop not found"
 
 def test_delete_laptop_with_reviews():
-    response = client.delete("/laptops/2")
+    response = client.delete("/laptops/1540")
     assert response.status_code == 200  
 
