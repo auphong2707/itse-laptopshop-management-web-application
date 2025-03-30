@@ -157,9 +157,9 @@ const ProductPage = () => {
 
         {/* Banner */}
         <Image
-          src="None"
+          src="/product_page_banner_2.png"
           width={"100%"}
-          style={{ width: "100%", height: "400px" }}
+          style={{ width: "100%", height: "auto" }}
           preview={false}
         />
 
