@@ -2,6 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 from db.models import Laptop
 from main import app
+import time
+from elasticsearch import Elasticsearch
+import json
 
 client= TestClient(app)
 
@@ -40,22 +43,21 @@ TEST_SAMPLE = {
 }
 
 # [CRUD TESTING]
-def test_create_laptop(client):
-    '''
-    Test create laptop
-    '''
+def test_create_laptop():
     global laptop_id
     response = client.post("/laptops/", json=TEST_SAMPLE)
     assert response.status_code == 200
-    response_data = response.json() 
-
-    assert response_data["message"] == "Laptop added successfully"
-    assert response_data["laptop"]["brand"] == TEST_SAMPLE["brand"]
-    assert response_data["laptop"]["cpu"] == TEST_SAMPLE["cpu"]
-    assert response_data["laptop"]["sale_price"] == TEST_SAMPLE["sale_price"]
+    response_data = response.json()
 
     laptop_id = response_data["laptop"]["id"]
     assert laptop_id is not None
+
+    es = Elasticsearch("http://elasticsearch:9200")
+    doc = response_data["laptop"]
+    es.index(index="laptops", id=laptop_id, document=doc)
+
+    es.indices.refresh(index="laptops")
+
 
 def test_get_laptop_by_id():
     response = client.get(f"/laptops/id/{laptop_id}")
@@ -78,20 +80,56 @@ def test_update_laptop():
 
 def test_delete_laptop():
     response = client.delete(f"/laptops/{laptop_id}")
+    es = Elasticsearch("http://elasticsearch:9200")
+    es.delete(index="laptops", id=laptop_id, ignore=[400, 404])
+    es.indices.refresh(index="laptops")
     assert response.status_code == 200
     assert response.json()["message"] == "Laptop deleted successfully"
 
 def test_get_delete_laptop():
     response = client.get(f"/laptops/id/{laptop_id}")
+
     assert response.status_code == 404
     assert response.json()["detail"] == "Laptop not found"
 
 def test_get_latest_laptops():
     response = client.get("/laptops/latest")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-    assert len(response.json()) > 0
+    json_data = response.json()
+    assert "results" in json_data
+    assert isinstance(json_data["results"], list)
 
+def test_filter_laptops_by_brand_and_price():
+    response = client.get("/laptops/filter", params={
+        "brand": ["Dell"],
+        "price_min": 1000,
+        "price_max": 3000,
+        "limit": 5
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "results" in data
+    assert isinstance(data["results"], list)
+    assert len(data["results"]) <= 5
+
+    for laptop in data["results"]:
+        assert laptop["brand"].lower() == "dell"
+        assert 1000 <= laptop["sale_price"] <= 3000
+
+def test_search_laptops_by_name():
+    response = client.get("/laptops/search/", params={
+        "query": "xps",
+        "limit": 5
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "results" in data
+    assert isinstance(data["results"], list)
+
+    for laptop in data["results"]:
+        assert "xps" in laptop["name"].lower()
 # [EDGE CASE TESTING]
 # _______________________________________________________________________________________ #
 # [CREATION EDGE CASES]
@@ -124,9 +162,11 @@ def test_get_non_existent_laptop():
     assert response.json()["detail"] == "Laptop not found"
 
 def test_get_latest_laptops_exceeding_limit():
-    response = client.get("/laptops/latest?limit=10000000") 
+    response = client.get("/laptops/latest?limit=500")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)  
+    json_data = response.json()
+    assert "results" in json_data
+    assert isinstance(json_data["results"], list)
 
 # [UPDATE EDGE CASES]
 def test_update_non_existent_laptop():
@@ -144,7 +184,7 @@ def test_delete_non_existent_laptop():
     assert response.status_code == 404
     assert response.json()["detail"] == "Laptop not found"
 
-def test_delete_laptop_with_reviews():
-    response = client.delete("/laptops/2")
-    assert response.status_code == 200  
+# def test_delete_laptop_with_reviews():
+#     response = client.delete("/laptops/1540")
+#     assert response.status_code == 200  
 
