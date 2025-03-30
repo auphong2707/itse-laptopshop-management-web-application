@@ -45,12 +45,6 @@ const StyledTabs = styled(Tabs)`
   }
 `;
 
-const Separator = styled.div`
-  height: 1px;
-  background: #ccc;
-  margin: 10px 0;
-`;
-
 const CustomerPage = () => {
   const [selectedTab, setSelectedTab] = useState("accountDashboard");
 
