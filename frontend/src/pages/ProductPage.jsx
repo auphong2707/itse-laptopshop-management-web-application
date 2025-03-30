@@ -141,7 +141,11 @@ const ProductPage = () => {
         </div>
 
         {/* Right Side: Product Image */}
-        <ProductImage />
+        <ProductImage 
+          imageUrls={JSON.parse(productData.product_image_mini || "[]").map(
+            (url) => `http://localhost:8000${url}`
+          )}
+        />
 
       </Content>
 
