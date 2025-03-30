@@ -59,7 +59,7 @@ const ImageGallery = ({ imageSources }) => {
         pagination={{ clickable: true }}
         autoplay={{ delay: 5000 }}
         onSlideChange={(swiper) => extractColor(imageSources[swiper.activeIndex])}
-        style={{ height: "300px" }}
+        style={{ height: "auto" }}
       >
         {imageSources.map((img, index) => (
           <SwiperSlide key={index} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
