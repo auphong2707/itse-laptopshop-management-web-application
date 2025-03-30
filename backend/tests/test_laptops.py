@@ -99,6 +99,37 @@ def test_get_latest_laptops():
     assert "results" in json_data
     assert isinstance(json_data["results"], list)
 
+def test_filter_laptops_by_brand_and_price():
+    response = client.get("/laptops/filter", params={
+        "brand": ["Dell"],
+        "price_min": 1000,
+        "price_max": 3000,
+        "limit": 5
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "results" in data
+    assert isinstance(data["results"], list)
+    assert len(data["results"]) <= 5
+
+    for laptop in data["results"]:
+        assert laptop["brand"].lower() == "dell"
+        assert 1000 <= laptop["sale_price"] <= 3000
+
+def test_search_laptops_by_name():
+    response = client.get("/laptops/search/", params={
+        "query": "xps",
+        "limit": 5
+    })
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "results" in data
+    assert isinstance(data["results"], list)
+
+    for laptop in data["results"]:
+        assert "xps" in laptop["name"].lower()
 # [EDGE CASE TESTING]
 # _______________________________________________________________________________________ #
 # [CREATION EDGE CASES]
