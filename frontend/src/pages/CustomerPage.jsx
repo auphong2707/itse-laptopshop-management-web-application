@@ -8,11 +8,14 @@ const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const Sidebar = styled(Col)`
-  background: #e9ecef;
+  background: #fff;
   padding: 20px;
+  width: 95vw !important;
 `;
 
 const StyledTabs = styled(Tabs)`
+  background: #e9ecef;
+  padding: 20px 5px;
   .ant-tabs-tab {
     padding: 12px 16px;
     width: 100%;
@@ -31,6 +34,17 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-content-holder {
     display: none !important;
   }
+  .ant-tabs-tab:nth-child(5),
+  .ant-tabs-tab:nth-child(9) {
+    border-top: 1px solid #ccc;
+    width: 100%;
+  }
+`;
+
+const Separator = styled.div`
+  height: 1px;
+  background: #ccc;
+  margin: 10px 0;
 `;
 
 const CustomerPage = () => {
@@ -120,12 +134,7 @@ const CustomerPage = () => {
     },
     {
       key: "orders",
-      label: (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-        <span style={{ alignSelf: "flex-start" }}>My Order</span>
-        <div style={{ borderBottom: "2px solid #ccc", marginTop: "25px", width: "225px" }}></div>
-      </div>
-      ),
+      label: "My Order",
       content: <Text>No orders found.</Text>,
     },
     {
@@ -145,12 +154,7 @@ const CustomerPage = () => {
     },
     {
       key: "wishList",
-      label: (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ alignSelf: "flex-start" }}>My Wish List</span>
-          <div style={{ borderBottom: "2px solid #ccc", marginTop: "25px", width: "225px" }}></div>
-        </div>
-      ),
+      label: "My Wish List",
       content: <Text>Items in your wish list will be displayed here.</Text>,
     },
     {
@@ -182,14 +186,12 @@ const CustomerPage = () => {
             ))}
           </StyledTabs>
 
-          <div style={{ background: "#e9ecef", padding: "20px", marginTop: "20px", textAlign: "center", width: "100%" }}>
-            <div style={{ position: "absolute", left: "0", right: "0", height: "8px", background: "white" }}></div> 
+          <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%" }}>
             <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>Compare Products</Text>
             <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items to compare.</p>
           </div>
 
-          <div style={{ background: "#e9ecef", padding: "20px", marginTop: "10px", textAlign: "center", width: "100%", position: "relative" }}>
-            <div style={{ position: "absolute", left: "0", right: "0", height: "8px", background: "white" }}></div> 
+          <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%", position: "relative" }}>
             <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>My Wish List</Text>
             <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items in your wish list.</p>
           </div>
