@@ -15,11 +15,11 @@ const { Content } = Layout;
 const { Text, Link } = Typography;
 
 const imageSources = [
-  "None",
-  "None",
-  "None",
-  "None",
-  "None"
+  "/homepage_advertisement_1.png",
+  "/homepage_advertisement_1.png",
+  "/homepage_advertisement_1.png",
+  "/homepage_advertisement_1.png",
+  "/homepage_advertisement_1.png"
 ]
 
 const contentStyle = {

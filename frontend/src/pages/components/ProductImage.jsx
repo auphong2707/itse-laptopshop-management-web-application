@@ -6,13 +6,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 
-const imageSources = [
-  "https://asset.msi.com/resize/image/global/product/product_5_20200430090514_5eaa244a51b97.png62405b38c58fe0f07fcef2367d8a9ba1/1024.png",
-  "https://example.com/image2.png",
-  "https://example.com/image3.png",
-];
-
-const ProductImage = () => {
+const ProductImage = ({ imageUrls }) => {
   return (
     <div style={{
       position: "absolute",
@@ -50,7 +44,7 @@ const ProductImage = () => {
           autoplay={{ delay: 5000 }}
           style={{ height: "100%", width: "100%", backgroundColor: "white", marginTop: "-5rem" }}
         >
-          {imageSources.map((img, index) => (
+          {imageUrls.map((img, index) => (
             <SwiperSlide key={index} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
               <img
                 src={img}
