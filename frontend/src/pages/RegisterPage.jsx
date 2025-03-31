@@ -14,21 +14,28 @@ const contentStyle = {
 
 const description = '\u00A0';
 
+
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleSignIn = async (values) => {
     console.log("Password step values:", values);
   
-    // Lấy thông tin đã lưu ở bước 1
     const step1Data = JSON.parse(localStorage.getItem("register_step1") || "{}");
+  
+    const normalizePhone = (phone) => {
+      if (phone.startsWith("0")) {
+        return "+84" + phone.slice(1);
+      }
+      return phone;
+    };
   
     const userData = {
       email: step1Data.email,
       password: values.password,
       display_name: `${step1Data.firstName} ${step1Data.lastName}`,
-      phone_number: step1Data.phoneNumber,
+      phone_number: normalizePhone(step1Data.phoneNumber),
       first_name: step1Data.firstName,
       last_name: step1Data.lastName,
       company: step1Data.company,
@@ -38,6 +45,8 @@ const RegisterPage = () => {
       role: "customer",
       secret_key: "",
     };
+  
+    setIsLoading(true); // 👉 Bắt đầu loading
   
     try {
       const response = await fetch("http://localhost:8000/accounts", {
@@ -52,16 +61,20 @@ const RegisterPage = () => {
       console.log("Backend response:", data);
   
       if (response.ok) {
-        alert("Account created successfully!");
-        localStorage.removeItem("register_step1"); // Xoá info tạm sau khi gửi
+        localStorage.removeItem("register_step1");
+        setCurrent(2); // 👉 chuyển sang bước xác nhận
       } else {
         alert(data.detail || "Registration failed.");
       }
+      
     } catch (error) {
       console.error("Error during registration:", error);
       alert("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false); // 👉 Tắt loading
     }
   };
+  
   
   
   const nextStep = async () => {
@@ -193,7 +206,7 @@ const RegisterPage = () => {
                   >
                     <Input     
                       size="large" 
-                      placeholder="Enter your last name" 
+                      placeholder="Enter your country" 
                       style={{ height: "50px", fontSize: "1.1rem" }} 
                     />
                   </Form.Item>
@@ -228,16 +241,21 @@ const RegisterPage = () => {
                   <Form.Item
                     label={<span style={{ fontSize: "1.3rem" }}>Password <span style={{ color: "red" }}>*</span></span>}
                     name="password"
-                    rules={[{ required: true, message: "Please enter your password." }]}
+                    rules={[
+                      { required: true, message: "Please enter your password." },
+                      { min: 6, message: "Password must be at least 6 characters." },
+                      { max: 32, message: "Password must be at most 32 characters." },
+                    ]}
                     required = {false}
                   >
-                    <Input     
-                      size="large" 
-                      placeholder="Enter your password" 
+                    <Input
+                      size="large"
+                      placeholder="Enter your password"
                       autoComplete="new-password"
-                      style={{ height: "50px", fontSize: "1.1rem" }} 
+                      style={{ height: "50px", fontSize: "1.1rem" }}
                     />
                   </Form.Item>
+
                   
                   <Form.Item
                     label={<span style={{ fontSize: "1.4rem" }}>Confirm Password <span style={{ color: "red" }}>*</span></span>}
@@ -265,14 +283,38 @@ const RegisterPage = () => {
 
                   <Form.Item style={{ marginTop: "50px" }}>
                     <Button
-                      type="primary" 
+                      type="primary"
                       htmlType="submit"
-                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "1rem", fontWeight: "bold" }}
+                      loading={isLoading} // 👈 hiển thị loading
+                      disabled={isLoading} // 👈 ngăn spam click
+                      style={{
+                        padding: "1rem 2rem",
+                        borderRadius: "25px",
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                      }}
                     >
-                      Finish
+                      {isLoading ? "Creating Account..." : "Finish"}
                     </Button>
-                  </Form.Item>                  
+                  </Form.Item>
+                                    
                 </>
+              )}
+
+              {current === 2 && (
+                <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
+                  <Title level={2} style={{ color: "green" }}>
+                    🎉 Account Created Successfully! 🎉
+                  </Title>
+                  <p style={{ fontSize: "1.2rem" }}>
+                    Your account has been created. You can now sign in using your credentials.
+                  </p>
+                  <Link to="/login">
+                    <Button type="primary" size="large" style={{ marginTop: "1rem" }}>
+                      Go to Login
+                    </Button>
+                  </Link>
+                </div>
               )}
             </Form>
           </Col>
