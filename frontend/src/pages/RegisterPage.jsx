@@ -19,25 +19,28 @@ const RegisterPage = () => {
   const [current, setCurrent] = useState(0);
 
   const handleSignIn = async (values) => {
-    console.log("Form values to send:", values);
+    console.log("Password step values:", values);
+  
+    // Lấy thông tin đã lưu ở bước 1
+    const step1Data = JSON.parse(localStorage.getItem("register_step1") || "{}");
   
     const userData = {
-      email: values.email,
-      password: values.password, 
-      display_name: `${values.firstName} ${values.lastName}`,
-      phone_number: values.phoneNumber,
-      first_name: values.firstName,
-      last_name: values.lastName,
-      company: values.company,
-      address: values.address,
-      country: values.country,
-      zip_code: values.zipPostalCode,
+      email: step1Data.email,
+      password: values.password,
+      display_name: `${step1Data.firstName} ${step1Data.lastName}`,
+      phone_number: step1Data.phoneNumber,
+      first_name: step1Data.firstName,
+      last_name: step1Data.lastName,
+      company: step1Data.company,
+      address: step1Data.address,
+      country: step1Data.country,
+      zip_code: step1Data.zipPostalCode,
       role: "customer",
       secret_key: "",
     };
   
     try {
-      const response = await fetch("http://localhost:8000/accounts", {
+      const response = await fetch("http://localhost:5714/accounts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +53,7 @@ const RegisterPage = () => {
   
       if (response.ok) {
         alert("Account created successfully!");
-        // Optionally redirect user
+        localStorage.removeItem("register_step1"); // Xoá info tạm sau khi gửi
       } else {
         alert(data.detail || "Registration failed.");
       }
@@ -60,14 +63,21 @@ const RegisterPage = () => {
     }
   };
   
+  
   const nextStep = async () => {
     try {
-      await form.validateFields(); 
-      setCurrent(current + 1);
+      await form.validateFields(); // validate step 1
+  
+      const values = form.getFieldsValue(); // lấy dữ liệu người dùng
+      // Lưu tạm vào localStorage
+      localStorage.setItem("register_step1", JSON.stringify(values));
+  
+      setCurrent(current + 1); // chuyển sang bước 2
     } catch (errorInfo) {
       console.log("Validation failed:", errorInfo);
     }
   };
+  
 
   return (
     <Layout>
