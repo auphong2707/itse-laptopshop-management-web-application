@@ -189,7 +189,12 @@ const HomePage = () => {
         {/* ASUS sub-brands */}
         <TabProductSlider
           tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK"]}
-          tabBanners={["None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/asus/asus_rog_banner.png",
+            "/tab-banners/asus/asus_tuf_banner.png",
+            "None",
+            "None"
+          ]}
           tabProductData={Object.values(brandProductData["asus"])}
         />
 

@@ -28,9 +28,10 @@ const TabProductSlider = ({tabLabels, tabBanners, tabProductData}) => {
 								src={tabBanners[index]} 
 								alt={tabName} width="228px"
 								height="345px"
-								style={{display:"block"}}
+								style={{display:"block", width:"228px", height:"345px"}}
 								preview={false}
 							/>
+							<div style={{ minWidth: "15px" }}></div>
 							<ProductSlider productData={tabProductData[index]} />
 						</div>
 					</TabPane>
