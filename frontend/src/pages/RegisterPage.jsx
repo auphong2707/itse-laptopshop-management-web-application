@@ -40,7 +40,7 @@ const RegisterPage = () => {
     };
   
     try {
-      const response = await fetch("http://localhost:5714/accounts", {
+      const response = await fetch("http://localhost:8000/accounts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +138,7 @@ const RegisterPage = () => {
                   <Form.Item
                     label={<span style={{ fontSize: "1.3rem" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
                     name="phoneNumber"
-                    rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^\d+$/, message: "Invalid phone number" }]}
+                    rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^(\+84|0)[1-9][0-9]{8}$/, message: "Invalid phone number" }]}
                     required = {false}
                   >
                     <Input     
