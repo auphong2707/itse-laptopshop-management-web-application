@@ -204,7 +204,14 @@ const HomePage = () => {
         {/* Lenovo sub-brands */}
         <TabProductSlider
           tabLabels={["LENOVO LEGION", "LENOVO LOQ", "LENOVO THINKPAD", "LENOVO THINKBOOK", "LENOVO YOGA", "LENOVO IDEAPAD"]}
-          tabBanners={["None", "None", "None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/lenovo/lenovo_legion_banner.png",
+            "/tab-banners/lenovo/lenovo_loq_banner.png", 
+            "/tab-banners/lenovo/lenovo_thinkpad_banner.png", 
+            "/tab-banners/lenovo/lenovo_thinkbook_banner.png", 
+            "/tab-banners/lenovo/lenovo_yoga_banner.png", 
+            "/tab-banners/lenovo/lenovo_ideapad_banner.png"
+          ]}
           tabProductData={Object.values(brandProductData["lenovo"])}
         />
 
@@ -214,7 +221,12 @@ const HomePage = () => {
         {/* Acer sub-brands */}
         <TabProductSlider
           tabLabels={["ACER PREDATOR", "ACER NITRO", "ACER SWIFT", "ACER ASPIRE"]}
-          tabBanners={["None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/acer/acer_predator_banner.png", 
+            "/tab-banners/acer/acer_nitro_banner.png", 
+            "/tab-banners/acer/acer_swift_banner.png", 
+            "/tab-banners/acer/acer_aspire_banner.png"
+          ]}
           tabProductData={Object.values(brandProductData["acer"])}
         />
         
@@ -224,7 +236,14 @@ const HomePage = () => {
         {/* Dell sub-brands */}
         <TabProductSlider
           tabLabels={["DELL ALIENWARE", "DELL G SERIES", "DELL XPS", "DELL INSPIRON", "DELL LATITUDE", "DELL PRECISION"]}
-          tabBanners={["None", "None", "None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/dell/dell_alienware_banner.png",
+            "/tab-banners/dell/dell_g_series_banner.png", 
+            "/tab-banners/dell/dell_xps_banner.png", 
+            "/tab-banners/dell/dell_inspiron_banner.png", 
+            "/tab-banners/dell/dell_latitude_banner.png", 
+            "/tab-banners/dell/dell_precision_banner.png"
+          ]}
           tabProductData={Object.values(brandProductData["dell"])}
         />
 
@@ -234,7 +253,14 @@ const HomePage = () => {
         {/* HP sub-brands */}
         <TabProductSlider
           tabLabels={["HP OMEN", "HP VICTUS", "HP SPECTRE", "HP ENVY", "HP PAVILION", "HP ELITEBOOK"]}
-          tabBanners={["None", "None", "None", "None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/HP/hp_omen_banner.png", 
+            "/tab-banners/HP/hp_victus_banner.png", 
+            "/tab-banners/HP/hp_spectre_banner.png", 
+            "/tab-banners/HP/hp_envy_banner.png", 
+            "/tab-banners/HP/hp_pavilion_banner.png", 
+            "/tab-banners/HP/hp_elitebook_banner.png"
+          ]}
           tabProductData={Object.values(brandProductData["hp"])}
         />
 
@@ -244,7 +270,12 @@ const HomePage = () => {
         {/* MSI sub-brands */}
         <TabProductSlider
           tabLabels={["MSI STEALTH", "MSI KATANA", "MSI CREATOR", "MSI MODERN"]}
-          tabBanners={["None", "None", "None", "None"]}
+          tabBanners={[
+            "/tab-banners/msi/msi_stealth_banner.png", 
+            "/tab-banners/msi/msi_katana_banner.png", 
+            "/tab-banners/msi/msi_creator_banner.png", 
+            "/tab-banners/msi/msi_modern_banner.png"
+          ]}
           tabProductData={Object.values(brandProductData["msi"])}
         />
 
