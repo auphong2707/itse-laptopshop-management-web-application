@@ -193,7 +193,7 @@ const HomePage = () => {
             "/tab-banners/asus/asus_rog_banner.png",
             "/tab-banners/asus/asus_tuf_banner.png",
             "/tab-banners/asus/asus_zenbook_banner.png",
-            "None"
+            "/tab-banners/asus/asus_vivobook_banner.png"
           ]}
           tabProductData={Object.values(brandProductData["asus"])}
         />
