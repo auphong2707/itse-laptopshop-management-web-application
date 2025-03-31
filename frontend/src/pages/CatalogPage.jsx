@@ -5,7 +5,7 @@ import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";	
 import ProductCard from "./components/ProductCard";
 import { useParams, useSearchParams } from "react-router-dom";
-import { transformLaptopData } from "../utils.js";
+import { transformLaptopData } from "../utils/transformData";
 import { debounce } from "lodash";
 import axios from "axios";
 
@@ -473,9 +473,11 @@ const CatalogPage = () => {
 	const quantityPerPage = parseInt(searchParams.get("quantityPerPage")) || 35;
 	const sortBy = searchParams.get("sortBy") || "latest";
 
-	const updateImmediateParams = (key, value) => {
+	const updateImmediateParams = (params) => {
 		const newParams = new URLSearchParams(searchParams);
-		newParams.set(key, value);
+		Object.keys(params).forEach((key) => {
+			newParams.set(key, params[key]);
+		});
 		setSearchParams(newParams);
 	};
 
@@ -487,9 +489,9 @@ const CatalogPage = () => {
 			subBrand: searchParams.getAll("subBrand"),
 			cpu: searchParams.getAll("cpu"),
 			vga: searchParams.getAll("vga"),
-			ramAmount: searchParams.getAll("ramAmount").map(Number),
-			storageAmount: searchParams.getAll("storageAmount").map(Number),
-			screenSize: searchParams.getAll("screenSize").map(Number)
+			ramAmount: searchParams.getAll("ramAmount"),
+			storageAmount: searchParams.getAll("storageAmount"),
+			screenSize: searchParams.getAll("screenSize")
 		}
 	}), [searchParams]); 
 
@@ -638,7 +640,7 @@ const CatalogPage = () => {
 							<div style={{ display: "flex", gap: 10 }}>
 								<CustomSelect 
 									value={sortBy} 
-									onChange={(value) => {updateImmediateParams("sortBy", value)}}
+									onChange={(value) => {updateImmediateParams({ sortBy: value, page: 1 })}}
 									style={{ width: 250, height: 50 }}
 								>
 									<Option value="latest">
@@ -658,7 +660,7 @@ const CatalogPage = () => {
 								<CustomSelect
 									defaultValue={{ value: quantityPerPage }}
 									style={{ width: 180, height: 50 }} 
-									onChange={(value) => {updateImmediateParams("quantityPerPage", value)}}
+									onChange={(value) => {updateImmediateParams({ quantityPerPage: value, page: 1 })}}
 								>
 									<Option value={15}>
 										<Text type="secondary" strong>Show: </Text>

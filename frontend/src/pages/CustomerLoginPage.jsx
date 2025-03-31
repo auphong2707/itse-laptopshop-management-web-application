@@ -1,8 +1,11 @@
-import React from 'react';
-import { Row, Col, Form, Typography, Input, Button, Layout, Breadcrumb } from 'antd';
+import React, { useState } from 'react';
+import { Row, Col, Form, Typography, Input, Button, Layout, Breadcrumb, Alert } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from './components/WebsiteFooter';
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 const { Content } = Layout;
 const { Text, Title } = Typography;
@@ -11,14 +14,49 @@ const contentStyle = {
     backgroundColor: "#fff",
     padding: "2rem",
   };
+
+const login = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User:", user);
+
+    // Get the Firebase Auth ID token
+    const token = await user.getIdToken();
+
+    // Send token to FastAPI backend
+    const response = await fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    console.log("Backend response:", data);
+  } catch (error) {
+    console.error("Error signing in:", error);
+    throw error;
+  }
+};
   
 const CustomerLoginPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState("");
 
-  const handleSignIn = (values) => {
-    // Handle sign-in logic
-    console.log("Sign-in form values:", values);
+  const handleSignIn = async (values) => {
+    const { email, password } = values;
+
+    try {
+      setLoginError(""); // clear any previous error
+      await login(email, password);
+      navigate("/"); // redirect to home
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError("Invalid email or password.");
+    }
   };
 
   return (
@@ -63,7 +101,7 @@ const CustomerLoginPage = () => {
                 onFinish={handleSignIn}
                 layout="vertical"
                 style={{ marginTop: "1rem" }}
-                hideRequiredMark
+                requiredMark={false}
               >
                 <Form.Item
                     label={
@@ -93,6 +131,17 @@ const CustomerLoginPage = () => {
                 >
                   <Input.Password placeholder="Your Name" />
                 </Form.Item>
+
+                {loginError && (
+                  <Form.Item>
+                    <Alert
+                      message={loginError}
+                      type="error"
+                      showIcon
+                      style={{ marginBottom: "1rem", borderRadius: "8px" }}
+                    />
+                  </Form.Item>
+                )}
 
                 <Form.Item>
                   <Button

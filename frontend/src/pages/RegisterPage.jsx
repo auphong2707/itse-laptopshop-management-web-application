@@ -14,7 +14,7 @@ const contentStyle = {
 
 const description = '\u00A0';
 
-const CustomerLoginPage = () => {
+const RegisterPage = () => {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
 
@@ -55,7 +55,7 @@ const CustomerLoginPage = () => {
         </div>
 
         <Row gutter={32}>
-          <Col xs={24} md={{ span: 14, offset: 3 }}> 
+          <Col xs={24} md={{ span: 14, offset: 3 }} style={{ paddingLeft: "5px" }}> 
             <Form layout="vertical" form={form} onFinish={handleSignIn}>
               {current === 0 && (
                 <>
@@ -254,4 +254,4 @@ const CustomerLoginPage = () => {
   );
 };
 
-export default CustomerLoginPage;
+export default RegisterPage;
