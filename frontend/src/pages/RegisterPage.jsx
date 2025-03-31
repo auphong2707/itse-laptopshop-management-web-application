@@ -74,22 +74,75 @@ const RegisterPage = () => {
       setIsLoading(false); // 👉 Tắt loading
     }
   };
+  const checkEmailAndPhone = async (email, phoneNumber) => {
+    try {
+      const response = await fetch("http://localhost:8000/accounts/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, phone_number: phoneNumber }),
+      });
   
-  
+      const data = await response.json();
+      return data; // trả về { email_exists: true, phone_exists: false } chẳng hạn
+    } catch (error) {
+      console.error("Error checking email/phone:", error);
+      return null;
+    }
+  };
   
   const nextStep = async () => {
     try {
-      await form.validateFields(); // validate step 1
+      await form.validateFields(); // validate form client-side
+      const values = form.getFieldsValue();
   
-      const values = form.getFieldsValue(); // lấy dữ liệu người dùng
-      // Lưu tạm vào localStorage
+      const normalizePhone = (phone) => {
+        if (phone.startsWith("0")) {
+          return "+84" + phone.slice(1);
+        }
+        return phone;
+      };
+  
+      const checkResult = await checkEmailAndPhone(values.email, normalizePhone(values.phoneNumber));
+      
+      if (!checkResult) {
+        return; // không làm gì nếu lỗi kết nối
+      }
+  
+      let hasError = false;
+  
+      if (checkResult.email_exists) {
+        form.setFields([
+          {
+            name: "email",
+            errors: ["Email already exists."],
+          },
+        ]);
+        hasError = true;
+      }
+  
+      if (checkResult.phone_exists) {
+        form.setFields([
+          {
+            name: "phoneNumber",
+            errors: ["Phone number already exists."],
+          },
+        ]);
+        hasError = true;
+      }
+  
+      if (hasError) return;
+  
+      // nếu không có lỗi, lưu vào localStorage và tiếp tục
       localStorage.setItem("register_step1", JSON.stringify(values));
+      setCurrent(current + 1);
   
-      setCurrent(current + 1); // chuyển sang bước 2
     } catch (errorInfo) {
       console.log("Validation failed:", errorInfo);
     }
   };
+  
   
 
   return (
