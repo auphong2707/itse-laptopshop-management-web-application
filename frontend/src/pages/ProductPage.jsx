@@ -13,9 +13,9 @@ const { Content } = Layout;
 const { Title, Text, Link } = Typography;
 
 const imageSources = [
-  "None",
-  "None",
-  "None",
+  "/product_page_banner_1.png",
+  "/product_page_banner_1.png",
+  "/product_page_banner_1.png",
 ]
 
 const ProductHeader = ({ title, series }) => (
@@ -151,7 +151,7 @@ const ProductPage = () => {
 
 
       {/* Advertisement */}
-      <ImageGallery imageSources={imageSources} />
+      <ImageGallery imageSources={imageSources} height="600px"/>
 
       <SupportSection />
 

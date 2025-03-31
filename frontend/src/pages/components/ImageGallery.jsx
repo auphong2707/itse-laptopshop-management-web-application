@@ -9,7 +9,7 @@ import "swiper/css/autoplay";
 import PropTypes from "prop-types";
 
 
-const ImageGallery = ({imageSources}) => {
+const ImageGallery = ({imageSources, height}) => {
   return (
     <div>
       <Swiper
@@ -19,13 +19,13 @@ const ImageGallery = ({imageSources}) => {
         navigation
         pagination={{ clickable: true }}
         autoplay={{ delay: 5000 }}
-        style={{ height: "300px", backgroundColor: "white" }}
+        style={{ height: height || "300px", backgroundColor: "white" }}
       >
         {imageSources.map((img, index) => (
           <SwiperSlide key={index}>
             <Image
               src={img}
-              height="100%"
+              height="auto%"
               width="100%"
               style={{ objectFit: "contain" }}
               preview={false}
@@ -39,6 +39,7 @@ const ImageGallery = ({imageSources}) => {
 
 ImageGallery.propTypes = {
   imageSources: PropTypes.arrayOf(PropTypes.string),
+  height: PropTypes.string,
 };
 
 export default ImageGallery;
