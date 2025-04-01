@@ -15,11 +15,11 @@ const { Content } = Layout;
 const { Text, Link } = Typography;
 
 const imageSources = [
-  "/homepage_advertisement_1.png",
-  "/homepage_advertisement_2.png",
-  "/homepage_advertisement_2.png",
-  "/homepage_advertisement_2.png",
-  "/homepage_advertisement_2.png"
+  "/homepage-image/homepage_advertisement/homepage_advertisement_1.png",
+  "/homepage-image/homepage_advertisement/homepage_advertisement_2.png",
+  "/homepage-image/homepage_advertisement/homepage_advertisement_3.png",
+  "/homepage-image/homepage_advertisement/homepage_advertisement_4.png",
+  "/homepage-image/homepage_advertisement/homepage_advertisement_5.png"
 ]
 
 const contentStyle = {
@@ -176,7 +176,7 @@ const HomePage = () => {
 
         {/* Banner */}
         <Image
-          src="/homepage_second_banner.png"
+          src="/homepage-image/homepage_second_banner.png"
           width={"100%"}
           style={{ width: "100%", height: "40px" }}
           preview={false}
