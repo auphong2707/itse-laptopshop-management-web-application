@@ -16,10 +16,10 @@ const { Text, Link } = Typography;
 
 const imageSources = [
   "/homepage_advertisement_1.png",
-  "/homepage_advertisement_1.png",
-  "/homepage_advertisement_1.png",
-  "/homepage_advertisement_1.png",
-  "/homepage_advertisement_1.png"
+  "/homepage_advertisement_2.png",
+  "/homepage_advertisement_2.png",
+  "/homepage_advertisement_2.png",
+  "/homepage_advertisement_2.png"
 ]
 
 const contentStyle = {
@@ -176,7 +176,7 @@ const HomePage = () => {
 
         {/* Banner */}
         <Image
-          src="None"
+          src="/homepage_second_banner.png"
           width={"100%"}
           style={{ width: "100%", height: "40px" }}
           preview={false}
