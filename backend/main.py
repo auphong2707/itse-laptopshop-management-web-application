@@ -305,6 +305,28 @@ def get_posts(limit: int = Query(12)):
     results = es.search(index="posts", body={"query": {"match_all": {}}, "size": limit})
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
+@app.post("/accounts/check")
+def check_email_and_phone(data: dict = Body(...)):
+    email = data.get("email")
+    phone = data.get("phone_number")
+
+    users_ref = firestore.client().collection("users")
+    email_exists = False
+    phone_exists = False
+
+    if email:
+        query = users_ref.where("email", "==", email).limit(1).stream()
+        email_exists = any(query)
+
+    if phone:
+        query = users_ref.where("phone_number", "==", phone).limit(1).stream()
+        phone_exists = any(query)
+
+    return {
+        "email_exists": email_exists,
+        "phone_exists": phone_exists
+    }
+
 @app.post("/accounts")
 def create_account(user_data: ExtendedUserCreate):
     try:
