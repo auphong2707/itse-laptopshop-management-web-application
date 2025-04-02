@@ -3,8 +3,10 @@ import random
 import os
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
+from tqdm import tqdm
 
 NUM_LAPTOPS = 0
+NUM_POSTS = 0
 
 def get_sub_brand(brand, name):
     if brand == 'asus':
@@ -213,6 +215,9 @@ import random
 from datetime import datetime, timedelta
 
 def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
+    global NUM_POSTS
+    NUM_POSTS = num_posts
+
     descriptions = [
         "Khám phá những chiếc laptop chơi game mới nhất!",
         "Nâng cấp góc làm việc của bạn với những phụ kiện tuyệt vời.",
@@ -271,7 +276,7 @@ def generate_images(template_dir='./backend/static/templates',
     except:
         font = ImageFont.load_default()
 
-    for laptop_id in range(1, NUM_LAPTOPS + 1):
+    for laptop_id in tqdm(range(1, NUM_LAPTOPS + 1), desc="Generating laptop images"):
         for i in range(1, 4):  # 3 images per laptop
             src_path = os.path.join(template_dir, f'laptop{i}.jpg')
             dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
@@ -287,6 +292,40 @@ def generate_images(template_dir='./backend/static/templates',
 
     print(f"Generated mock images for {NUM_LAPTOPS} laptops.")
 
+def generate_post_images(num_posts=20,
+                         template_path='./backend/static/templates/posts.jpg',
+                         output_dir='./backend/static/post_images'):
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", size=100)
+    except:
+        font = ImageFont.load_default()
+
+    for i in tqdm(range(1, num_posts + 1), desc="Generating post images"):
+        if not os.path.exists(template_path):
+            print(f"[WARN] Template image not found at: {template_path}")
+            break
+
+        with Image.open(template_path) as img:
+            draw = ImageDraw.Draw(img)
+            text = f"Post #{i}"
+            draw.text(
+                (50, 50),
+                text,
+                font=font,
+                fill="black",
+                stroke_width=4,
+                stroke_fill="white"
+            )
+
+            output_path = os.path.join(output_dir, f"post_{i}.jpg")
+            img.save(output_path)
+
+    print(f"Generated {num_posts} post images in '{output_dir}'")
+
 if __name__ == "__main__":
     clear_old_commands()
     generate_laptop_insert_queries()
@@ -294,3 +333,4 @@ if __name__ == "__main__":
     generate_reviews()
     generate_subscriptions()
     generate_posts()
+    generate_post_images(num_posts=NUM_POSTS)
