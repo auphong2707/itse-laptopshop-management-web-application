@@ -216,7 +216,7 @@ from datetime import datetime, timedelta
 
 def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
     global NUM_POSTS
-    NUM_POSTS = num_posts
+    NUM_POSTS = num_posts  # store for image generation
 
     descriptions = [
         "Khám phá những chiếc laptop chơi game mới nhất!",
@@ -228,32 +228,27 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
         "Tối ưu thời lượng pin với những bước đơn giản.",
         "Chơi game di động: Những laptop gaming tốt nhất để mang theo.",
     ]
-    
-    image_urls = [
-        "https://example.com/images/laptop1.jpg",
-        "https://example.com/images/laptop2.jpg",
-        "https://example.com/images/laptop3.jpg",
-        "https://example.com/images/laptop4.jpg",
-    ]
-    
+
     links = [
         "https://example.com/bai-viet-1",
         "https://example.com/bai-viet-2",
         "https://example.com/bai-viet-3",
         "https://example.com/bai-viet-4",
     ]
-    
-    values = []  
 
-    for _ in range(num_posts):  # Không kiểm tra trùng lặp
+    values = []
+
+    for i in tqdm(range(1, num_posts + 1), desc="Generating post SQL"):
         description = random.choice(descriptions)
-        image_url = random.choice(image_urls)
         link = random.choice(links)
-        
-        # Sinh ngày ngẫu nhiên trong 365 ngày gần nhất
+
+        # Use generated image path
+        image_url = f"/static/post_images/post_{i}.jpg"
+
+        # Random created_at
         days_ago = random.randint(0, 365)
         created_at = (datetime.now() - timedelta(days=days_ago)).date()
-        
+
         values.append(f"('{image_url}', '{description}', '{link}', '{created_at}')")
 
     insert_query = "INSERT INTO posts (image_url, description, link, created_at) VALUES "
@@ -262,7 +257,7 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
-    print(f"INSERT post queries successfully written to {sql_output_path}")
+    print(f"INSERT post queries written for {num_posts} posts to {sql_output_path}")
 
 def generate_images(template_dir='./backend/static/templates',
                     output_dir='./backend/static/laptop_images'):
