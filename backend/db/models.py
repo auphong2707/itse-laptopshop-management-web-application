@@ -1,5 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func, TIMESTAMP
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DateTime, func, TIMESTAMP, Float
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.dialects.postgresql import JSON
 
 Base = declarative_base()
 
@@ -86,3 +87,25 @@ class NewsletterSubscription(Base):
     email = Column(String, unique=True, nullable=False)
     subscribed_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(String, nullable=False)
+    total_price = Column(Float, nullable=False)
+    status = Column(String, default="pending")
+    created_at = Column(DateTime, server_default=func.current_timestamp())
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+    items = relationship("OrderItem", back_populates="order")
+
+class OrderItem(Base):
+    __tablename__ = "order_items"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+    laptop_id = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
+
+    order = relationship("Order", back_populates="items")
