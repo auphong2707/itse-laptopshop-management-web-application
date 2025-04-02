@@ -376,6 +376,16 @@ def delete_account(uid: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+def deep_json_load(s):
+    """Recursively load JSON until the result is not a string."""
+    try:
+        result = json.loads(s)
+        while isinstance(result, str):
+            result = json.loads(result)
+        return result
+    except Exception:
+        return None
+    
 @app.post("/laptops/{laptop_id}/upload_images")
 def upload_images_to_laptop(
     laptop_id: int,
@@ -383,41 +393,64 @@ def upload_images_to_laptop(
     db: Session = Depends(get_db)
 ):
     """
-    Upload multiple images for a laptop, save them to disk,
-    write laptop ID on each image, and store URLs in product_image_mini.
+    Upload new images for a laptop. If the laptop already has images,
+    the new images are appended. For example, if there are already 3 images,
+    the next file will be saved as id_img4.jpg and added to the URL list.
     """
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
     if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    image_urls = []
+    # Use deep_json_load to fully decode any nested JSON encoding.
+    existing_urls = []
+    if laptop.product_image_mini:
+        decoded = deep_json_load(laptop.product_image_mini)
+        if isinstance(decoded, list):
+            existing_urls = decoded
+        elif decoded is not None:
+            existing_urls = [decoded]
 
     os.makedirs("static/laptop_images", exist_ok=True)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 128)
-    except:
+        font = ImageFont.truetype("arial.ttf", 150)
+    except Exception:
         font = ImageFont.load_default()
 
+    new_urls = []
+    starting_index = len(existing_urls)
     for i, file in enumerate(files):
-        filename = f"{laptop_id}_img{i+1}.jpg"
+        new_index = starting_index + i + 1
+        filename = f"{laptop_id}_img{new_index}.jpg"
         filepath = os.path.join("static/laptop_images", filename)
 
+        # Save the uploaded file
         with open(filepath, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # Reopen image to draw watermark
         with Image.open(filepath) as img:
             draw = ImageDraw.Draw(img)
-            draw.text((10, 10), f"ID: {laptop_id}", fill="white", font=font)
+            draw.text(
+                (30, 30),
+                f"ID: {laptop_id}",
+                fill="black",
+                stroke_fill="white",
+                stroke_width=3,
+                font=font
+            )
             img.save(filepath)
 
-        image_url = f"/static/laptop_images/{filename}"
-        image_urls.append(image_url)
+        new_urls.append(f"/static/laptop_images/{filename}")
 
-    laptop.product_image_mini = json.dumps(image_urls)
+    # Append new URLs to the existing list and update DB
+    all_urls = existing_urls + new_urls
+    laptop.product_image_mini = json.dumps(all_urls)
     db.commit()
 
-    return {"message": "Images uploaded successfully", "image_urls": image_urls}
+    return {"message": "Images uploaded successfully", "image_urls": all_urls}
+
+
 
 @app.post("/login")
 def login_user(user_data=Depends(verify_firebase_token)):
