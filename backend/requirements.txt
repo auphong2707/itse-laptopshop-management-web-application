@@ -52,7 +52,6 @@ pydantic_core==2.27.2
 PyJWT==2.10.1
 pyparsing==3.2.1
 pytest==8.3.5
-python-multipart==0.0.20
 python-dotenv==1.1.0
 requests==2.32.3
 rsa==4.9
