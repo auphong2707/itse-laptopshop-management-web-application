@@ -6,7 +6,7 @@ const { Paragraph, Text } = Typography;
 const PostCard = ({img, title, date}) => (
 	<Card
 		hoverable
-		cover={<img src={img} style={{ height: 120 }}/>}
+		cover={<img src={img} style={{ height: 200, objectFit: "contain" }}/>}
 		style={{
 			height: 345
 		}}
