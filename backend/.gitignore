@@ -164,3 +164,6 @@ commands/insert_sample_data.sql
 
 # Secret
 secret/
+
+static/laptop_images/
+static/post_images/

@@ -11,16 +11,16 @@ import ProductCard from "./ProductCard";
 
 import PropTypes from "prop-types";
 
-const ProductSlider = ({productData}) => {
+const ProductSlider = ({ productData }) => {
   return (
     <Swiper
-      modules={[Navigation]}      // Use the Navigation module
-      navigation                 // Enable navigation arrows
-      slidesPerView="auto"          // Number of slides visible at once
-      centeredSlides={false}         // Align slides to the left
-      watchOverflow={true}          // Prevent empty space when there are less than 3 slides
-      slidesOffsetBefore={0}   // Aligns slides to the left
-      slidesOffsetAfter={0}    // Ensures no unwanted right offset
+      modules={[Navigation]} // Use the Navigation module
+      navigation // Enable navigation arrows
+      slidesPerView="auto" // Number of slides visible at once
+      centeredSlides={false} // Align slides to the left
+      watchOverflow={true} // Prevent empty space when there are less than 3 slides
+      slidesOffsetBefore={0} // Aligns slides to the left
+      slidesOffsetAfter={0} // Ensures no unwanted right offset
     >
       {productData.map((product, index) => (
         <SwiperSlide key={index}>
@@ -32,7 +32,7 @@ const ProductSlider = ({productData}) => {
 };
 
 ProductSlider.propTypes = {
-	productData: PropTypes.arrayOf(PropTypes.object),
+  productData: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ProductSlider;

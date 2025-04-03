@@ -1,14 +1,14 @@
 /* Swiper Navigation Buttons */
 .swiper-button-prev,
 .swiper-button-next {
-    color: black !important; /* Change arrow color to black */
-    scale: 0.5;
+  color: black !important; /* Change arrow color to black */
+  scale: 0.5;
 }
 
 /* Show arrows on hover */
 .product-slider-container:hover .swiper-button-prev,
 .product-slider-container:hover .swiper-button-next {
-opacity: 1; /* Show arrows when hovering */
+  opacity: 1; /* Show arrows when hovering */
 }
 
 /* Ensure buttons are positioned correctly */
@@ -20,7 +20,9 @@ opacity: 1; /* Show arrows when hovering */
   right: -2px;
 }
 
-.swiper-slide { width: auto; }
+.swiper-slide {
+  width: auto;
+}
 
 .ant-tabs-tab-btn {
   font-weight: bold;

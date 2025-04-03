@@ -126,3 +126,30 @@ CREATE TABLE delete_log (
     deleted_at TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id, table_name)
 );
+
+
+-- ORDERS
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+-- Add updated_at column to orders table
+ALTER TABLE orders ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Ensure updated_at updates on modification
+CREATE TRIGGER set_orders_updated_at
+BEFORE UPDATE ON orders
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
