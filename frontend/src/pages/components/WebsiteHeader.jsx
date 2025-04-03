@@ -224,9 +224,11 @@ const WebsiteHeader = () => {
         <Flex align="center" gap="35px">
           <Flex align="center" gap="middle">
             <SearchOutlined style={{ fontSize: "18px", color: "black" }} />
-            <ShoppingCartOutlined
-              style={{ fontSize: "21px", color: "black" }}
-            />
+            <Link to="/shopping-cart">
+              <ShoppingCartOutlined
+                style={{ fontSize: "21px", color: "black" }}
+              />
+            </Link>
           </Flex>
 
           {/* Account Menu */}
