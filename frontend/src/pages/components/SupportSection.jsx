@@ -23,7 +23,7 @@ const SupportSection = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-end", 
+          alignItems: "flex-end",
           gap: "10px",
           marginLeft: "250px",
           marginRight: "-150px",
@@ -39,16 +39,16 @@ const SupportSection = () => {
         <img
           src="/customer-support.png"
           alt="Customer Support"
-          style={{ 
+          style={{
             height: "100%",
-            maxHeight: "350px", 
-            width: "auto",         
+            maxHeight: "350px",
+            width: "auto",
             border: "none",
             outline: "none",
             boxShadow: "none",
             zIndex: "-10",
             marginRight: "350px",
-        }}
+          }}
         />
       </div>
     </div>

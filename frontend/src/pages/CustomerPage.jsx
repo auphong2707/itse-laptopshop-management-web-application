@@ -54,66 +54,157 @@ const CustomerPage = () => {
       label: "Account Dashboard",
       content: (
         <div style={{ paddingLeft: "40px", marginTop: "-2px" }}>
-          <Title level={4} style={{ marginBottom: "10px" }}>Account Information</Title>
-          <div style={{ borderBottom: "1px solid #ccc", marginBottom: "20px" }}></div>
-      
+          <Title level={4} style={{ marginBottom: "10px" }}>
+            Account Information
+          </Title>
+          <div
+            style={{ borderBottom: "1px solid #ccc", marginBottom: "20px" }}
+          ></div>
+
           <Row gutter={[16, 16]} style={{ paddingBottom: "20px" }}>
             <Col span={12}>
-              <Text strong style={{ fontSize: "14px" }}>Contact Information</Text>
+              <Text strong style={{ fontSize: "14px" }}>
+                Contact Information
+              </Text>
               <p style={{ fontSize: "14px" }}>Alex Driver</p>
               <p style={{ fontSize: "14px" }}>ExampleAdress@gmail.com</p>
               <div style={{ marginTop: "30px" }}>
-                <a href="#" style={{ fontSize: "14px", color: "#1890ff", textDecoration: "underline", cursor: "pointer" }} 
-                   onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                   onMouseOut={(e) => e.target.style.color = "#1890ff"}>Edit</a> | 
-                <a href="#" style={{ fontSize: "14px", color: "#1890ff", textDecoration: "underline", cursor: "pointer", marginLeft: "8px" }} 
-                   onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                   onMouseOut={(e) => e.target.style.color = "#1890ff"}>Change Password</a>
+                <a
+                  href="#"
+                  style={{
+                    fontSize: "14px",
+                    color: "#1890ff",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+                >
+                  Edit
+                </a>{" "}
+                |
+                <a
+                  href="#"
+                  style={{
+                    fontSize: "14px",
+                    color: "#1890ff",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    marginLeft: "8px",
+                  }}
+                  onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+                >
+                  Change Password
+                </a>
               </div>
             </Col>
             <Col span={12}>
-              <Text strong style={{ fontSize: "14px" }}>Newsletters</Text>
-              <p style={{ fontSize: "14px" }}>You don’t subscribe to our newsletter.</p>
+              <Text strong style={{ fontSize: "14px" }}>
+                Newsletters
+              </Text>
+              <p style={{ fontSize: "14px" }}>
+                You don’t subscribe to our newsletter.
+              </p>
               <div style={{ marginTop: "60px" }}>
-                <a href="#" style={{ fontSize: "14px", color: "#1890ff", textDecoration: "underline", cursor: "pointer" }} 
-                   onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                   onMouseOut={(e) => e.target.style.color = "#1890ff"}>Edit</a>
+                <a
+                  href="#"
+                  style={{
+                    fontSize: "14px",
+                    color: "#1890ff",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+                >
+                  Edit
+                </a>
               </div>
             </Col>
           </Row>
-      
+
           <div style={{ marginTop: "40px" }}></div>
-      
+
           <Row gutter={[16, 16]} style={{ marginTop: "20px" }}>
             <Col span={24}>
-              <Title level={4} style={{ display: "inline-block", marginBottom: "0px"}}>
+              <Title
+                level={4}
+                style={{ display: "inline-block", marginBottom: "0px" }}
+              >
                 Address Book
               </Title>
-              <a href="#" style={{ fontSize: "14px", marginLeft: "10px", color: "#1890ff", textDecoration: "underline", cursor: "pointer" }} 
-                 onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                 onMouseOut={(e) => e.target.style.color = "#1890ff"}>Manage Addresses</a>
+              <a
+                href="#"
+                style={{
+                  fontSize: "14px",
+                  marginLeft: "10px",
+                  color: "#1890ff",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+              >
+                Manage Addresses
+              </a>
             </Col>
           </Row>
-      
-          <div style={{ borderBottom: "1px solid #ccc", marginTop: "10px", marginBottom: "10px", width: "100%" }}></div>
-      
+
+          <div
+            style={{
+              borderBottom: "1px solid #ccc",
+              marginTop: "10px",
+              marginBottom: "10px",
+              width: "100%",
+            }}
+          ></div>
+
           <Row gutter={[16, 16]}>
             <Col span={12}>
-              <Text strong style={{ fontSize: "14px" }}>Default Billing Address</Text>
-              <p style={{ fontSize: "14px" }}>You have not set a default billing address.</p>
+              <Text strong style={{ fontSize: "14px" }}>
+                Default Billing Address
+              </Text>
+              <p style={{ fontSize: "14px" }}>
+                You have not set a default billing address.
+              </p>
               <div style={{ marginTop: "40px" }}>
-                <a href="#" style={{ fontSize: "14px", color: "#1890ff", textDecoration: "underline", cursor: "pointer" }} 
-                   onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                   onMouseOut={(e) => e.target.style.color = "#1890ff"}>Edit Address</a>
+                <a
+                  href="#"
+                  style={{
+                    fontSize: "14px",
+                    color: "#1890ff",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+                >
+                  Edit Address
+                </a>
               </div>
             </Col>
             <Col span={12}>
-              <Text strong style={{ fontSize: "14px" }}>Default Shipping Address</Text>
-              <p style={{ fontSize: "14px" }}>You have not set a default shipping address.</p>
+              <Text strong style={{ fontSize: "14px" }}>
+                Default Shipping Address
+              </Text>
+              <p style={{ fontSize: "14px" }}>
+                You have not set a default shipping address.
+              </p>
               <div style={{ marginTop: "40px" }}>
-                <a href="#" style={{ fontSize: "14px", color: "#1890ff", textDecoration: "underline", cursor: "pointer" }} 
-                   onMouseOver={(e) => e.target.style.color = "#0056b3"} 
-                   onMouseOut={(e) => e.target.style.color = "#1890ff"}>Edit Address</a>
+                <a
+                  href="#"
+                  style={{
+                    fontSize: "14px",
+                    color: "#1890ff",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                  }}
+                  onMouseOver={(e) => (e.target.style.color = "#0056b3")}
+                  onMouseOut={(e) => (e.target.style.color = "#1890ff")}
+                >
+                  Edit Address
+                </a>
               </div>
             </Col>
           </Row>
@@ -170,7 +261,10 @@ const CustomerPage = () => {
   return (
     <Layout>
       <WebsiteHeader />
-      <Content className="responsive-padding" style={{ backgroundColor: "#fff" }}>
+      <Content
+        className="responsive-padding"
+        style={{ backgroundColor: "#fff" }}
+      >
         <Breadcrumb separator=">" style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Home</Breadcrumb.Item>
           <Breadcrumb.Item>My Dashboard</Breadcrumb.Item>
@@ -178,23 +272,68 @@ const CustomerPage = () => {
         <Title level={2}>My Dashboard</Title>
         <Row gutter={16}>
           <Sidebar flex="1">
-            <StyledTabs activeKey={selectedTab} onChange={setSelectedTab} tabPosition="left">
+            <StyledTabs
+              activeKey={selectedTab}
+              onChange={setSelectedTab}
+              tabPosition="left"
+            >
               {tabs.map((tab) => (
                 <Tabs.TabPane tab={tab.label} key={tab.key} />
               ))}
             </StyledTabs>
 
-            <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%" }}>
-              <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>Compare Products</Text>
-              <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items to compare.</p>
+            <div
+              style={{
+                background: "#e9ecef",
+                padding: "10px 20px 20px 20px",
+                marginTop: "20px",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              <Text
+                strong
+                style={{
+                  fontSize: "16px",
+                  display: "block",
+                  marginTop: "12px",
+                  paddingBottom: "8px",
+                }}
+              >
+                Compare Products
+              </Text>
+              <p style={{ fontSize: "14px", marginTop: "8px" }}>
+                You have no items to compare.
+              </p>
             </div>
 
-            <div style={{ background: "#e9ecef", padding: "10px 20px 20px 20px", marginTop: "20px", textAlign: "center", width: "100%", position: "relative" }}>
-              <Text strong style={{ fontSize: "16px", display: "block", marginTop: "12px", paddingBottom: "8px" }}>My Wish List</Text>
-              <p style={{ fontSize: "14px", marginTop: "8px" }}>You have no items in your wish list.</p>
+            <div
+              style={{
+                background: "#e9ecef",
+                padding: "10px 20px 20px 20px",
+                marginTop: "20px",
+                textAlign: "center",
+                width: "100%",
+                position: "relative",
+              }}
+            >
+              <Text
+                strong
+                style={{
+                  fontSize: "16px",
+                  display: "block",
+                  marginTop: "12px",
+                  paddingBottom: "8px",
+                }}
+              >
+                My Wish List
+              </Text>
+              <p style={{ fontSize: "14px", marginTop: "8px" }}>
+                You have no items in your wish list.
+              </p>
             </div>
           </Sidebar>
-          
+
           <Col flex="3">
             {tabs.find((tab) => tab.key === selectedTab)?.content}
           </Col>

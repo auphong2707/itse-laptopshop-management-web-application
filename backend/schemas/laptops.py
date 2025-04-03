@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 
+
 class LaptopCreate(BaseModel):
     brand: str
     sub_brand: str
@@ -33,6 +34,7 @@ class LaptopCreate(BaseModel):
     quantity: int = Field(..., ge=0)
     original_price: int = Field(..., gt=0)
     sale_price: int = Field(..., gt=0)
+
 
 class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
@@ -67,6 +69,7 @@ class LaptopUpdate(BaseModel):
     original_price: Optional[int] = Field(None, gt=0)
     sale_price: Optional[int] = Field(None, gt=0)
 
+
 class LaptopResponse(LaptopCreate):
-    id: int  
+    id: int
     model_config = ConfigDict(from_attributes=True)
