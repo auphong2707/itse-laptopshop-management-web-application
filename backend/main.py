@@ -1,6 +1,6 @@
 import os
 from elasticsearch import Elasticsearch
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Body
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -14,7 +14,7 @@ from schemas.laptops import *
 from schemas.newsletter import *
 
 from services.firebase_auth import *
-
+    
 app = FastAPI()
 
 load_dotenv()
@@ -351,7 +351,9 @@ def create_account(user_data: ExtendedUserCreate):
         auth.set_custom_user_claims(user_record.uid, {"role": user_data.role})
 
         # 5. Store extended profile in Firestore
-        db.collection("users").document(user_record.uid).set({
+        firestore.client().collection("users").document(user_record.uid).set({
+            "email": user_data.email,                
+            "phone_number": user_data.phone_number,  
             "first_name": user_data.first_name,
             "last_name": user_data.last_name,
             "company": user_data.company,
