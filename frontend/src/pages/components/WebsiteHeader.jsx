@@ -62,7 +62,11 @@ const AccountMenu = () => {
       {user ? (
         <>
           <Menu.Item key="account" style={{ fontWeight: "bold" }}>
-            My Account
+            {user.role === "customer" ? (
+              <Link to="/customer">My Account</Link>
+            ) : (
+              "My Account"
+            )}
           </Menu.Item>
 
           {user.role === "admin" ? (
