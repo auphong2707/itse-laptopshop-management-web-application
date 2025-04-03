@@ -25,7 +25,6 @@
 				// Python & FastAPI
 				"ms-python.python",
 				"ms-python.black-formatter",
-				"ms-python.flake8",
 				"batisteo.vscode-django",             // For Django-style navigation (optional for FastAPI)
 
 				// FastAPI Swagger/OpenAPI tools
