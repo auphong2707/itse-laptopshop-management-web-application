@@ -58,7 +58,6 @@ jobs:
           git commit -m "🚀 Daily Run: Update results" || echo "No changes to commit"
 
       - name: ⬆️ Push changes (only on real branches)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
           CURRENT_BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
           echo "Pushing to branch: $CURRENT_BRANCH"
