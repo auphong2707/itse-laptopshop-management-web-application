@@ -58,4 +58,6 @@ jobs:
           git commit -m "🚀 Daily Run: Update results" || echo "No changes to commit"
 
       - name: ⬆️ Push changes
-        run: git push origin || echo "No changes to push"
+        run: |
+          git push origin HEAD:${GITHUB_REF_NAME} || echo "No changes to push"
+
