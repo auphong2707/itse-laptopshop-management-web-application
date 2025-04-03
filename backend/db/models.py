@@ -98,14 +98,18 @@ class Order(Base):
     created_at = Column(DateTime, server_default=func.current_timestamp())
     updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
 
-    items = relationship("OrderItem", back_populates="order")
+    items = relationship(
+        "OrderItem",
+        back_populates="order",
+        cascade="all, delete-orphan"
+    )
 
 class OrderItem(Base):
     __tablename__ = "order_items"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
-    laptop_id = Column(Integer, nullable=False)
+    product_id = Column(Integer, nullable=False)
     quantity = Column(Integer, nullable=False)
 
     order = relationship("Order", back_populates="items")

@@ -1,7 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import Request, HTTPException, Header
 from firebase_admin import credentials, auth, firestore, initialize_app
+from firebase_admin.exceptions import FirebaseError
 
 
 try :
@@ -35,3 +36,14 @@ def verify_firebase_token(request: Request):
         return decoded_token
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Token verification failed: {str(e)}")
+
+def get_current_user(authorization: str = Header(...)) -> str:
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid token format")
+    
+    token = authorization.split(" ")[1]
+    try:
+        decoded_token = auth.verify_id_token(token)
+        return decoded_token["uid"]
+    except FirebaseError:
+        raise HTTPException(status_code=401, detail="Invalid or expired Firebase token")

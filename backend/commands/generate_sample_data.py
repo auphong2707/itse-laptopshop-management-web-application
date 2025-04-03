@@ -270,8 +270,8 @@ def generate_orders(sql_output_path='./backend/commands/insert_sample_data.sql',
     order_values = []
     order_item_values = []
 
-    current_order_id = 1  # Assuming starting from ID 1; adjust if needed
-    current_order_item_id = 1  # Used if you want to insert order_items separately later
+    current_order_id = 1
+    current_order_item_id = 1
 
     for _ in range(num_orders):
         user_id = random.choice(user_ids)
@@ -282,26 +282,22 @@ def generate_orders(sql_output_path='./backend/commands/insert_sample_data.sql',
         total_price = 0.0
         for product_id in item_ids:
             quantity = random.randint(1, 3)
-            price = random.uniform(300, 2000)  # Simulated sale price
+            price = random.uniform(300, 2000)
             total_price += price * quantity
 
             order_items.append((current_order_id, product_id, quantity))
             current_order_item_id += 1
 
-        # Create order row
         status = random.choice(order_statuses)
-        created_at = datetime.now() - timedelta(days=random.randint(0, 365))
-        updated_at = created_at + timedelta(days=random.randint(0, 10))
-        order_values.append(f"({current_order_id}, '{user_id}', {round(total_price, 2)}, '{status}', '{created_at}', '{updated_at}')")
+        order_values.append(f"({current_order_id}, '{user_id}', {round(total_price, 2)}, '{status}')")
 
-        # Create item rows for this order
         for (order_id, product_id, quantity) in order_items:
             order_item_values.append(f"({order_id}, {product_id}, {quantity})")
 
         current_order_id += 1
 
-    # Write orders
-    order_insert = "INSERT INTO orders (id, user_id, total_price, status, created_at, updated_at) VALUES "
+    # Write orders (without created_at and updated_at)
+    order_insert = "INSERT INTO orders (id, user_id, total_price, status) VALUES "
     order_insert += ',\n'.join(order_values) + ";"
 
     # Write order items
