@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { data, useParams } from "react-router-dom";
+import { data, Link, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image } from "antd";
+import PropTypes from "prop-types";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import ProductImage from "./components/ProductImage";
@@ -9,8 +10,9 @@ import Purchase from "./components/Purchase";
 import SupportSection from "./components/SupportSection";
 import ImageGallery from "./components/ImageGallery";
 
+
 const { Content } = Layout;
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 const imageSources = [
   "/product_page_banner_1.png",
@@ -21,9 +23,15 @@ const imageSources = [
 const ProductHeader = ({ title, series }) => (
   <>
     <Breadcrumb separator=">" style={{ marginBottom: "1rem" }}>
-      <Breadcrumb.Item>Home</Breadcrumb.Item>
-      <Breadcrumb.Item>Laptops</Breadcrumb.Item>
-      <Breadcrumb.Item>{series}</Breadcrumb.Item>
+      <Breadcrumb.Item>
+        <Link to="/">Home</Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>
+        <Link to="/laptops/all">Laptops</Link>
+      </Breadcrumb.Item>
+      <Breadcrumb.Item>
+      <Link to={`/laptops/${series?.toLowerCase()}`}>{series}</Link>
+      </Breadcrumb.Item>
     </Breadcrumb>
     <Title level={2} style={{ fontWeight: "bold" }}>
       {title}
@@ -33,6 +41,12 @@ const ProductHeader = ({ title, series }) => (
     </Text>
   </>
 );
+
+ProductHeader.propTypes = {
+  title: PropTypes.string.isRequired,
+  series: PropTypes.string,
+};
+
 
 const ExtraInfo = ({ productId }) => (
   <div
@@ -47,9 +61,9 @@ const ExtraInfo = ({ productId }) => (
   >
     <Text style={{ fontWeight: "bold" }}>
       Have a Question?{" "}
-      <Link href="#" style={{ textDecoration: "underline" }}>
+      <Typography.Link href="#" style={{ textDecoration: "underline" }}>
         Contact Us
-      </Link>
+      </Typography.Link>
     </Text>
     <Text>VN-{productId}</Text>
   </div>
@@ -155,10 +169,11 @@ const transformData = (data) => {
     ram_type: data["ram_type"].toUpperCase(),
     storage_type: data["storage_type"].toUpperCase(),
     vga: data["vga"] ? data["vga"].toUpperCase() : "N/A",
-    default_os: data["default_os"]
+    default_os: data["default_os"] ? data["default_os"]
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" "),
+      .join(" ") : "N/A",
+    webcam_resolution: data["webcam_resolution"] ? data["webcam_resolution"].toUpperCase() : "N/A",
   };
 };
 
