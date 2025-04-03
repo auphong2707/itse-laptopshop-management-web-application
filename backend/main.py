@@ -14,20 +14,12 @@ from schemas.laptops import *
 from schemas.newsletter import *
 from schemas.orders import *
 
-from services.firebase_auth import ExtendedUserCreate
+from services.firebase_auth import *
 from fastapi.staticfiles import StaticFiles
 from fastapi import UploadFile, File
 from PIL import Image, ImageDraw, ImageFont
 
 import shutil
-
-try:
-    cred = credentials.Certificate("secret/firebase-service-key.json")
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-except FileNotFoundError:
-    print("File not found. Therefore, firebase service is unavailable.")
-from services.firebase_auth import *
 
 app = FastAPI()
 
