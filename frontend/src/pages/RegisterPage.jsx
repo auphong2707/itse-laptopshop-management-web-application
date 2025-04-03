@@ -362,7 +362,7 @@ const RegisterPage = () => {
                   <p style={{ fontSize: "1.2rem" }}>
                     Your account has been created. You can now sign in using your credentials.
                   </p>
-                  <Link to="/login">
+                  <Link to="/customer/login">
                     <Button type="primary" size="large" style={{ marginTop: "1rem" }}>
                       Go to Login
                     </Button>
