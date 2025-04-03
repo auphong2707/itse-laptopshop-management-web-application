@@ -57,7 +57,10 @@ jobs:
         run: |
           git commit -m "🚀 Daily Run: Update results" || echo "No changes to commit"
 
-      - name: ⬆️ Push changes
+      - name: ⬆️ Push changes (only on real branches)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: |
-          git push origin HEAD:${GITHUB_REF_NAME} || echo "No changes to push"
+          CURRENT_BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
+          echo "Pushing to branch: $CURRENT_BRANCH"
+          git push origin HEAD:refs/heads/$CURRENT_BRANCH || echo "No changes to push"
 
