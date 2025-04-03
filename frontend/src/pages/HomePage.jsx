@@ -40,7 +40,7 @@ const transformTestimonialData = (data) => {
 const transformPostData = (data) => {
   return data.map(item => {
     return {
-      img: item.image_url,
+      img: `http://localhost:8000${item.image_url}`,
       title: item.description,
       date: item.created_at.split('T')[0].replace(/-/g, '.'),
       link: item.link
@@ -133,6 +133,7 @@ const HomePage = () => {
         });
         
         setPostData(postData);
+        console.log("Post data:", postData);
 
         setTestimonialData(testimonialData);
   
