@@ -8,54 +8,66 @@ from tqdm import tqdm
 NUM_LAPTOPS = 0
 NUM_POSTS = 0
 
+
 def get_sub_brand(brand, name):
-    if brand == 'asus':
-        sub_brands = ['rog', 'tuf', 'zenbook', 'vivobook']
+    if brand == "asus":
+        sub_brands = ["rog", "tuf", "zenbook", "vivobook"]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
 
-    elif brand == 'lenovo':
-        sub_brands = ['legion', 'loq', 'thinkpad', 'thinkbook', 'yoga','ideapad']
+    elif brand == "lenovo":
+        sub_brands = ["legion", "loq", "thinkpad", "thinkbook", "yoga", "ideapad"]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
 
-    elif brand == 'acer':
-        sub_brands = ['predator', 'nitro', 'swift', 'aspire']
+    elif brand == "acer":
+        sub_brands = ["predator", "nitro", "swift", "aspire"]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
 
-    elif brand == 'dell':
-        sub_brands = ['alienware', 'gaming g', 'xps', 'inspiron', 'latitude', 'precision']
+    elif brand == "dell":
+        sub_brands = [
+            "alienware",
+            "gaming g",
+            "xps",
+            "inspiron",
+            "latitude",
+            "precision",
+        ]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
-                if sub_brand == 'gaming g':
-                    return 'g series'
+                if sub_brand == "gaming g":
+                    return "g series"
                 return sub_brand
 
-    elif brand == 'hp':
-        sub_brands = ['omen', 'victus', 'spectre', 'envy', 'pavilion', 'elitebook']
+    elif brand == "hp":
+        sub_brands = ["omen", "victus", "spectre", "envy", "pavilion", "elitebook"]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
 
-    elif brand == 'msi':
-        sub_brands = ['stealth', 'katana', 'prestigate', 'creator', 'modern']
+    elif brand == "msi":
+        sub_brands = ["stealth", "katana", "prestigate", "creator", "modern"]
         for sub_brand in sub_brands:
             if sub_brand in name.lower():
                 return sub_brand
-    
-    return 'n/a'
+
+    return "n/a"
+
 
 def clear_old_commands():
-    with open('./backend/commands/insert_sample_data.sql', 'w') as sql_file:
+    with open("./backend/commands/insert_sample_data.sql", "w") as sql_file:
         sql_file.write("")
     print("Old commands cleared")
 
-def generate_laptop_insert_queries(json_data_directory='./backend/data/', 
-                                 sql_output_path='./backend/commands/insert_sample_data.sql'):
+
+def generate_laptop_insert_queries(
+    json_data_directory="./backend/data/",
+    sql_output_path="./backend/commands/insert_sample_data.sql",
+):
     """
     Generate insert queries from JSON data file
     """
@@ -65,69 +77,80 @@ def generate_laptop_insert_queries(json_data_directory='./backend/data/',
         number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
 
     def convert_value(value):
-        if isinstance(value, str) and value.lower() == 'n/a':
-            return 'NULL'
-        if value == 'n/a' or value == 'N/A':  
-            return 'NULL'
-        elif value is None:  
-            return 'NULL'
+        if isinstance(value, str) and value.lower() == "n/a":
+            return "NULL"
+        if value == "n/a" or value == "N/A":
+            return "NULL"
+        elif value is None:
+            return "NULL"
         return f"'{value}'" if isinstance(value, str) else str(value)
 
     try:
         laptops = []
-        json_file_paths = [os.path.join(json_data_directory, file) for file in os.listdir(json_data_directory) if file.endswith('.json')]
+        json_file_paths = [
+            os.path.join(json_data_directory, file)
+            for file in os.listdir(json_data_directory)
+            if file.endswith(".json")
+        ]
         for json_file_path in json_file_paths:
-            with open(json_file_path, 'r') as file:
+            with open(json_file_path, "r") as file:
                 data = json.load(file)
                 laptops.extend(data)
         global NUM_LAPTOPS
         values = []
         for laptop in laptops:
-            if laptop['price'] == 'n/a':
+            if laptop["price"] == "n/a":
                 continue
             NUM_LAPTOPS += 1
             value_tuple = (
-                convert_value(laptop['brand']),
-                convert_value(get_sub_brand(laptop['brand'], laptop['name'])),
-                convert_value(laptop['name']),
-                convert_value(laptop['cpu']),
-                convert_value(laptop['vga']),
-                convert_value(laptop['ram_amount']),
-                convert_value(laptop['ram_type']),
-                convert_value(laptop['storage_amount']),
-                convert_value(laptop['storage_type']),
-                convert_value(laptop['webcam_resolution']),
-                convert_value(laptop['screen_size']),
-                convert_value(laptop['screen_resolution']),
-                convert_value(laptop['screen_refresh_rate']),
-                convert_value(laptop['screen_brightness']),
-                convert_value(laptop['battery_capacity']),
-                convert_value(laptop['battery_cells']),
-                convert_value(laptop['weight']),
-                convert_value(laptop['default_os']),
-                convert_value(laptop['warranty']),
-                convert_value(laptop['width']),
-                convert_value(laptop['depth']),
-                convert_value(laptop['height']),
-                convert_value(laptop['number_usb_a_ports']),
-                convert_value(laptop['number_usb_c_ports']),
-                convert_value(laptop['number_hdmi_ports']),
-                convert_value(laptop['number_ethernet_ports']),
-                convert_value(laptop['number_audio_jacks']),
-                convert_value(json.dumps([
-        f"/static/laptop_images/{NUM_LAPTOPS}_img1.jpg",
-        f"/static/laptop_images/{NUM_LAPTOPS}_img2.jpg",
-        f"/static/laptop_images/{NUM_LAPTOPS}_img3.jpg"])),
+                convert_value(laptop["brand"]),
+                convert_value(get_sub_brand(laptop["brand"], laptop["name"])),
+                convert_value(laptop["name"]),
+                convert_value(laptop["cpu"]),
+                convert_value(laptop["vga"]),
+                convert_value(laptop["ram_amount"]),
+                convert_value(laptop["ram_type"]),
+                convert_value(laptop["storage_amount"]),
+                convert_value(laptop["storage_type"]),
+                convert_value(laptop["webcam_resolution"]),
+                convert_value(laptop["screen_size"]),
+                convert_value(laptop["screen_resolution"]),
+                convert_value(laptop["screen_refresh_rate"]),
+                convert_value(laptop["screen_brightness"]),
+                convert_value(laptop["battery_capacity"]),
+                convert_value(laptop["battery_cells"]),
+                convert_value(laptop["weight"]),
+                convert_value(laptop["default_os"]),
+                convert_value(laptop["warranty"]),
+                convert_value(laptop["width"]),
+                convert_value(laptop["depth"]),
+                convert_value(laptop["height"]),
+                convert_value(laptop["number_usb_a_ports"]),
+                convert_value(laptop["number_usb_c_ports"]),
+                convert_value(laptop["number_hdmi_ports"]),
+                convert_value(laptop["number_ethernet_ports"]),
+                convert_value(laptop["number_audio_jacks"]),
+                convert_value(
+                    json.dumps(
+                        [
+                            f"/static/laptop_images/{NUM_LAPTOPS}_img1.jpg",
+                            f"/static/laptop_images/{NUM_LAPTOPS}_img2.jpg",
+                            f"/static/laptop_images/{NUM_LAPTOPS}_img3.jpg",
+                        ]
+                    )
+                ),
                 str(random.randint(0, 20)),
-                convert_value(laptop['price']),
-                convert_value(laptop['price'] - random.randint(0, 20)/100 * laptop['price'])
+                convert_value(laptop["price"]),
+                convert_value(
+                    laptop["price"] - random.randint(0, 20) / 100 * laptop["price"]
+                ),
             )
 
             values.append(f"({', '.join(value_tuple)})")
 
-        insert_query += ', '.join(values) + ";"
+        insert_query += ", ".join(values) + ";"
 
-        with open(sql_output_path, 'a') as sql_file:
+        with open(sql_output_path, "a") as sql_file:
             sql_file.write(insert_query + "\n")
 
         print(f"INSERT laptop queries successfully written to {sql_output_path}")
@@ -139,29 +162,32 @@ def generate_laptop_insert_queries(json_data_directory='./backend/data/',
     except Exception as e:
         print(f"Error occurred: {str(e)}")
 
-def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql', num_reviews=10000):
+
+def generate_reviews(
+    sql_output_path="./backend/commands/insert_sample_data.sql", num_reviews=10000
+):
     global NUM_LAPTOPS
     laptop_ids = list(range(1, NUM_LAPTOPS + 1))
     user_names = [
-    'Nguyen Van An', 
-    'Tran Thi Binh', 
-    'Le Minh Chi', 
-    'Pham Duc Duy', 
-    'Hoang Thi Em', 
-    'Vu Quang Phat', 
-    'Bui Tuan Ga', 
-    'Doan Huyen Ha'
+        "Nguyen Van An",
+        "Tran Thi Binh",
+        "Le Minh Chi",
+        "Pham Duc Duy",
+        "Hoang Thi Em",
+        "Vu Quang Phat",
+        "Bui Tuan Ga",
+        "Doan Huyen Ha",
     ]
     ratings = [1, 2, 3, 4, 5]
     review_texts = [
-    'Sản phẩm thực sự xuất sắc! Tôi đã sử dụng laptop này trong hơn một tháng và rất ấn tượng với hiệu năng mạnh mẽ, pin trâu và thiết kế tinh tế. Màn hình hiển thị sắc nét, bàn phím gõ rất êm, phù hợp cho cả công việc văn phòng lẫn chơi game nhẹ. Giao hàng nhanh, đóng gói cẩn thận, đáng giá từng đồng!',
-    'Máy có hiệu năng khá tốt, đáp ứng được nhu cầu làm việc hàng ngày của tôi như lướt web, soạn thảo văn bản và xem video. Tuy nhiên, loa âm thanh hơi nhỏ, đôi lúc phải dùng tai nghe để trải nghiệm tốt hơn. Nhìn chung, với mức giá này thì đây là lựa chọn ổn, không có gì để phàn nàn quá nhiều.',
-    'Sản phẩm ở mức trung bình. Tôi mua để làm việc từ xa, cấu hình đủ dùng nhưng tốc độ khởi động hơi chậm so với kỳ vọng. Màn hình màu sắc tạm ổn, không quá nổi bật. Điểm cộng là trọng lượng nhẹ, dễ mang theo, nhưng tôi mong nhà sản xuất cải thiện thêm về phần mềm đi kèm.',
-    'Thành thật mà nói, tôi không hài lòng lắm. Máy chạy ổn trong tuần đầu, nhưng sau đó bắt đầu có hiện tượng giật lag khi mở nhiều ứng dụng cùng lúc. Pin tụt khá nhanh, chỉ dùng được khoảng 3-4 tiếng dù quảng cáo là 6 tiếng. Đóng gói giao hàng thì ổn, nhưng chất lượng sản phẩm cần được xem xét lại.',
-    'Rất thất vọng với chiếc laptop này. Tôi mua để chỉnh sửa ảnh và video nhưng máy quá yếu, không thể xử lý các phần mềm nặng dù cấu hình quảng cáo là đủ dùng. Quạt tản nhiệt kêu to, nóng máy sau khoảng 1 tiếng sử dụng. Tôi đã liên hệ đổi trả nhưng chưa nhận được phản hồi thỏa đáng từ cửa hàng.',
-    'Tuyệt vời! Đây là lần đầu tiên tôi mua laptop online mà hài lòng đến vậy. Máy chạy mượt mà, thiết kế sang trọng, phù hợp với công việc lập trình của tôi. Đặc biệt, pin dùng được hơn 8 tiếng liên tục, rất tiện khi phải di chuyển nhiều. Đội ngũ hỗ trợ khách hàng cũng rất nhiệt tình, cho 5 sao không suy nghĩ!',
-    'Sản phẩm tốt trong tầm giá. Tôi dùng để học online và làm việc nhóm, máy đáp ứng ổn mọi nhu cầu cơ bản. Điểm trừ nhỏ là vỏ máy dễ bám vân tay, phải lau thường xuyên để giữ sạch sẽ. Giao hàng đúng hẹn, nhân viên tư vấn nhiệt tình, tôi khá hài lòng với trải nghiệm mua sắm lần này.',
-    'Máy tạm ổn, không quá đặc biệt. Hiệu năng đủ để lướt web, xem phim và làm việc nhẹ, nhưng khi chạy đa nhiệm thì hơi đuối. Màn hình có góc nhìn hẹp, ngồi lệch một chút là màu sắc bị biến đổi. Với giá tiền này, tôi nghĩ có thể tìm được lựa chọn tốt hơn trên thị trường.'
+        "Sản phẩm thực sự xuất sắc! Tôi đã sử dụng laptop này trong hơn một tháng và rất ấn tượng với hiệu năng mạnh mẽ, pin trâu và thiết kế tinh tế. Màn hình hiển thị sắc nét, bàn phím gõ rất êm, phù hợp cho cả công việc văn phòng lẫn chơi game nhẹ. Giao hàng nhanh, đóng gói cẩn thận, đáng giá từng đồng!",
+        "Máy có hiệu năng khá tốt, đáp ứng được nhu cầu làm việc hàng ngày của tôi như lướt web, soạn thảo văn bản và xem video. Tuy nhiên, loa âm thanh hơi nhỏ, đôi lúc phải dùng tai nghe để trải nghiệm tốt hơn. Nhìn chung, với mức giá này thì đây là lựa chọn ổn, không có gì để phàn nàn quá nhiều.",
+        "Sản phẩm ở mức trung bình. Tôi mua để làm việc từ xa, cấu hình đủ dùng nhưng tốc độ khởi động hơi chậm so với kỳ vọng. Màn hình màu sắc tạm ổn, không quá nổi bật. Điểm cộng là trọng lượng nhẹ, dễ mang theo, nhưng tôi mong nhà sản xuất cải thiện thêm về phần mềm đi kèm.",
+        "Thành thật mà nói, tôi không hài lòng lắm. Máy chạy ổn trong tuần đầu, nhưng sau đó bắt đầu có hiện tượng giật lag khi mở nhiều ứng dụng cùng lúc. Pin tụt khá nhanh, chỉ dùng được khoảng 3-4 tiếng dù quảng cáo là 6 tiếng. Đóng gói giao hàng thì ổn, nhưng chất lượng sản phẩm cần được xem xét lại.",
+        "Rất thất vọng với chiếc laptop này. Tôi mua để chỉnh sửa ảnh và video nhưng máy quá yếu, không thể xử lý các phần mềm nặng dù cấu hình quảng cáo là đủ dùng. Quạt tản nhiệt kêu to, nóng máy sau khoảng 1 tiếng sử dụng. Tôi đã liên hệ đổi trả nhưng chưa nhận được phản hồi thỏa đáng từ cửa hàng.",
+        "Tuyệt vời! Đây là lần đầu tiên tôi mua laptop online mà hài lòng đến vậy. Máy chạy mượt mà, thiết kế sang trọng, phù hợp với công việc lập trình của tôi. Đặc biệt, pin dùng được hơn 8 tiếng liên tục, rất tiện khi phải di chuyển nhiều. Đội ngũ hỗ trợ khách hàng cũng rất nhiệt tình, cho 5 sao không suy nghĩ!",
+        "Sản phẩm tốt trong tầm giá. Tôi dùng để học online và làm việc nhóm, máy đáp ứng ổn mọi nhu cầu cơ bản. Điểm trừ nhỏ là vỏ máy dễ bám vân tay, phải lau thường xuyên để giữ sạch sẽ. Giao hàng đúng hẹn, nhân viên tư vấn nhiệt tình, tôi khá hài lòng với trải nghiệm mua sắm lần này.",
+        "Máy tạm ổn, không quá đặc biệt. Hiệu năng đủ để lướt web, xem phim và làm việc nhẹ, nhưng khi chạy đa nhiệm thì hơi đuối. Màn hình có góc nhìn hẹp, ngồi lệch một chút là màu sắc bị biến đổi. Với giá tiền này, tôi nghĩ có thể tìm được lựa chọn tốt hơn trên thị trường.",
     ]
     values = []
     for _ in range(num_reviews):
@@ -169,52 +195,59 @@ def generate_reviews(sql_output_path='./backend/commands/insert_sample_data.sql'
         user_name = random.choice(user_names)
         rating = random.choice(ratings)
         review_text = random.choice(review_texts)
-        
+
         values.append(f"({laptop_id}, '{user_name}', {rating}, '{review_text}')")
 
     # Create and write the INSERT query
-    insert_query = "INSERT INTO reviews (laptop_id, user_name, rating, review_text) VALUES "
-    insert_query += ', '.join(values) + ";"
+    insert_query = (
+        "INSERT INTO reviews (laptop_id, user_name, rating, review_text) VALUES "
+    )
+    insert_query += ", ".join(values) + ";"
 
-    with open(sql_output_path, 'a') as sql_file:
+    with open(sql_output_path, "a") as sql_file:
         sql_file.write(insert_query + "\n")
 
     print(f"INSERT review queries successfully written to {sql_output_path}")
 
-def generate_subscriptions(sql_output_path='./backend/commands/insert_sample_data.sql', num_subs=20):
+
+def generate_subscriptions(
+    sql_output_path="./backend/commands/insert_sample_data.sql", num_subs=20
+):
     names = [
-    'NguyenVanAn', 
-    'TranThiBinh', 
-    'LeMinhChi', 
-    'PhamDucDuy', 
-    'HoangThiEm', 
-    'VuQuangPhat', 
-    'BuiTuanGa', 
-    'DoanHuyenHa'
+        "NguyenVanAn",
+        "TranThiBinh",
+        "LeMinhChi",
+        "PhamDucDuy",
+        "HoangThiEm",
+        "VuQuangPhat",
+        "BuiTuanGa",
+        "DoanHuyenHa",
     ]
-    domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
+    domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"]
     values = []
-    used_emails = set() 
+    used_emails = set()
     while len(values) < num_subs:
         name = random.choice(names)
         domain = random.choice(domains)
         email = f"{name.lower()}@{domain}"
-        if email not in used_emails:  
+        if email not in used_emails:
             used_emails.add(email)
             values.append(f"('{email}')")
 
     insert_query = "INSERT INTO newsletter_subscriptions (email) VALUES "
-    insert_query += ', '.join(values) + ";"
+    insert_query += ", ".join(values) + ";"
 
-    with open(sql_output_path, 'a') as sql_file:
+    with open(sql_output_path, "a") as sql_file:
         sql_file.write(insert_query + "\n")
 
     print(f"INSERT subscription queries successfully written to {sql_output_path}")
 
-import random
-from datetime import datetime, timedelta
 
-def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
+
+
+def generate_posts(
+    sql_output_path="./backend/commands/insert_sample_data.sql", num_posts=20
+):
     global NUM_POSTS
     NUM_POSTS = num_posts  # store for image generation
 
@@ -251,16 +284,21 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
 
         values.append(f"('{image_url}', '{description}', '{link}', '{created_at}')")
 
-    insert_query = "INSERT INTO posts (image_url, description, link, created_at) VALUES "
-    insert_query += ', '.join(values) + ";"
+    insert_query = (
+        "INSERT INTO posts (image_url, description, link, created_at) VALUES "
+    )
+    insert_query += ", ".join(values) + ";"
 
-    with open(sql_output_path, 'a') as sql_file:
+    with open(sql_output_path, "a") as sql_file:
         sql_file.write(insert_query + "\n")
 
     print(f"INSERT post queries written for {num_posts} posts to {sql_output_path}")
 
-def generate_images(template_dir='./backend/static/templates',
-                    output_dir='./backend/static/laptop_images'):
+
+def generate_images(
+    template_dir="./backend/static/templates",
+    output_dir="./backend/static/laptop_images",
+):
     global NUM_LAPTOPS
 
     if not os.path.exists(output_dir):
@@ -273,7 +311,7 @@ def generate_images(template_dir='./backend/static/templates',
 
     for laptop_id in tqdm(range(1, NUM_LAPTOPS + 1), desc="Generating laptop images"):
         for i in range(1, 4):  # 3 images per laptop
-            src_path = os.path.join(template_dir, f'laptop{i}.jpg')
+            src_path = os.path.join(template_dir, f"laptop{i}.jpg")
             dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
 
             if not os.path.exists(src_path):
@@ -282,15 +320,25 @@ def generate_images(template_dir='./backend/static/templates',
 
             with Image.open(src_path) as img:
                 draw = ImageDraw.Draw(img)
-                draw.text((30, 30), f"ID: {laptop_id}", font=font, fill="black", stroke_fill="white", stroke_width=3)
+                draw.text(
+                    (30, 30),
+                    f"ID: {laptop_id}",
+                    font=font,
+                    fill="black",
+                    stroke_fill="white",
+                    stroke_width=3,
+                )
                 img.save(dest_path)
 
     print(f"Generated mock images for {NUM_LAPTOPS} laptops.")
 
-def generate_post_images(num_posts=20,
-                         template_path='./backend/static/templates/posts.jpg',
-                         output_dir='./backend/static/post_images'):
-    
+
+def generate_post_images(
+    num_posts=20,
+    template_path="./backend/static/templates/posts.jpg",
+    output_dir="./backend/static/post_images",
+):
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -313,13 +361,84 @@ def generate_post_images(num_posts=20,
                 font=font,
                 fill="black",
                 stroke_width=4,
-                stroke_fill="white"
+                stroke_fill="white",
             )
 
             output_path = os.path.join(output_dir, f"post_{i}.jpg")
             img.save(output_path)
 
     print(f"Generated {num_posts} post images in '{output_dir}'")
+
+
+def generate_orders(
+    sql_output_path="./backend/commands/insert_sample_data.sql", num_orders=100
+):
+    global NUM_LAPTOPS
+    if NUM_LAPTOPS == 0:
+        print("No laptops available to generate orders.")
+        return
+
+    user_ids = [
+        "user_001",
+        "user_002",
+        "user_003",
+        "user_004",
+        "user_005",
+        "user_006",
+        "user_007",
+        "user_008",
+    ]
+    order_statuses = ["pending", "processing", "shipped", "delivered", "cancelled"]
+
+    order_values = []
+    order_item_values = []
+
+    current_order_id = 1
+    current_order_item_id = 1
+
+    for _ in range(num_orders):
+        user_id = random.choice(user_ids)
+        num_items = random.randint(1, 4)
+        item_ids = random.sample(range(1, NUM_LAPTOPS + 1), num_items)
+
+        order_items = []
+        total_price = 0.0
+        for product_id in item_ids:
+            quantity = random.randint(1, 3)
+            price = random.uniform(300, 2000)
+            total_price += price * quantity
+
+            order_items.append((current_order_id, product_id, quantity))
+            current_order_item_id += 1
+
+        status = random.choice(order_statuses)
+        order_values.append(
+            f"({current_order_id}, '{user_id}', {round(total_price, 2)}, '{status}')"
+        )
+
+        for order_id, product_id, quantity in order_items:
+            order_item_values.append(f"({order_id}, {product_id}, {quantity})")
+
+        current_order_id += 1
+
+    # Write orders (without created_at and updated_at)
+    order_insert = "INSERT INTO orders (id, user_id, total_price, status) VALUES "
+    order_insert += ",\n".join(order_values) + ";"
+
+    # Write order items
+    order_item_insert = (
+        "INSERT INTO order_items (order_id, product_id, quantity) VALUES "
+    )
+    order_item_insert += ",\n".join(order_item_values) + ";"
+
+    with open(sql_output_path, "a") as sql_file:
+        sql_file.write(order_insert + "\n")
+        sql_file.write(order_item_insert + "\n")
+
+    print(
+        f"INSERT order and order_item queries successfully written to {sql_output_path}"
+    )
+
 
 if __name__ == "__main__":
     clear_old_commands()
@@ -328,4 +447,5 @@ if __name__ == "__main__":
     generate_reviews()
     generate_subscriptions()
     generate_posts()
+    generate_orders()
     generate_post_images(num_posts=NUM_POSTS)

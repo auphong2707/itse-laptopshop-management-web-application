@@ -8,8 +8,7 @@ import "swiper/css/pagination";
 import "swiper/css/autoplay";
 import PropTypes from "prop-types";
 
-
-const ImageGallery = ({imageSources, height}) => {
+const ImageGallery = ({ imageSources, height }) => {
   return (
     <div>
       <Swiper
@@ -34,8 +33,8 @@ const ImageGallery = ({imageSources, height}) => {
         ))}
       </Swiper>
     </div>
-  )
-}
+  );
+};
 
 ImageGallery.propTypes = {
   imageSources: PropTypes.arrayOf(PropTypes.string),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { data, useParams } from "react-router-dom";
-import { Layout, Typography, Breadcrumb, Table, Image} from "antd";
+import { Layout, Typography, Breadcrumb, Table, Image } from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import ProductImage from "./components/ProductImage";
@@ -16,7 +16,7 @@ const imageSources = [
   "/product_page_banner_1.png",
   "/product_page_banner_1.png",
   "/product_page_banner_1.png",
-]
+];
 
 const ProductHeader = ({ title, series }) => (
   <>
@@ -25,17 +25,31 @@ const ProductHeader = ({ title, series }) => (
       <Breadcrumb.Item>Laptops</Breadcrumb.Item>
       <Breadcrumb.Item>{series}</Breadcrumb.Item>
     </Breadcrumb>
-    <Title level={2} style={{ fontWeight: "bold" }}>{title}</Title>
+    <Title level={2} style={{ fontWeight: "bold" }}>
+      {title}
+    </Title>
     <Text type="secondary" style={{ color: "#0156ff", cursor: "pointer" }}>
       Be the first to review this product
     </Text>
   </>
 );
 
-const ExtraInfo = ({productId}) => (
-  <div style={{ marginTop: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", paddingBottom: "50px" }}>
+const ExtraInfo = ({ productId }) => (
+  <div
+    style={{
+      marginTop: "2rem",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexWrap: "wrap",
+      paddingBottom: "50px",
+    }}
+  >
     <Text style={{ fontWeight: "bold" }}>
-      Have a Question? <Link href="#" style={{ textDecoration: "underline" }}>Contact Us</Link>
+      Have a Question?{" "}
+      <Link href="#" style={{ textDecoration: "underline" }}>
+        Contact Us
+      </Link>
     </Text>
     <Text>VN-{productId}</Text>
   </div>
@@ -47,7 +61,7 @@ const AboutProduct = ({ title, series, description, id }) => (
     <p style={{ marginTop: "1rem", fontSize: "16px", lineHeight: "1.6" }}>
       {description}
     </p>
-    <ExtraInfo productId={id}/>
+    <ExtraInfo productId={id} />
   </div>
 );
 
@@ -57,25 +71,69 @@ const Specs = ({ data, id }) => (
     <Table
       columns={[
         { title: "Category", dataIndex: "category", key: "category" },
-        { title: "Details", dataIndex: "details", key: "details" }
+        { title: "Details", dataIndex: "details", key: "details" },
       ]}
       dataSource={[
         { key: "1", category: "CPU", details: data.cpu },
-        { key: "2", category: "RAM", details: `${data.ram_amount}GB (${data.ram_type})` },
-        { key: "3", category: "Storage", details: `${data.storage_amount}GB ${data.storage_type}` },
-        { key: "4", category: "Screen Size", details: `${data.screen_size} inches` },
-        { key: "5", category: "Screen Resolution", details: data.screen_resolution },
-        { key: "6", category: "Screen Refresh Rate", details: `${data.screen_refresh_rate}Hz` },
-        { key: "7", category: "Battery Capacity", details: `${data.battery_capacity}Wh (${data.battery_cells} cells)` },
+        {
+          key: "2",
+          category: "RAM",
+          details: `${data.ram_amount}GB (${data.ram_type})`,
+        },
+        {
+          key: "3",
+          category: "Storage",
+          details: `${data.storage_amount}GB ${data.storage_type}`,
+        },
+        {
+          key: "4",
+          category: "Screen Size",
+          details: `${data.screen_size} inches`,
+        },
+        {
+          key: "5",
+          category: "Screen Resolution",
+          details: data.screen_resolution,
+        },
+        {
+          key: "6",
+          category: "Screen Refresh Rate",
+          details: `${data.screen_refresh_rate}Hz`,
+        },
+        {
+          key: "7",
+          category: "Battery Capacity",
+          details: `${data.battery_capacity}Wh (${data.battery_cells} cells)`,
+        },
         { key: "8", category: "Graphics Card (VGA)", details: data.vga },
         { key: "9", category: "Operating System", details: data.default_os },
         { key: "10", category: "Weight", details: `${data.weight} kg` },
         { key: "11", category: "HDMI Ports", details: data.number_hdmi_ports },
-        { key: "12", category: "USB-C Ports", details: data.number_usb_c_ports },
-        { key: "13", category: "USB-A Ports", details: data.number_usb_a_ports },
-        { key: "14", category: "Ethernet Ports", details: data.number_ethernet_ports },
-        { key: "15", category: "Audio Jacks", details: data.number_audio_jacks },
-        { key: "16", category: "Webcam Resolution", details: data.webcam_resolution },
+        {
+          key: "12",
+          category: "USB-C Ports",
+          details: data.number_usb_c_ports,
+        },
+        {
+          key: "13",
+          category: "USB-A Ports",
+          details: data.number_usb_a_ports,
+        },
+        {
+          key: "14",
+          category: "Ethernet Ports",
+          details: data.number_ethernet_ports,
+        },
+        {
+          key: "15",
+          category: "Audio Jacks",
+          details: data.number_audio_jacks,
+        },
+        {
+          key: "16",
+          category: "Webcam Resolution",
+          details: data.webcam_resolution,
+        },
         { key: "17", category: "Width", details: `${data.width} cm` },
         { key: "18", category: "Depth", details: `${data.depth} cm` },
         { key: "19", category: "Height", details: `${data.height} cm` },
@@ -84,7 +142,7 @@ const Specs = ({ data, id }) => (
       pagination={false}
       bordered
     />
-    <ExtraInfo productId={id}/>
+    <ExtraInfo productId={id} />
   </div>
 );
 
@@ -112,56 +170,61 @@ const ProductPage = () => {
       .then((response) => response.json())
       .then((data) => transformData(data))
       .then((data) => setProductData(data));
-  }, [id]);  
+  }, [id]);
 
   console.log(productData);
 
   return (
     <Layout>
       <WebsiteHeader />
-      <Content className="responsive-padding" style={{ 
-        backgroundColor: "#fff", 
-        padding: "0rem", 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center",
-        height: "100%"
-      }}>
-
+      <Content
+        className="responsive-padding"
+        style={{
+          backgroundColor: "#fff",
+          padding: "0rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
         <Purchase price={productData.sale_price} />
         {/* Left Side: Product Tabs */}
         <div style={{ width: "70%", paddingLeft: "7%" }}>
           <ProductTabs
             tabLabels={["About Product", "Specs"]}
             tabContents={[
-              AboutProduct({title:productData["name"], series:productData["brand"], description:productData["description"], id:id}),
-              Specs({data:productData, id:id})
+              AboutProduct({
+                title: productData["name"],
+                series: productData["brand"],
+                description: productData["description"],
+                id: id,
+              }),
+              Specs({ data: productData, id: id }),
             ]}
           />
         </div>
 
         {/* Right Side: Product Image */}
-        <ProductImage 
+        <ProductImage
           imageUrls={JSON.parse(productData.product_image_mini || "[]").map(
-            (url) => `http://localhost:8000${url}`
+            (url) => `http://localhost:8000${url}`,
           )}
         />
-
       </Content>
 
-
       {/* Advertisement */}
-      <ImageGallery imageSources={imageSources} height="600px"/>
+      <ImageGallery imageSources={imageSources} height="600px" />
 
       <SupportSection />
 
-        {/* Banner */}
-        <Image
-          src="/product_page_banner_2.png"
-          width={"100%"}
-          style={{ width: "100%", height: "auto" }}
-          preview={false}
-        />
+      {/* Banner */}
+      <Image
+        src="/product_page_banner_2.png"
+        width={"100%"}
+        style={{ width: "100%", height: "auto" }}
+        preview={false}
+      />
 
       <WebsiteFooter />
     </Layout>

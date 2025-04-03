@@ -13,7 +13,7 @@ const firebaseConfig = {
   storageBucket: "itse-laptopshop-manageme-f73cd.firebasestorage.app",
   messagingSenderId: "911829055483",
   appId: "1:911829055483:web:7cb26a90d05cc37f06fd5e",
-  measurementId: "G-Z95TK1SG4V"
+  measurementId: "G-Z95TK1SG4V",
 };
 
 // Initialize Firebase

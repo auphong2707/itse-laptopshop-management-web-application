@@ -1,5 +1,9 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  ScrollRestoration,
+} from "react-router-dom";
 import AdministratorPage from "./pages/AdministratorPage";
 import { DeletingProducts, Detail } from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";

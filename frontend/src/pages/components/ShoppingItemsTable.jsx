@@ -1,9 +1,8 @@
-import React, { useState,useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Image, InputNumber, Button, Layout, Space } from "antd";
-import { DeleteOutlined, EyeOutlined} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
-
 
 //Hàm format tiền
 const formatPrice = (price) => {
@@ -72,32 +71,42 @@ const Items = ({ product, index, onSubtotalChange }) => {
       </Text>
 
       {/* Giá tiền đơn vị */}
-      <div style={{ display: "flex", justifyContent: "center" }}>  
-        <Text 
-          style={{ fontSize: "16px", fontWeight: "bold" }}
-          >{formatPrice(product.price)}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <Text style={{ fontSize: "16px", fontWeight: "bold" }}>
+          {formatPrice(product.price)}
         </Text>
       </div>
       {/* Bộ chọn số lượng */}
-      <div style={{ display: "flex", justifyContent: "center" }}>  
-        <InputNumber 
-          min={0} 
-          value={quantity} 
-          onChange={handleQuantityChange} 
-          style={{ width: "60px", textAlign: "center", justifyContent: "center"}} 
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <InputNumber
+          min={0}
+          value={quantity}
+          onChange={handleQuantityChange}
+          style={{
+            width: "60px",
+            textAlign: "center",
+            justifyContent: "center",
+          }}
         />
       </div>
       {/* Tổng tiền */}
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Text  
-          style={{ fontSize: "16px", fontWeight: "bold" }}
-          >{rawSubtotal}
+        <Text style={{ fontSize: "16px", fontWeight: "bold" }}>
+          {rawSubtotal}
         </Text>
-        </div>
+      </div>
       {/* Nút thao tác */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", paddingRight: "14px" }}>
-          <Button type="text" icon={<EyeOutlined />} style={{ color: "#888" }} />
-          <Button type="text" icon={<DeleteOutlined />} danger />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "2px",
+          paddingRight: "14px",
+        }}
+      >
+        <Button type="text" icon={<EyeOutlined />} style={{ color: "#888" }} />
+        <Button type="text" icon={<DeleteOutlined />} danger />
       </div>
     </div>
   );
@@ -105,8 +114,9 @@ const Items = ({ product, index, onSubtotalChange }) => {
 
 // Component chính (bảng hiển thị danh mục + Items)
 const ShoppingItemsTable = ({ setTotalPrice }) => {
-
-  const [subTotals, setSubTotals] = useState(Array(productsData.length).fill(0));
+  const [subTotals, setSubTotals] = useState(
+    Array(productsData.length).fill(0),
+  );
 
   const handleSubtotalChange = (newSubtotal, index) => {
     const newSubTotals = [...subTotals];
@@ -121,30 +131,35 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
   }, [subTotals, setTotalPrice]);
 
   return (
-    <div style={{ paddingTop: "0px",
-                  paddingBottom: "20px",
-                  paddingLeft: "20px",
-                  paddingRight: "20px", 
-                  borderRadius: "8px" }} 
-                  bordered={false}>
+    <div
+      style={{
+        paddingTop: "0px",
+        paddingBottom: "20px",
+        paddingLeft: "20px",
+        paddingRight: "20px",
+        borderRadius: "8px",
+      }}
+      bordered={false}
+    >
       {/* Header */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 2fr 1fr 1fr 1fr 0.5fr",
           fontWeight: "bold",
-          paddingTop:"10px",
+          paddingTop: "10px",
           paddingBottom: "15px",
           borderBottom: "1.5px solid #ddd",
-          gap: "15px"
+          gap: "15px",
         }}
       >
-        <Text style={{ display: "flex", justifyContent: "center"}}>Item</Text>
-        <Text style={{ display: "flex", justifyContent: "center"}}>Name</Text> 
-        <Text style={{ display: "flex", justifyContent: "center"}}>Price</Text>
-        <Text style={{ display: "flex", justifyContent: "center"}}>Qty</Text>
-        <Text style={{ display: "flex", justifyContent: "center"}}>Subtotal</Text>
-        
+        <Text style={{ display: "flex", justifyContent: "center" }}>Item</Text>
+        <Text style={{ display: "flex", justifyContent: "center" }}>Name</Text>
+        <Text style={{ display: "flex", justifyContent: "center" }}>Price</Text>
+        <Text style={{ display: "flex", justifyContent: "center" }}>Qty</Text>
+        <Text style={{ display: "flex", justifyContent: "center" }}>
+          Subtotal
+        </Text>
       </div>
 
       {/* Danh sách sản phẩm (.map) */}
@@ -157,48 +172,59 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
         />
       ))}
 
-
-      
-
-      
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 2fr 1fr 1fr 1fr 0.5fr",
           fontWeight: "bold",
-          paddingTop:"15px",
+          paddingTop: "15px",
           paddingBottom: "15px",
           borderBottom: "1px solid #ddd",
-          gap: "15px"
+          gap: "15px",
         }}
       >
         <Text />
         <Text />
         <Text />
-        <Text style={{ display: "flex", justifyContent: "center", fontSize: "17px"}}>Total price: </Text>
-        <Text style={{ display: "flex", justifyContent: "center", fontSize: "17px"}}>{formatPrice(subTotals.reduce((acc, val) => acc + val, 0))}</Text>
-        
+        <Text
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            fontSize: "17px",
+          }}
+        >
+          Total price:{" "}
+        </Text>
+        <Text
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            fontSize: "17px",
+          }}
+        >
+          {formatPrice(subTotals.reduce((acc, val) => acc + val, 0))}
+        </Text>
       </div>
-      
+
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between", 
+          justifyContent: "space-between",
           alignItems: "center",
           paddingTop: "20px",
           paddingBottom: "15px",
           paddingLeft: "15px",
-          paddingRight: "15px", 
+          paddingRight: "15px",
         }}
       >
         {/* Nút Clear Shopping Cart */}
         <Button
           type="primary"
           style={{
-            backgroundColor: "#000",   // màu nền đen
-            borderColor: "#000",       // viền đen (trùng màu nền)
-            borderRadius: "9999px",    // bo tròn
-            fontWeight: "bold"
+            backgroundColor: "#000", // màu nền đen
+            borderColor: "#000", // viền đen (trùng màu nền)
+            borderRadius: "9999px", // bo tròn
+            fontWeight: "bold",
           }}
         >
           Clear Shopping Cart
@@ -212,15 +238,11 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
             borderColor: "#000",
             borderRadius: "9999px",
             fontWeight: "bold",
-            
           }}
         >
           Continue Shopping
         </Button>
-      </div> 
-
-      
-
+      </div>
     </div>
   );
 };

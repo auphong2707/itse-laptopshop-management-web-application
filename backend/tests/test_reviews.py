@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from main import app
 from elasticsearch import Elasticsearch
@@ -7,18 +6,24 @@ client = TestClient(app)
 
 es = Elasticsearch("http://elasticsearch:9200")
 
+
 def test_get_reviews():
     # 🧪 Insert mock review docs
     mock_reviews = [
-        {"laptop_id": 1, "user_name": "Test A", "rating": 4, "review_text": "Very good"},
+        {
+            "laptop_id": 1,
+            "user_name": "Test A",
+            "rating": 4,
+            "review_text": "Very good",
+        },
         {"laptop_id": 2, "user_name": "Test B", "rating": 4, "review_text": "Solid"},
-        {"laptop_id": 3, "user_name": "Test C", "rating": 4, "review_text": "Nice!"}
+        {"laptop_id": 3, "user_name": "Test C", "rating": 4, "review_text": "Nice!"},
     ]
 
     for i, doc in enumerate(mock_reviews):
-        es.index(index="reviews", id=i+1, document=doc)
+        es.index(index="reviews", id=i + 1, document=doc)
 
-    es.indices.refresh(index="reviews")  
+    es.indices.refresh(index="reviews")
 
     response = client.get("/reviews?rating=4&limit=3")
     assert response.status_code == 200
@@ -27,9 +32,10 @@ def test_get_reviews():
     assert isinstance(json_data["results"], list)
     assert len(json_data["results"]) <= 3
 
+
 # def test_create_review():
 #     review_data = {
-#         "laptop_id": 1,  
+#         "laptop_id": 1,
 #         "user_name": "Dao Vu Tien Dat",
 #         "rating": 5,
 #         "review_text": "Laptop xịn xò!"
@@ -40,7 +46,7 @@ def test_get_reviews():
 
 # def test_create_review_non_existent_laptop():
 #     review_data = {
-#         "laptop_id": 99999999,  
+#         "laptop_id": 99999999,
 #         "user_name": "Dao Vu Tien Dat",
 #         "rating": 5,
 #         "review_text": "Laptop hỏng"
@@ -53,8 +59,8 @@ def test_get_reviews():
 #     review_data = {
 #         "laptop_id": 1,
 #         "user_name": "Dao Vu Tien Dat",
-#         "rating": 10,  
+#         "rating": 10,
 #         "review_text": "Great laptop!"
 #     }
 #     response = client.post("/reviews", json=review_data)
-#     assert response.status_code == 422  
+#     assert response.status_code == 422
