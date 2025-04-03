@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Typography, Rate, Tooltip, Image } from "antd";
 import { CheckCircleFilled, InfoCircleFilled } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -11,6 +11,24 @@ const formatPrice = (price) => {
 };
 
 const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalPrice, salePrice, productId }) => {
+  const [productData, setProductData] = useState(null);
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/laptops/id/${productId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const imageUrls = JSON.parse(data.product_image_mini || "[]").map(
+          (url) => `http://localhost:8000${url}`
+        );
+        setProductData({
+          ...data,
+          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg", // Use the first image
+        });
+      });
+  }, [productId]);
+
+  if (!productData) return null; // Wait until data is loaded
+  
   return (
     <div style={{ padding: 3 }}>
       <Link to={`/product/${productId}`} style={{ textDecoration: "none", color: "inherit" }}>
@@ -42,7 +60,7 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
           )}
  
           {/* Product Image */}
-          <Image src={imgSource} height={120} width="100%" preview={false} />
+          <Image src={productData.imageUrl} height={120} width="100%" preview={false} />
  
           {/* Star Rating & Reviews */}
           <div style={{ marginTop: 2, width: "100%" }}>

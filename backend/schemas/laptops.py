@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
+from typing import Optional, List
 
 class LaptopCreate(BaseModel):
     brand: str
@@ -29,7 +29,7 @@ class LaptopCreate(BaseModel):
     number_hdmi_ports: int = Field(..., ge=0)
     number_ethernet_ports: int = Field(..., ge=0)
     number_audio_jacks: int = Field(..., ge=0)
-    product_image_mini: str
+    product_image_mini: List[str]
     quantity: int = Field(..., ge=0)
     original_price: int = Field(..., gt=0)
     sale_price: int = Field(..., gt=0)

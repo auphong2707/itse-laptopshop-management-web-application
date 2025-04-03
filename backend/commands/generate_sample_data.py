@@ -2,8 +2,11 @@ import json
 import random
 import os
 from datetime import datetime, timedelta
+from PIL import Image, ImageDraw, ImageFont
+from tqdm import tqdm
 
 NUM_LAPTOPS = 0
+NUM_POSTS = 0
 
 def get_sub_brand(brand, name):
     if brand == 'asus':
@@ -111,7 +114,10 @@ def generate_laptop_insert_queries(json_data_directory='./backend/data/',
                 convert_value(laptop['number_hdmi_ports']),
                 convert_value(laptop['number_ethernet_ports']),
                 convert_value(laptop['number_audio_jacks']),
-                'NULL',
+                convert_value(json.dumps([
+        f"/static/laptop_images/{NUM_LAPTOPS}_img1.jpg",
+        f"/static/laptop_images/{NUM_LAPTOPS}_img2.jpg",
+        f"/static/laptop_images/{NUM_LAPTOPS}_img3.jpg"])),
                 str(random.randint(0, 20)),
                 convert_value(laptop['price']),
                 convert_value(laptop['price'] - random.randint(0, 20)/100 * laptop['price'])
@@ -209,6 +215,9 @@ import random
 from datetime import datetime, timedelta
 
 def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', num_posts=20):
+    global NUM_POSTS
+    NUM_POSTS = num_posts  # store for image generation
+
     descriptions = [
         "Khám phá những chiếc laptop chơi game mới nhất!",
         "Nâng cấp góc làm việc của bạn với những phụ kiện tuyệt vời.",
@@ -219,32 +228,27 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
         "Tối ưu thời lượng pin với những bước đơn giản.",
         "Chơi game di động: Những laptop gaming tốt nhất để mang theo.",
     ]
-    
-    image_urls = [
-        "https://example.com/images/laptop1.jpg",
-        "https://example.com/images/laptop2.jpg",
-        "https://example.com/images/laptop3.jpg",
-        "https://example.com/images/laptop4.jpg",
-    ]
-    
+
     links = [
         "https://example.com/bai-viet-1",
         "https://example.com/bai-viet-2",
         "https://example.com/bai-viet-3",
         "https://example.com/bai-viet-4",
     ]
-    
-    values = []  
 
-    for _ in range(num_posts):  # Không kiểm tra trùng lặp
+    values = []
+
+    for i in tqdm(range(1, num_posts + 1), desc="Generating post SQL"):
         description = random.choice(descriptions)
-        image_url = random.choice(image_urls)
         link = random.choice(links)
-        
-        # Sinh ngày ngẫu nhiên trong 365 ngày gần nhất
+
+        # Use generated image path
+        image_url = f"/static/post_images/post_{i}.jpg"
+
+        # Random created_at
         days_ago = random.randint(0, 365)
         created_at = (datetime.now() - timedelta(days=days_ago)).date()
-        
+
         values.append(f"('{image_url}', '{description}', '{link}', '{created_at}')")
 
     insert_query = "INSERT INTO posts (image_url, description, link, created_at) VALUES "
@@ -253,12 +257,75 @@ def generate_posts(sql_output_path='./backend/commands/insert_sample_data.sql', 
     with open(sql_output_path, 'a') as sql_file:
         sql_file.write(insert_query + "\n")
 
-    print(f"INSERT post queries successfully written to {sql_output_path}")
+    print(f"INSERT post queries written for {num_posts} posts to {sql_output_path}")
+
+def generate_images(template_dir='./backend/static/templates',
+                    output_dir='./backend/static/laptop_images'):
+    global NUM_LAPTOPS
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 150)
+    except:
+        font = ImageFont.load_default()
+
+    for laptop_id in tqdm(range(1, NUM_LAPTOPS + 1), desc="Generating laptop images"):
+        for i in range(1, 4):  # 3 images per laptop
+            src_path = os.path.join(template_dir, f'laptop{i}.jpg')
+            dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
+
+            if not os.path.exists(src_path):
+                print(f"[WARN] Template image {src_path} not found, skipping")
+                continue
+
+            with Image.open(src_path) as img:
+                draw = ImageDraw.Draw(img)
+                draw.text((30, 30), f"ID: {laptop_id}", font=font, fill="black", stroke_fill="white", stroke_width=3)
+                img.save(dest_path)
+
+    print(f"Generated mock images for {NUM_LAPTOPS} laptops.")
+
+def generate_post_images(num_posts=20,
+                         template_path='./backend/static/templates/posts.jpg',
+                         output_dir='./backend/static/post_images'):
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", size=100)
+    except:
+        font = ImageFont.load_default()
+
+    for i in tqdm(range(1, num_posts + 1), desc="Generating post images"):
+        if not os.path.exists(template_path):
+            print(f"[WARN] Template image not found at: {template_path}")
+            break
+
+        with Image.open(template_path) as img:
+            draw = ImageDraw.Draw(img)
+            text = f"Post #{i}"
+            draw.text(
+                (50, 50),
+                text,
+                font=font,
+                fill="black",
+                stroke_width=4,
+                stroke_fill="white"
+            )
+
+            output_path = os.path.join(output_dir, f"post_{i}.jpg")
+            img.save(output_path)
+
+    print(f"Generated {num_posts} post images in '{output_dir}'")
 
 if __name__ == "__main__":
-    # Clear the existing content of the SQL file
     clear_old_commands()
     generate_laptop_insert_queries()
+    generate_images()
     generate_reviews()
     generate_subscriptions()
     generate_posts()
+    generate_post_images(num_posts=NUM_POSTS)

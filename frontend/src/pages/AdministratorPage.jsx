@@ -74,26 +74,40 @@ const Detail = () => {
 	const [form] = Form.useForm();
 	const { id } = useParams();
 	const [productData, setProductData] = useState({});
+	const [pictures, setPictures] = useState([]);
 	
 	useEffect(() => {
 		if (id) {
-			// Fetch laptop data if ID is present
 			axios.get(`http://localhost:8000/laptops/id/${id}`)
 				.then((response) => {
 					setProductData(response.data);
-					form.setFieldsValue(response.data); // Populate form with fetched data
+					form.setFieldsValue(response.data);
+	
+					// Extract and parse product images
+					let images = [];
+					if (response.data.product_image_mini) {
+						try {
+							images = JSON.parse(response.data.product_image_mini || "[]")
+							.map((url) => `http://localhost:8000${url}`);
+							console.log("Parsed images:", images);
+						} catch (error) {
+							console.error("Error parsing product images:", error);
+							images = [];
+						}
+					}
+					setPictures(images);
 				})
 				.catch(() => {
 					setProductData({});
-					form.resetFields(); // Clear form if fetch fails
+					form.resetFields();
+					setPictures([]); // Clear pictures on error
 				});
 		} else {
-			// Clear form if no ID is present
 			form.resetFields();
+			setPictures([]); // Clear pictures when no ID
 		}
 	}, [id]);
-
-	const [pictures, setPictures] = useState([]);
+	
 
   	const handleAddPicture = (event) => {
 		const file = event.target.files[0];
@@ -336,51 +350,51 @@ const Detail = () => {
 						style={{ width: '650px', height: '400px', padding: '1rem' }}
 					>
 						{pictures.map((picture, index) => (
-						<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-							<img
-							src={picture}
-							alt={`Picture ${index + 1}`}
-							style={{ width: '600px', height: '400px' }}
-							/>
-							{/* Delete Button */}
-							<button
-							onClick={() => handleDeletePicture(index)}
-							style={{
-								position: 'absolute',
-								top: '-12px',  // Moves it above the image
-								right: '10px', // Slightly to the right
-								background: '#b0b0b0', // Gray background
-								border: 'none',
-								cursor: 'pointer',
-								fontSize: '14px', // Smaller font size
-								color: 'red', // Red CloseOutlined icon
-								borderRadius: '50%',
-								width: '22px', // Smaller button
-								height: '24px',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								transition: 'background 0.3s ease',
-							}}
-							onMouseEnter={(e) => (e.target.style.background = '#8a8a8a')} // Darker gray on hover
-							onMouseLeave={(e) => (e.target.style.background = '#b0b0b0')}
-							>
-							<CloseOutlined />
-							</button>
-						</SwiperSlide>
+							<SwiperSlide key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+								<img
+									src={picture}
+									alt={`Picture ${index + 1}`}
+									style={{ width: '600px', height: '400px' }}
+								/>
+								<button
+									onClick={() => handleDeletePicture(index)}
+									style={{
+										position: 'absolute',
+										top: '-12px',
+										right: '10px',
+										background: '#b0b0b0',
+										border: 'none',
+										cursor: 'pointer',
+										fontSize: '14px',
+										color: 'red',
+										borderRadius: '50%',
+										width: '22px',
+										height: '24px',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										transition: 'background 0.3s ease',
+									}}
+									onMouseEnter={(e) => (e.target.style.background = '#8a8a8a')}
+									onMouseLeave={(e) => (e.target.style.background = '#b0b0b0')}
+								>
+									<CloseOutlined />
+								</button>
+							</SwiperSlide>
 						))}
-						<SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-						<label style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #aaa', borderRadius: '8px' }}>
-							Add picture
-							<input
-							type="file"
-							accept="image/*"
-							style={{ display: 'none' }}
-							onChange={handleAddPicture}
-							/>
-						</label>
-						</SwiperSlide>
-					</Swiper>
+							{/* Add Picture Button */}
+							<SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+								<label style={{ cursor: 'pointer', padding: '20px', border: '2px dashed #aaa', borderRadius: '8px' }}>
+									Add picture
+									<input
+										type="file"
+										accept="image/*"
+										style={{ display: 'none' }}
+										onChange={handleAddPicture}
+									/>
+								</label>
+							</SwiperSlide>
+						</Swiper>
 					</Form.Item>
 				</div>
 			</div>
@@ -442,100 +456,113 @@ const DeletingProducts = () => {
 			borderRadius: "12px",
 		  }}
 		/>
-		{products.map((product) => (
-		  <div
-			key={product.id}
-			style={{
-			  display: "flex",
-			  alignItems: "center",
-			  padding: "1rem",
-			  borderBottom: "1px solid #ddd",
-			  width: "50%",
-			}}
-		  >
-			<img
-			  src={product.product_image_mini}
-			  alt={product.name}
-			  style={{
-				width: "80px",
-				height: "80px",
-				objectFit: "cover",
-				marginRight: "1rem",
-			  }}
-			/>
-			<span
-			  style={{
-				flexGrow: 1,
-				fontWeight: "bold",
-				marginRight: "0.5rem",
-			  }}
-			>
-			  {product.name}
-			</span>
-			<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-			  <button
-				style={{
-				  width: "32px",
-				  height: "32px",
-				  borderRadius: "50%",
-				  border: "none",
-				  background: "#f5f5f5",
-				  cursor: "pointer",
-				  color: "#a6a6a6",
-				  display: "flex",
-				  alignItems: "center",
-				  justifyContent: "center",
-				  transition: "background-color 0.3s, transform 0.3s",
-				}}
-				onClick={() => handleDelete(product.id)}
-				onMouseEnter={(e) => {
-				  e.currentTarget.style.backgroundColor = "#ddd";
-				  e.currentTarget.style.transform = "scale(1.1)";
-				  e.currentTarget.style.color = "#595959";
-				}}
-				onMouseLeave={(e) => {
-				  e.currentTarget.style.backgroundColor = "#f5f5f5";
-				  e.currentTarget.style.transform = "scale(1)";
-				  e.currentTarget.style.color = "#a6a6a6";
-				}}
-			  >
-				<CloseOutlined />
-			  </button>
-  
-			  <button
-				style={{
-				  width: "32px",
-				  height: "32px",
-				  borderRadius: "50%",
-				  border: "none",
-				  background: "#f5f5f5",
-				  cursor: "pointer",
-				  color: "#a6a6a6",
-				  display: "flex",
-				  alignItems: "center",
-				  justifyContent: "center",
-				  transition: "background-color 0.3s, transform 0.3s",
-				}}
-				onClick={() => handleEdit(product.id)}
-				onMouseEnter={(e) => {
-				  e.currentTarget.style.backgroundColor = "#ddd";
-				  e.currentTarget.style.transform = "scale(1.1)";
-				  e.currentTarget.style.color = "#595959";
-				}}
-				onMouseLeave={(e) => {
-				  e.currentTarget.style.backgroundColor = "#f5f5f5";
-				  e.currentTarget.style.transform = "scale(1)";
-				  e.currentTarget.style.color = "#a6a6a6";
-				}}
-			  >
-				<EditOutlined />
-			  </button>
-			</div>
-		  </div>
-		))}
+		{products.map((product) => {
+			// Parse and extract the first image
+			let imageUrl = "";
+			try {
+				const images = JSON.parse(product.product_image_mini || "[]");
+				if (images.length > 0) {
+					imageUrl = `http://localhost:8000${images[0]}`;
+				}
+			} catch (error) {
+				console.error("Error parsing product images:", error);
+			}
+
+			return (
+				<div
+					key={product.id}
+					style={{
+						display: "flex",
+						alignItems: "center",
+						padding: "1rem",
+						borderBottom: "1px solid #ddd",
+						width: "50%",
+					}}
+				>
+					<img
+						src={imageUrl}
+						alt={product.name}
+						style={{
+							width: "80px",
+							height: "80px",
+							objectFit: "cover",
+							marginRight: "1rem",
+						}}
+					/>
+					<span
+						style={{
+							flexGrow: 1,
+							fontWeight: "bold",
+							marginRight: "0.5rem",
+						}}
+					>
+						{product.name}
+					</span>
+					<div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+						<button
+							style={{
+								width: "32px",
+								height: "32px",
+								borderRadius: "50%",
+								border: "none",
+								background: "#f5f5f5",
+								cursor: "pointer",
+								color: "#a6a6a6",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								transition: "background-color 0.3s, transform 0.3s",
+							}}
+							onClick={() => handleDelete(product.id)}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = "#ddd";
+								e.currentTarget.style.transform = "scale(1.1)";
+								e.currentTarget.style.color = "#595959";
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = "#f5f5f5";
+								e.currentTarget.style.transform = "scale(1)";
+								e.currentTarget.style.color = "#a6a6a6";
+							}}
+						>
+							<CloseOutlined />
+						</button>
+						<button
+							style={{
+								width: "32px",
+								height: "32px",
+								borderRadius: "50%",
+								border: "none",
+								background: "#f5f5f5",
+								cursor: "pointer",
+								color: "#a6a6a6",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								transition: "background-color 0.3s, transform 0.3s",
+							}}
+							onClick={() => handleEdit(product.id)}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = "#ddd";
+								e.currentTarget.style.transform = "scale(1.1)";
+								e.currentTarget.style.color = "#595959";
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = "#f5f5f5";
+								e.currentTarget.style.transform = "scale(1)";
+								e.currentTarget.style.color = "#a6a6a6";
+							}}
+						>
+							<EditOutlined />
+						</button>
+					</div>
+				</div>
+			);
+		})}
 	  </div>
 	);
-  };
+};
+
 
 const AdminTabs = () => {
 	const navigate = useNavigate();

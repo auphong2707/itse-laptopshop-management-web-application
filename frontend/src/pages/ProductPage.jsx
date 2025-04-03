@@ -13,9 +13,9 @@ const { Content } = Layout;
 const { Title, Text, Link } = Typography;
 
 const imageSources = [
-  "None",
-  "None",
-  "None",
+  "/product_page_banner_1.png",
+  "/product_page_banner_1.png",
+  "/product_page_banner_1.png",
 ]
 
 const ProductHeader = ({ title, series }) => (
@@ -141,21 +141,25 @@ const ProductPage = () => {
         </div>
 
         {/* Right Side: Product Image */}
-        <ProductImage />
+        <ProductImage 
+          imageUrls={JSON.parse(productData.product_image_mini || "[]").map(
+            (url) => `http://localhost:8000${url}`
+          )}
+        />
 
       </Content>
 
 
       {/* Advertisement */}
-      <ImageGallery imageSources={imageSources} />
+      <ImageGallery imageSources={imageSources} height="600px"/>
 
       <SupportSection />
 
         {/* Banner */}
         <Image
-          src="None"
+          src="/product_page_banner_2.png"
           width={"100%"}
-          style={{ width: "100%", height: "400px" }}
+          style={{ width: "100%", height: "auto" }}
           preview={false}
         />
 
