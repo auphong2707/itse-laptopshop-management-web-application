@@ -62,7 +62,11 @@ const AccountMenu = () => {
       {user ? (
         <>
           <Menu.Item key="account" style={{ fontWeight: "bold" }}>
-            My Account
+            {user.role === "customer" ? (
+              <Link to="/customer">My Account</Link>
+            ) : (
+              "My Account"
+            )}
           </Menu.Item>
 
           {user.role === "admin" ? (
@@ -224,9 +228,11 @@ const WebsiteHeader = () => {
         <Flex align="center" gap="35px">
           <Flex align="center" gap="middle">
             <SearchOutlined style={{ fontSize: "18px", color: "black" }} />
-            <ShoppingCartOutlined
-              style={{ fontSize: "21px", color: "black" }}
-            />
+            <Link to="/shopping-cart">
+              <ShoppingCartOutlined
+                style={{ fontSize: "21px", color: "black" }}
+              />
+            </Link>
           </Flex>
 
           {/* Account Menu */}

@@ -16,7 +16,7 @@ import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";
 import ProductCard from "./components/ProductCard";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { transformLaptopData } from "../utils/transformData";
 import { debounce } from "lodash";
 import axios from "axios";
@@ -796,9 +796,13 @@ const CatalogPage = () => {
 
         <br></br>
 
-        <Breadcrumb>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Laptops</Breadcrumb.Item>
+        <Breadcrumb separator=">" style={{ marginBottom: "1rem" }}>
+          <Breadcrumb.Item>
+            <Link to="/">Home</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/laptops/all">Laptops</Link>
+          </Breadcrumb.Item>
           <Breadcrumb.Item>{formatedBrand}</Breadcrumb.Item>
         </Breadcrumb>
 

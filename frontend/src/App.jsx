@@ -12,6 +12,7 @@ import HomePage from "./pages/HomePage";
 import ProductPage from "./pages/ProductPage";
 import RegisterPage from "./pages/RegisterPage";
 import CustomerPage from "./pages/CustomerPage";
+import ShoppingCartPage from "./pages/ShoppingCartPage";
 import "./App.css";
 
 const router = createBrowserRouter([
@@ -89,6 +90,15 @@ const router = createBrowserRouter([
       <>
         <ScrollRestoration />
         <ProductPage />
+      </>
+    ),
+  },
+  {
+    path: "/shopping-cart",
+    element: (
+      <>
+        <ScrollRestoration />
+        <ShoppingCartPage />
       </>
     ),
   },
