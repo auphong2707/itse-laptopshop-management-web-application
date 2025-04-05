@@ -1,6 +1,7 @@
 import os
 import json
 from elasticsearch import Elasticsearch
+from fastapi import FastAPI, Depends, HTTPException, Query, Body
 from fastapi import FastAPI, Depends, HTTPException, Query, status
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -336,6 +337,27 @@ def get_posts(limit: int = Query(12)):
     results = es.search(index="posts", body={"query": {"match_all": {}}, "size": limit})
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
+@app.post("/accounts/check")
+def check_email_and_phone(data: dict = Body(...)):
+    email = data.get("email")
+    phone = data.get("phone_number")
+
+    users_ref = firestore.client().collection("users")
+    email_exists = False
+    phone_exists = False
+
+    if email:
+        query = users_ref.where("email", "==", email).limit(1).stream()
+        email_exists = any(query)
+
+    if phone:
+        query = users_ref.where("phone_number", "==", phone).limit(1).stream()
+        phone_exists = any(query)
+
+    return {
+        "email_exists": email_exists,
+        "phone_exists": phone_exists
+    }
 
 @app.post("/accounts")
 def create_account(user_data: ExtendedUserCreate):
@@ -363,17 +385,17 @@ def create_account(user_data: ExtendedUserCreate):
         auth.set_custom_user_claims(user_record.uid, {"role": user_data.role})
 
         # 5. Store extended profile in Firestore
-        db.collection("users").document(user_record.uid).set(
-            {
-                "first_name": user_data.first_name,
-                "last_name": user_data.last_name,
-                "company": user_data.company,
-                "address": user_data.address,
-                "country": user_data.country,
-                "zip_code": user_data.zip_code,
-                "role": user_data.role,
-            }
-        )
+        firestore.client().collection("users").document(user_record.uid).set({
+            "email": user_data.email,                
+            "phone_number": user_data.phone_number,  
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "company": user_data.company,
+            "address": user_data.address,
+            "country": user_data.country,
+            "zip_code": user_data.zip_code,
+            "role": user_data.role,
+        })
 
         return {
             "message": f"{user_data.role.capitalize()} account created successfully",

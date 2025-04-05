@@ -25,22 +25,136 @@ const contentStyle = {
 
 const description = "\u00A0";
 
+
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleSignIn = async (values) => {
-    console.log("Sign-in form values:", values);
+    console.log("Password step values:", values);
+
+    const step1Data = JSON.parse(localStorage.getItem("register_step1") || "{}");
+
+    const normalizePhone = (phone) => {
+      if (phone.startsWith("0")) {
+        return "+84" + phone.slice(1);
+      }
+      return phone;
+    };
+
+    const userData = {
+      email: step1Data.email,
+      password: values.password,
+      display_name: `${step1Data.firstName} ${step1Data.lastName}`,
+      phone_number: normalizePhone(step1Data.phoneNumber),
+      first_name: step1Data.firstName,
+      last_name: step1Data.lastName,
+      company: step1Data.company,
+      address: step1Data.address,
+      country: step1Data.country,
+      zip_code: step1Data.zipPostalCode,
+      role: "customer",
+      secret_key: "",
+    };
+
+    setIsLoading(true); // 👉 Bắt đầu loading
+
+    try {
+      const response = await fetch("http://localhost:8000/accounts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+      console.log("Backend response:", data);
+
+      if (response.ok) {
+        localStorage.removeItem("register_step1");
+        setCurrent(2); // 👉 chuyển sang bước xác nhận
+      } else {
+        alert(data.detail || "Registration failed.");
+      }
+
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false); // 👉 Tắt loading
+    }
+  };
+  const checkEmailAndPhone = async (email, phoneNumber) => {
+    try {
+      const response = await fetch("http://localhost:8000/accounts/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, phone_number: phoneNumber }),
+      });
+
+      const data = await response.json();
+      return data; // trả về { email_exists: true, phone_exists: false } chẳng hạn
+    } catch (error) {
+      console.error("Error checking email/phone:", error);
+      return null;
+    }
   };
 
   const nextStep = async () => {
     try {
-      await form.validateFields();
+      await form.validateFields(); // validate form client-side
+      const values = form.getFieldsValue();
+
+      const normalizePhone = (phone) => {
+        if (phone.startsWith("0")) {
+          return "+84" + phone.slice(1);
+        }
+        return phone;
+      };
+
+      const checkResult = await checkEmailAndPhone(values.email, normalizePhone(values.phoneNumber));
+
+      if (!checkResult) {
+        return; // không làm gì nếu lỗi kết nối
+      }
+
+      let hasError = false;
+
+      if (checkResult.email_exists) {
+        form.setFields([
+          {
+            name: "email",
+            errors: ["Email already exists."],
+          },
+        ]);
+        hasError = true;
+      }
+
+      if (checkResult.phone_exists) {
+        form.setFields([
+          {
+            name: "phoneNumber",
+            errors: ["Phone number already exists."],
+          },
+        ]);
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // nếu không có lỗi, lưu vào localStorage và tiếp tục
+      localStorage.setItem("register_step1", JSON.stringify(values));
       setCurrent(current + 1);
+
     } catch (errorInfo) {
       console.log("Validation failed:", errorInfo);
     }
   };
+
+
 
   return (
     <Layout>
@@ -133,10 +247,7 @@ const RegisterPage = () => {
                       </span>
                     }
                     name="phoneNumber"
-                    rules={[
-                      { required: true, message: "Please enter phone number" },
-                      { pattern: /^\d+$/, message: "Invalid phone number" },
-                    ]}
+                    rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^(\+84|0)[1-9][0-9]{8}$/, message: "Invalid phone number" }]}
                     required={false}
                   >
                     <Input
@@ -186,6 +297,19 @@ const RegisterPage = () => {
                     <Input
                       size="large"
                       placeholder="Enter your address"
+                      style={{ height: "50px", fontSize: "1.1rem" }}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={<span style={{ fontSize: "1.3rem" }}>Country<span style={{ color: "red" }}>*</span></span>}
+                    name="country"
+                    rules={[{ required: true, message: "Please enter your country" }]}
+                    required={false}
+                  >
+                    <Input
+                      size="large"
+                      placeholder="Enter your country"
                       style={{ height: "50px", fontSize: "1.1rem" }}
                     />
                   </Form.Item>
@@ -258,10 +382,9 @@ const RegisterPage = () => {
                     }
                     name="password"
                     rules={[
-                      {
-                        required: true,
-                        message: "Please enter your password.",
-                      },
+                      { required: true, message: "Please enter your password." },
+                      { min: 6, message: "Password must be at least 6 characters." },
+                      { max: 32, message: "Password must be at most 32 characters." },
                     ]}
                     required={false}
                   >
@@ -272,6 +395,7 @@ const RegisterPage = () => {
                       style={{ height: "50px", fontSize: "1.1rem" }}
                     />
                   </Form.Item>
+
 
                   <Form.Item
                     label={
@@ -310,6 +434,8 @@ const RegisterPage = () => {
                     <Button
                       type="primary"
                       htmlType="submit"
+                      loading={isLoading} // 👈 hiển thị loading
+                      disabled={isLoading} // 👈 ngăn spam click
                       style={{
                         padding: "1rem 2rem",
                         borderRadius: "25px",
@@ -317,10 +443,27 @@ const RegisterPage = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      Finish
+                      {isLoading ? "Creating Account..." : "Finish"}
                     </Button>
                   </Form.Item>
+
                 </>
+              )}
+
+              {current === 2 && (
+                <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
+                  <Title level={2} style={{ color: "green" }}>
+                    🎉 Account Created Successfully! 🎉
+                  </Title>
+                  <p style={{ fontSize: "1.2rem" }}>
+                    Your account has been created. You can now sign in using your credentials.
+                  </p>
+                  <Link to="/customer/login">
+                    <Button type="primary" size="large" style={{ marginTop: "1rem" }}>
+                      Go to Login
+                    </Button>
+                  </Link>
+                </div>
               )}
             </Form>
           </Col>
