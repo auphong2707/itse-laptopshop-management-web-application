@@ -2,23 +2,23 @@ version: '3.8'
 
 services:
   app:
-    build: 
+    build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
-
+    container_name: app
     volumes:
       - ../../itse-laptopshop-management-web-application:/workspaces/itse-laptopshop-management-web-application
-    
     environment:
       PGPASSWORD: postgres
       ELASTICSEARCH_HOST: elasticsearch
-
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
-
     depends_on:
       - db
       - elasticsearch
+      - redis
     networks:
       - app-network
 
@@ -26,6 +26,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/DockerfilePostgres
+    container_name: db
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -35,7 +36,6 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
     networks:
@@ -49,8 +49,8 @@ services:
       - xpack.security.enabled=false
       - action.destructive_requires_name=false
     ports:
-      - "9200:9200"  # Expose HTTP API
-      - "9300:9300"  # Expose internal cluster communication
+      - "9200:9200" # Expose HTTP API
+      - "9300:9300" # Expose internal cluster communication
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     restart: unless-stopped
@@ -70,6 +70,18 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+    restart: unless-stopped
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -77,3 +89,4 @@ networks:
 volumes:
   postgres-data:
   elasticsearch-data:
+  redis-data:
