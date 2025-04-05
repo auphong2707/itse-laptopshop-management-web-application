@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from sqlalchemy.exc import IntegrityError
 from firebase_admin import auth
 
 from db.models import *
@@ -14,6 +15,7 @@ from db.session import *
 from schemas.laptops import *
 from schemas.newsletter import *
 from schemas.orders import *
+from schemas.refund_tickets import *
 
 from services.firebase_auth import *
 from fastapi.staticfiles import StaticFiles
@@ -646,3 +648,78 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
     # Commit both operations together
     db.commit()
     return {"message": "Order deleted successfully"}
+
+# Create a refund ticket
+@app.post("/refund_tickets/", response_model=RefundTicketResponse)
+async def create_refund_ticket(refund_ticket: RefundTicketCreate, db: Session = Depends(get_db)):
+    # Check if refund ticket for this email & phone number already exists
+    existing_ticket = db.query(RefundTicket).filter_by(
+        email=refund_ticket.email, phone_number=refund_ticket.phone_number
+    ).first()
+
+    if existing_ticket:
+        raise HTTPException(
+            status_code=400,
+            detail="Refund ticket already exists for this email and phone number combination."
+        )
+
+    # Create a new RefundTicket instance
+    new_refund_ticket = RefundTicket(
+        email=refund_ticket.email,
+        phone_number=refund_ticket.phone_number,
+        order_id=refund_ticket.order_id,
+        reason=refund_ticket.reason,
+        amount=refund_ticket.amount,
+        status=refund_ticket.status,
+    )
+
+    try:
+        # Add the new refund ticket to the database
+        db.add(new_refund_ticket)
+        db.commit()  # Commit the transaction
+        db.refresh(new_refund_ticket)  # Refresh the object to get the updated state from the DB
+        
+        # Return the success message and the ticket data
+        return {"message": "Refund ticket created successfully", "ticket": new_refund_ticket}
+
+    except IntegrityError:
+        db.rollback()  # Rollback in case of an error
+        raise HTTPException(status_code=500, detail="Error creating the refund ticket.")
+
+# Refund tickets (with optional filters)
+@app.get("/refund_tickets/", response_model=List[RefundTicketResponse])
+async def get_refund_tickets(email: Optional[str] = None, phone_number: Optional[str] = None, 
+                             status: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(RefundTicket)
+
+    if email:
+        query = query.filter(RefundTicket.email == email)
+    if phone_number:
+        query = query.filter(RefundTicket.phone_number == phone_number)
+    if status:
+        query = query.filter(RefundTicket.status == status)
+
+    refund_tickets = query.all()  # Fetch all matching refund tickets
+
+    return refund_tickets
+
+# Update the refund ticket (like change status or mark as resolved)
+@app.put("/refund_tickets/{refund_ticket_id}", response_model=RefundTicketResponse)
+async def update_refund_ticket(refund_ticket_id: int, refund_ticket_update: RefundTicketUpdate, db: Session = Depends(get_db)):
+    # Fetch the refund ticket to update
+    refund_ticket = db.query(RefundTicket).filter(RefundTicket.id == refund_ticket_id).first()
+
+    if not refund_ticket:
+        raise HTTPException(status_code=404, detail="Refund ticket not found")
+
+    # Update fields
+    if refund_ticket_update.status:
+        refund_ticket.status = refund_ticket_update.status
+    if refund_ticket_update.resolved_at:
+        refund_ticket.resolved_at = refund_ticket_update.resolved_at
+
+    # Commit the changes to the database
+    db.commit()
+    db.refresh(refund_ticket)  # Refresh the object to get the updated state from the DB
+
+    return refund_ticket
