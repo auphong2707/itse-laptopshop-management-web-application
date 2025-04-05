@@ -1,5 +1,6 @@
 import React from "react";
 import { Tabs, Image, ConfigProvider } from "antd";
+import { Link } from "react-router-dom";
 import ProductSlider from "./ProductSlider";
 
 const { TabPane } = Tabs;
@@ -20,7 +21,7 @@ const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
     >
       <Tabs>
         {tabLabels.map((tabName, index) => (
-          <TabPane tab={tabName} key={index}>
+          <TabPane tab={tabName.toUpperCase()} key={index}>
             <div
               style={{
                 display: "flex",
@@ -28,14 +29,18 @@ const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
                 alignItems: "center",
               }}
             >
-              <Image
-                src={tabBanners[index]}
-                alt={tabName}
-                width="228px"
-                height="345px"
-                style={{ display: "block", width: "228px", height: "345px" }}
-                preview={false}
-              />
+              <Link 
+                to={`/laptops/all?subBrand=${tabName.replace(" ", "+")}`}
+              >
+                <Image
+                  src={tabBanners[index]}
+                  alt={tabName}
+                  width="228px"
+                  height="345px"
+                  style={{ display: "block", width: "228px", height: "345px" }}
+                  preview={false}
+                />
+              </Link>
               <div style={{ minWidth: "15px" }}></div>
               <ProductSlider productData={tabProductData[index]} />
             </div>
