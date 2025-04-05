@@ -1,8 +1,8 @@
 import os
 import json
 from elasticsearch import Elasticsearch
-from fastapi import FastAPI, Depends, HTTPException, Query, Body
-from fastapi import FastAPI, Depends, HTTPException, Query, status
+from fastapi import FastAPI, Depends, HTTPException, Query, Body, status
+
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
