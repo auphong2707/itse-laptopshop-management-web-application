@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Typography, Rate, Tooltip, Image } from "antd";
 import { CheckCircleFilled, InfoCircleFilled } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -7,13 +7,43 @@ import PropTypes from "prop-types";
 const { Title, Text, Paragraph } = Typography;
 
 const formatPrice = (price) => {
-	return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalPrice, salePrice, productId }) => {
+const ProductCard = ({
+  inStock,
+  imgSource,
+  rate,
+  numRate,
+  productName,
+  originalPrice,
+  salePrice,
+  productId,
+}) => {
+  const [productData, setProductData] = useState(null);
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/laptops/id/${productId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const imageUrls = JSON.parse(data.product_image_mini || "[]").map(
+          (url) => `http://localhost:8000${url}`,
+        );
+        setProductData({
+          ...data,
+          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg", // Use the first image
+        });
+      });
+  }, [productId]);
+
+  if (!productData) return null; // Wait until data is loaded
+
   return (
     <div style={{ padding: 3 }}>
-      <Link to={`/product/${productId}`} style={{ textDecoration: "none", color: "inherit" }}>
+      <Link
+        to={`/product/${productId}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
         <Card
           style={{
             width: 228,
@@ -26,32 +56,50 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
         >
           {/* Availability Check */}
           {inStock ? (
-            <div style={{ align: "center", marginBottom: 10, color: "#78A962" }}>
+            <div
+              style={{ align: "center", marginBottom: 10, color: "#78A962" }}
+            >
               <CheckCircleFilled style={{ fontSize: 12 }} />
-              <Text strong style={{ marginLeft: 7, color: "#78A962", fontSize: 12 }}>
+              <Text
+                strong
+                style={{ marginLeft: 7, color: "#78A962", fontSize: 12 }}
+              >
                 in stock
               </Text>
             </div>
           ) : (
-            <div style={{ alignC: "center", marginBottom: 10, color: "#C94D3F" }}>
+            <div
+              style={{ alignC: "center", marginBottom: 10, color: "#C94D3F" }}
+            >
               <InfoCircleFilled style={{ fontSize: 12 }} />
-              <Text strong style={{ marginLeft: 7, color: "#C94D3F", fontSize: 12 }}>
+              <Text
+                strong
+                style={{ marginLeft: 7, color: "#C94D3F", fontSize: 12 }}
+              >
                 check availability
               </Text>
             </div>
           )}
- 
+
           {/* Product Image */}
-          <Image src={imgSource} height={120} width="100%" preview={false} />
- 
+          <Image
+            src={productData.imageUrl}
+            height={120}
+            width="100%"
+            preview={false}
+          />
+
           {/* Star Rating & Reviews */}
           <div style={{ marginTop: 2, width: "100%" }}>
             <Rate disabled value={rate} style={{ fontSize: 10 }} allowHalf />
-            <Text style={{ marginLeft: 10, color: "#666", fontSize: 10 }} strong={false}>
+            <Text
+              style={{ marginLeft: 10, color: "#666", fontSize: 10 }}
+              strong={false}
+            >
               ({numRate} Reviews)
             </Text>
           </div>
- 
+
           {/* Product Name */}
           <div style={{ marginTop: 5 }}>
             <Tooltip title={productName} placement="top">
@@ -64,7 +112,7 @@ const ProductCard = ({ inStock, imgSource, rate, numRate, productName, originalP
               </Paragraph>
             </Tooltip>
           </div>
- 
+
           {/* Price Section */}
           <div>
             <Text delete style={{ fontSize: 13, color: "#888" }} strong={false}>
@@ -91,20 +139,23 @@ ProductCard.propTypes = {
 };
 
 const getRandomProductCardData = () => {
-	const originalPrice = Math.random() * 1000;
-	const salePrice = originalPrice - Math.random() * 100;
+  const originalPrice = Math.random() * 1000;
+  const salePrice = originalPrice - Math.random() * 100;
 
   return {
-		inStock: Math.random() > 0.5,
-		imgSource: null,
-		rate: Math.random() * 5,
-		numRate: Math.floor(Math.random() * 100),
-		productName: `PRODUCT ${Math.floor(Math.random() * 100)}` + " ("+ "LENGTH TEST ".repeat(5) + ")",
-		originalPrice: originalPrice,
-		salePrice: salePrice
-	}
+    inStock: Math.random() > 0.5,
+    imgSource: null,
+    rate: Math.random() * 5,
+    numRate: Math.floor(Math.random() * 100),
+    productName:
+      `PRODUCT ${Math.floor(Math.random() * 100)}` +
+      " (" +
+      "LENGTH TEST ".repeat(5) +
+      ")",
+    originalPrice: originalPrice,
+    salePrice: salePrice,
+  };
 };
-
 
 export default ProductCard;
 

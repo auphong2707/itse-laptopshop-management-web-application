@@ -1,40 +1,41 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { HeartOutlined, BarChartOutlined, MailOutlined } from "@ant-design/icons";
+import {
+  HeartOutlined,
+  BarChartOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
 
-const imageSources = [
-  "https://asset.msi.com/resize/image/global/product/product_5_20200430090514_5eaa244a51b97.png62405b38c58fe0f07fcef2367d8a9ba1/1024.png",
-  "https://example.com/image2.png",
-  "https://example.com/image3.png",
-];
-
-const ProductImage = () => {
+const ProductImage = ({ imageUrls }) => {
   return (
-    <div style={{
-      position: "absolute",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: "20px",
-      top: "300px",
-      right: "150px",
-      paddingTop: "-2rem",
-    }}>
-      
-      {/* Icons Container */}
-      <div style={{
+    <div
+      style={{
+        position: "absolute",
         display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        zIndex: "10",
-        position: "relative", 
-        marginRight: "10px", 
-        marginBottom: "300px",
-      }}>
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "20px",
+        top: "300px",
+        right: "150px",
+        paddingTop: "-2rem",
+      }}
+    >
+      {/* Icons Container */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          zIndex: "10",
+          position: "relative",
+          marginRight: "10px",
+          marginBottom: "300px",
+        }}
+      >
         <IconButton icon={<HeartOutlined />} tooltip="Add to Wishlist" />
         <IconButton icon={<BarChartOutlined />} tooltip="Compare" />
         <IconButton icon={<MailOutlined />} tooltip="Send Inquiry" />
@@ -48,10 +49,22 @@ const ProductImage = () => {
           slidesPerView={1}
           pagination={{ clickable: true, dynamicBullets: true }}
           autoplay={{ delay: 5000 }}
-          style={{ height: "100%", width: "100%", backgroundColor: "white", marginTop: "-5rem" }}
+          style={{
+            height: "100%",
+            width: "100%",
+            backgroundColor: "white",
+            marginTop: "-5rem",
+          }}
         >
-          {imageSources.map((img, index) => (
-            <SwiperSlide key={index} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          {imageUrls.map((img, index) => (
+            <SwiperSlide
+              key={index}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <img
                 src={img}
                 alt={`Product ${index + 1}`}
@@ -61,7 +74,6 @@ const ProductImage = () => {
           ))}
         </Swiper>
       </div>
-      
     </div>
   );
 };
