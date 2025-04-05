@@ -11,6 +11,7 @@ import {
   Breadcrumb,
   Divider,
 } from "antd";
+import { Link } from "react-router-dom";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import ShoppingItemsTable from "./components/ShoppingItemsTable";
@@ -34,7 +35,7 @@ const PaypalButton = styled(Button)`
 `;
 
 const { Content } = Layout;
-const { Text, Link, Title } = Typography;
+const { Text, Title } = Typography;
 
 //Hàm format tiền
 const formatPrice = (price) => {
@@ -67,8 +68,12 @@ const ShoppingCartPage = () => {
           separator=">"
           style={{ marginBottom: "1rem" }}
         >
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Shopping Cart</Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/">Home</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/shopping-cart">Shopping Cart</Link>
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Title
           level={2}

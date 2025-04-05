@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Layout, Typography, Breadcrumb, Tabs, Row, Col } from "antd";
+import { Link } from "react-router-dom";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import styled from "styled-components";
@@ -266,8 +267,12 @@ const CustomerPage = () => {
         style={{ backgroundColor: "#fff" }}
       >
         <Breadcrumb separator=">" style={{ margin: "16px 0" }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>My Dashboard</Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/">Home</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+          <Link to="/customer">My Dashboard</Link>
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Title level={2}>My Dashboard</Title>
         <Row gutter={16}>

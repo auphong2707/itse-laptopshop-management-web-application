@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Layout, Typography, Image, Divider } from "antd";
+import { Link } from "react-router-dom";
 import WebsiteHeader from "./components/WebsiteHeader";
 import ImageGallery from "./components/ImageGallery";
 import ProductSlider from "./components/ProductSlider";
@@ -12,7 +13,7 @@ import { transformLaptopData } from "../utils/transformData";
 import axios from "axios";
 
 const { Content } = Layout;
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 const imageSources = [
   "/homepage-image/homepage_advertisement/homepage_advertisement_1.png",
@@ -21,6 +22,54 @@ const imageSources = [
   "/homepage-image/homepage_advertisement/homepage_advertisement_4.png",
   "/homepage-image/homepage_advertisement/homepage_advertisement_5.png",
 ];
+
+const brandsImg = [
+  { name: "asus", logo: "/brand-logo/asus-logo.png" },
+  { name: "lenovo", logo: "/brand-logo/lenovo-logo.png" },
+  { name: "acer", logo: "/brand-logo/acer-logo.png" },
+  { name: "dell", logo: "/brand-logo/dell-logo.png" },
+  { name: "hp", logo: "/brand-logo/hp-logo.png" },
+  { name: "msi", logo: "/brand-logo/msi-logo.png" },
+];
+
+const BrandLogoGallery = () => {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      {brandsImg.map((brand) => (
+        <div
+          key={brand.name}
+          style={{
+            width: "12%",
+            height: "100px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Link to={`/laptops/${brand.name}`}>
+            <Image
+              src={brand.logo}
+              preview={false}
+              style={{
+                filter: "grayscale(100%)",
+                cursor: "pointer",
+                transition: "transform 0.3s ease, filter 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = "scale(1.1)";
+                e.target.style.filter = "grayscale(0%)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = "scale(1)";
+                e.target.style.filter = "grayscale(100%)";
+              }}
+            />
+          </Link>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const contentStyle = {
   color: "#fff",
@@ -203,9 +252,9 @@ const HomePage = () => {
               New Products
             </Text>
 
-            <Link href={"/laptops/all"} underline>
+            <Typography.Link href={"/laptops/all"} underline>
               See All New Products
-            </Link>
+            </Typography.Link>
           </div>
           <ProductSlider productData={newProductData} />
         </div>
@@ -226,7 +275,7 @@ const HomePage = () => {
 
         {/* ASUS sub-brands */}
         <TabProductSlider
-          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS ZENBOOK", "ASUS VIVOBOOK"]}
+          tabLabels={["ASUS ROG", "ASUS TUF", "ASUS Zenbook", "ASUS Vivobook"]}
           tabBanners={[
             "/tab-banners/asus/asus_rog_banner.png",
             "/tab-banners/asus/asus_tuf_banner.png",
@@ -242,12 +291,12 @@ const HomePage = () => {
         {/* Lenovo sub-brands */}
         <TabProductSlider
           tabLabels={[
-            "LENOVO LEGION",
-            "LENOVO LOQ",
-            "LENOVO THINKPAD",
-            "LENOVO THINKBOOK",
-            "LENOVO YOGA",
-            "LENOVO IDEAPAD",
+            "Lenovo Legion",
+            "Lenovo LoQ",
+            "Lenovo ThinkPad",
+            "Lenovo ThinkBook",
+            "Lenovo Yoga",
+            "Lenovo ideaPad",
           ]}
           tabBanners={[
             "/tab-banners/lenovo/lenovo_legion_banner.png",
@@ -266,10 +315,10 @@ const HomePage = () => {
         {/* Acer sub-brands */}
         <TabProductSlider
           tabLabels={[
-            "ACER PREDATOR",
-            "ACER NITRO",
-            "ACER SWIFT",
-            "ACER ASPIRE",
+            "Acer Predator",
+            "Acer Nitro",
+            "Acer Swift",
+            "Acer Aspire",
           ]}
           tabBanners={[
             "/tab-banners/acer/acer_predator_banner.png",
@@ -286,12 +335,12 @@ const HomePage = () => {
         {/* Dell sub-brands */}
         <TabProductSlider
           tabLabels={[
-            "DELL ALIENWARE",
-            "DELL G SERIES",
-            "DELL XPS",
-            "DELL INSPIRON",
-            "DELL LATITUDE",
-            "DELL PRECISION",
+            "Dell Alienware",
+            "Dell G Series",
+            "Dell XPS",
+            "Dell Inspiron",
+            "Dell Latitude",
+            "Dell Precision",
           ]}
           tabBanners={[
             "/tab-banners/dell/dell_alienware_banner.png",
@@ -311,11 +360,11 @@ const HomePage = () => {
         <TabProductSlider
           tabLabels={[
             "HP OMEN",
-            "HP VICTUS",
-            "HP SPECTRE",
+            "HP Victus",
+            "HP Spectre",
             "HP ENVY",
-            "HP PAVILION",
-            "HP ELITEBOOK",
+            "HP Pavilion",
+            "HP EliteBook",
           ]}
           tabBanners={[
             "/tab-banners/HP/hp_omen_banner.png",
@@ -333,7 +382,7 @@ const HomePage = () => {
 
         {/* MSI sub-brands */}
         <TabProductSlider
-          tabLabels={["MSI STEALTH", "MSI KATANA", "MSI CREATOR", "MSI MODERN"]}
+          tabLabels={["MSI Stealth", "MSI Katana", "MSI Creator", "MSI Modern"]}
           tabBanners={[
             "/tab-banners/msi/msi_stealth_banner.png",
             "/tab-banners/msi/msi_katana_banner.png",
@@ -347,103 +396,7 @@ const HomePage = () => {
         <br></br>
 
         {/* Brand logo gallery */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/asus-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/lenovo-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/acer-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/dell-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/hp-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-
-          <div
-            style={{
-              width: "12%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="/brand-logo/msi-logo.png"
-              preview={false}
-              style={{ filter: "grayscale(100%)" }}
-            />
-          </div>
-        </div>
+        <BrandLogoGallery />
 
         <br></br>
         <br></br>
