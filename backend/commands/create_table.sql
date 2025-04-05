@@ -153,3 +153,55 @@ CREATE TRIGGER set_orders_updated_at
 BEFORE UPDATE ON orders
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- Create the RefundTicket table with email and phone_number as identifiers
+CREATE TABLE IF NOT EXISTS refund_tickets (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL,  -- User's email
+    phone_number TEXT NOT NULL,  -- User's phone number
+    order_id INTEGER NOT NULL,  -- Associated order ID
+    reason TEXT NOT NULL,  -- Reason for the refund
+    amount DECIMAL(10, 2) CHECK (amount > 0),  -- Refund amount must be positive
+    status VARCHAR(50) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',  -- Only valid statuses
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the refund was created
+    resolved_at TIMESTAMP,  -- Timestamp when the refund was resolved (if applicable)
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,  -- Foreign key to orders
+    CONSTRAINT unique_user_email_phone UNIQUE(email, phone_number)  -- Ensure unique combination of email and phone
+);
+
+-- Create a function that updates the refund status to 'approved' when resolved_at is set
+CREATE OR REPLACE FUNCTION update_refund_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- If the resolved_at field is set, change the status to 'approved'
+    IF NEW.resolved_at IS NOT NULL THEN
+        NEW.status := 'approved';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create a trigger that calls the function after the resolved_at field is updated
+CREATE TRIGGER update_refund_status_trigger
+AFTER UPDATE OF resolved_at
+ON refund_tickets
+FOR EACH ROW
+EXECUTE FUNCTION update_refund_status();
+
+-- Add updated_at column to refund_tickets table
+ALTER TABLE refund_tickets ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Create a trigger to update the updated_at field on every update
+CREATE OR REPLACE FUNCTION set_refund_ticket_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to update the `updated_at` timestamp on every update
+CREATE TRIGGER set_refund_ticket_updated_at_trigger
+BEFORE UPDATE ON refund_tickets
+FOR EACH ROW
+EXECUTE FUNCTION set_refund_ticket_updated_at();
