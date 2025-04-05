@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Col, Form, Typography, Input, Layout, Button, Breadcrumb, Steps, Divider } from 'antd';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Row,
+  Col,
+  Form,
+  Typography,
+  Input,
+  Layout,
+  Button,
+  Breadcrumb,
+  Steps,
+  Divider,
+} from "antd";
 import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from './components/WebsiteFooter';
+import WebsiteFooter from "./components/WebsiteFooter";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -12,9 +23,7 @@ const contentStyle = {
   padding: "2rem",
 };
 
-const description = '\u00A0';
-
-
+const description = "\u00A0";
 
 const RegisterPage = () => {
   const [form] = Form.useForm();
@@ -23,7 +32,9 @@ const RegisterPage = () => {
   const handleSignIn = async (values) => {
     console.log("Password step values:", values);
 
-    const step1Data = JSON.parse(localStorage.getItem("register_step1") || "{}");
+    const step1Data = JSON.parse(
+      localStorage.getItem("register_step1") || "{}",
+    );
 
     const normalizePhone = (phone) => {
       if (phone.startsWith("0")) {
@@ -67,7 +78,6 @@ const RegisterPage = () => {
       } else {
         alert(data.detail || "Registration failed.");
       }
-
     } catch (error) {
       console.error("Error during registration:", error);
       alert("Something went wrong. Please try again.");
@@ -105,7 +115,10 @@ const RegisterPage = () => {
         return phone;
       };
 
-      const checkResult = await checkEmailAndPhone(values.email, normalizePhone(values.phoneNumber));
+      const checkResult = await checkEmailAndPhone(
+        values.email,
+        normalizePhone(values.phoneNumber),
+      );
 
       if (!checkResult) {
         return; // không làm gì nếu lỗi kết nối
@@ -138,19 +151,20 @@ const RegisterPage = () => {
       // nếu không có lỗi, lưu vào localStorage và tiếp tục
       localStorage.setItem("register_step1", JSON.stringify(values));
       setCurrent(current + 1);
-
     } catch (errorInfo) {
       console.log("Validation failed:", errorInfo);
     }
   };
 
-
-
   return (
     <Layout>
       <WebsiteHeader />
       <Content className="responsive-padding" style={contentStyle}>
-        <Breadcrumb className="responsive-padding" separator=">" style={{ marginBottom: "1rem" }}>
+        <Breadcrumb
+          className="responsive-padding"
+          separator=">"
+          style={{ marginBottom: "1rem" }}
+        >
           <Breadcrumb.Item>
             <Link to="/">Home</Link>
           </Breadcrumb.Item>
@@ -159,25 +173,40 @@ const RegisterPage = () => {
           </Breadcrumb.Item>
         </Breadcrumb>
 
-        <Title level={1} className="responsive-padding" style={{ marginBottom: "2rem" }}>
+        <Title
+          level={1}
+          className="responsive-padding"
+          style={{ marginBottom: "2rem" }}
+        >
           Sign up
         </Title>
-
-
 
         <div className="responsive-padding">
           <Divider style={{ borderWidth: 1 }} />
         </div>
 
         <Row gutter={32}>
-          <Col xs={24} md={{ span: 14, offset: 3 }} style={{ paddingLeft: "5px" }}>
+          <Col
+            xs={24}
+            md={{ span: 14, offset: 3 }}
+            style={{ paddingLeft: "5px" }}
+          >
             <Form layout="vertical" form={form} onFinish={handleSignIn}>
               {current === 0 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>First Name <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        First Name <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="firstName"
-                    rules={[{ required: true, message: "Please enter your first name." }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your first name.",
+                      },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -189,9 +218,18 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Last Name <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Last Name <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="lastName"
-                    rules={[{ required: true, message: "Please enter your last name." }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your last name.",
+                      },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -203,9 +241,19 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Phone Number <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Phone Number <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="phoneNumber"
-                    rules={[{ required: true, message: "Please enter phone number" }, { pattern: /^(\+84|0)[1-9][0-9]{8}$/, message: "Invalid phone number" }]}
+                    rules={[
+                      { required: true, message: "Please enter phone number" },
+                      {
+                        pattern: /^(\+84|0)[1-9][0-9]{8}$/,
+                        message: "Invalid phone number",
+                      },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -217,9 +265,16 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Email <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Email <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="email"
-                    rules={[{ required: true, message: "Please enter your email." }, { type: "email", message: "Please enter a valid email." }]}
+                    rules={[
+                      { required: true, message: "Please enter your email." },
+                      { type: "email", message: "Please enter a valid email." },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -253,9 +308,15 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Country<span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Country<span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="country"
-                    rules={[{ required: true, message: "Please enter your country" }]}
+                    rules={[
+                      { required: true, message: "Please enter your country" },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -266,9 +327,18 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Zip/Postal code <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Zip/Postal code <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="zipPostalCode"
-                    rules={[{ required: true, message: "Please enter your zip/postal code" }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your zip/postal code",
+                      },
+                    ]}
                     required={false}
                   >
                     <Input
@@ -282,7 +352,12 @@ const RegisterPage = () => {
                     <Button
                       type="primary"
                       onClick={nextStep}
-                      style={{ padding: "1rem 2rem", borderRadius: "25px", fontSize: "1rem", fontWeight: "bold" }}
+                      style={{
+                        padding: "1rem 2rem",
+                        borderRadius: "25px",
+                        fontSize: "1rem",
+                        fontWeight: "bold",
+                      }}
                     >
                       Next
                     </Button>
@@ -293,12 +368,25 @@ const RegisterPage = () => {
               {current === 1 && (
                 <>
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Password <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.3rem" }}>
+                        Password <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="password"
                     rules={[
-                      { required: true, message: "Please enter your password." },
-                      { min: 6, message: "Password must be at least 6 characters." },
-                      { max: 32, message: "Password must be at most 32 characters." },
+                      {
+                        required: true,
+                        message: "Please enter your password.",
+                      },
+                      {
+                        min: 6,
+                        message: "Password must be at least 6 characters.",
+                      },
+                      {
+                        max: 32,
+                        message: "Password must be at most 32 characters.",
+                      },
                     ]}
                     required={false}
                   >
@@ -310,18 +398,26 @@ const RegisterPage = () => {
                     />
                   </Form.Item>
 
-
                   <Form.Item
-                    label={<span style={{ fontSize: "1.4rem" }}>Confirm Password <span style={{ color: "red" }}>*</span></span>}
+                    label={
+                      <span style={{ fontSize: "1.4rem" }}>
+                        Confirm Password <span style={{ color: "red" }}>*</span>
+                      </span>
+                    }
                     name="confirmPassword"
                     rules={[
-                      { required: true, message: "Please confirm your password." },
+                      {
+                        required: true,
+                        message: "Please confirm your password.",
+                      },
                       ({ getFieldValue }) => ({
                         validator(_, value) {
                           if (!value || getFieldValue("password") === value) {
                             return Promise.resolve();
                           }
-                          return Promise.reject(new Error("Passwords do not match!"));
+                          return Promise.reject(
+                            new Error("Passwords do not match!"),
+                          );
                         },
                       }),
                     ]}
@@ -351,7 +447,6 @@ const RegisterPage = () => {
                       {isLoading ? "Creating Account..." : "Finish"}
                     </Button>
                   </Form.Item>
-
                 </>
               )}
 
@@ -361,10 +456,15 @@ const RegisterPage = () => {
                     🎉 Account Created Successfully! 🎉
                   </Title>
                   <p style={{ fontSize: "1.2rem" }}>
-                    Your account has been created. You can now sign in using your credentials.
+                    Your account has been created. You can now sign in using
+                    your credentials.
                   </p>
                   <Link to="/customer/login">
-                    <Button type="primary" size="large" style={{ marginTop: "1rem" }}>
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={{ marginTop: "1rem" }}
+                    >
                       Go to Login
                     </Button>
                   </Link>
@@ -385,8 +485,18 @@ const RegisterPage = () => {
               }}
               direction="vertical"
               items={[
-                { title: <span style={{ fontSize: "1.2rem" }}>Information</span>, description },
-                { title: <span style={{ fontSize: "1.2rem" }}>Set up password</span>, description }
+                {
+                  title: (
+                    <span style={{ fontSize: "1.2rem" }}>Information</span>
+                  ),
+                  description,
+                },
+                {
+                  title: (
+                    <span style={{ fontSize: "1.2rem" }}>Set up password</span>
+                  ),
+                  description,
+                },
               ]}
               style={{ marginBottom: "2rem", fontSize: "1.2rem" }}
             />

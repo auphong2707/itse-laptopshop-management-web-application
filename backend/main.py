@@ -339,6 +339,7 @@ def get_posts(limit: int = Query(12)):
     results = es.search(index="posts", body={"query": {"match_all": {}}, "size": limit})
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
+
 @app.post("/accounts/check")
 def check_email_and_phone(data: dict = Body(...)):
     email = data.get("email")
@@ -356,10 +357,8 @@ def check_email_and_phone(data: dict = Body(...)):
         query = users_ref.where("phone_number", "==", phone).limit(1).stream()
         phone_exists = any(query)
 
-    return {
-        "email_exists": email_exists,
-        "phone_exists": phone_exists
-    }
+    return {"email_exists": email_exists, "phone_exists": phone_exists}
+
 
 @app.post("/accounts")
 def create_account(user_data: ExtendedUserCreate):
@@ -387,17 +386,19 @@ def create_account(user_data: ExtendedUserCreate):
         auth.set_custom_user_claims(user_record.uid, {"role": user_data.role})
 
         # 5. Store extended profile in Firestore
-        firestore.client().collection("users").document(user_record.uid).set({
-            "email": user_data.email,                
-            "phone_number": user_data.phone_number,  
-            "first_name": user_data.first_name,
-            "last_name": user_data.last_name,
-            "company": user_data.company,
-            "address": user_data.address,
-            "country": user_data.country,
-            "zip_code": user_data.zip_code,
-            "role": user_data.role,
-        })
+        firestore.client().collection("users").document(user_record.uid).set(
+            {
+                "email": user_data.email,
+                "phone_number": user_data.phone_number,
+                "first_name": user_data.first_name,
+                "last_name": user_data.last_name,
+                "company": user_data.company,
+                "address": user_data.address,
+                "country": user_data.country,
+                "zip_code": user_data.zip_code,
+                "role": user_data.role,
+            }
+        )
 
         return {
             "message": f"{user_data.role.capitalize()} account created successfully",
@@ -649,18 +650,23 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Order deleted successfully"}
 
+
 # Create a refund ticket
 @app.post("/refund_tickets/", response_model=RefundTicketResponse)
-async def create_refund_ticket(refund_ticket: RefundTicketCreate, db: Session = Depends(get_db)):
+async def create_refund_ticket(
+    refund_ticket: RefundTicketCreate, db: Session = Depends(get_db)
+):
     # Check if refund ticket for this email & phone number already exists
-    existing_ticket = db.query(RefundTicket).filter_by(
-        email=refund_ticket.email, phone_number=refund_ticket.phone_number
-    ).first()
+    existing_ticket = (
+        db.query(RefundTicket)
+        .filter_by(email=refund_ticket.email, phone_number=refund_ticket.phone_number)
+        .first()
+    )
 
     if existing_ticket:
         raise HTTPException(
             status_code=400,
-            detail="Refund ticket already exists for this email and phone number combination."
+            detail="Refund ticket already exists for this email and phone number combination.",
         )
 
     # Create a new RefundTicket instance
@@ -677,19 +683,29 @@ async def create_refund_ticket(refund_ticket: RefundTicketCreate, db: Session = 
         # Add the new refund ticket to the database
         db.add(new_refund_ticket)
         db.commit()  # Commit the transaction
-        db.refresh(new_refund_ticket)  # Refresh the object to get the updated state from the DB
-        
+        db.refresh(
+            new_refund_ticket
+        )  # Refresh the object to get the updated state from the DB
+
         # Return the success message and the ticket data
-        return {"message": "Refund ticket created successfully", "ticket": new_refund_ticket}
+        return {
+            "message": "Refund ticket created successfully",
+            "ticket": new_refund_ticket,
+        }
 
     except IntegrityError:
         db.rollback()  # Rollback in case of an error
         raise HTTPException(status_code=500, detail="Error creating the refund ticket.")
 
+
 # Refund tickets (with optional filters)
 @app.get("/refund_tickets/", response_model=List[RefundTicketResponse])
-async def get_refund_tickets(email: Optional[str] = None, phone_number: Optional[str] = None, 
-                             status: Optional[str] = None, db: Session = Depends(get_db)):
+async def get_refund_tickets(
+    email: Optional[str] = None,
+    phone_number: Optional[str] = None,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
     query = db.query(RefundTicket)
 
     if email:
@@ -703,11 +719,18 @@ async def get_refund_tickets(email: Optional[str] = None, phone_number: Optional
 
     return refund_tickets
 
+
 # Update the refund ticket (like change status or mark as resolved)
 @app.put("/refund_tickets/{refund_ticket_id}", response_model=RefundTicketResponse)
-async def update_refund_ticket(refund_ticket_id: int, refund_ticket_update: RefundTicketUpdate, db: Session = Depends(get_db)):
+async def update_refund_ticket(
+    refund_ticket_id: int,
+    refund_ticket_update: RefundTicketUpdate,
+    db: Session = Depends(get_db),
+):
     # Fetch the refund ticket to update
-    refund_ticket = db.query(RefundTicket).filter(RefundTicket.id == refund_ticket_id).first()
+    refund_ticket = (
+        db.query(RefundTicket).filter(RefundTicket.id == refund_ticket_id).first()
+    )
 
     if not refund_ticket:
         raise HTTPException(status_code=404, detail="Refund ticket not found")

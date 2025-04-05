@@ -18,7 +18,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from datetime import datetime
 
-import enum 
+import enum
 
 Base = declarative_base()
 
@@ -143,11 +143,13 @@ class OrderItem(Base):
 
     order = relationship("Order", back_populates="items")
 
+
 # Enum for Refund Status
 class RefundStatus(enum.Enum):
     pending = "Pending"
     approved = "Approved"
     rejected = "Rejected"
+
 
 class RefundTicket(Base):
     __tablename__ = "refund_tickets"
@@ -155,19 +157,34 @@ class RefundTicket(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, nullable=False)  # User's email
     phone_number = Column(String, nullable=False)  # User's phone number
-    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)  # Associated order ID
+    order_id = Column(
+        Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
+    )  # Associated order ID
     reason = Column(String, nullable=False)  # Reason for the refund
     amount = Column(Float, nullable=False)  # Refund amount
-    status = Column(Enum(RefundStatus), nullable=False, default=RefundStatus.pending)  # Use Enum for status
-    created_at = Column(DateTime, default=datetime.utcnow)  # Timestamp when the refund was created
-    resolved_at = Column(DateTime, nullable=True)  # Timestamp when the refund was resolved (if applicable)
+    status = Column(
+        Enum(RefundStatus), nullable=False, default=RefundStatus.pending
+    )  # Use Enum for status
+    created_at = Column(
+        DateTime, default=datetime.utcnow
+    )  # Timestamp when the refund was created
+    resolved_at = Column(
+        DateTime, nullable=True
+    )  # Timestamp when the refund was resolved (if applicable)
 
     # Relationship to `Order`
     order = relationship("Order", backref="refund_ticket")
 
     # Adding all constraints and indexes in one __table_args__
     __table_args__ = (
-        CheckConstraint('amount > 0', name='check_amount_positive'),  # Ensure the amount is positive
-        CheckConstraint("status IN ('Pending', 'Approved', 'Rejected')", name="check_status_valid_values"),  # Ensure valid status values
-        Index('ix_refund_email_phone', 'email', 'phone_number', postgresql_using='btree'),  # Index for email + phone_number with btree in PostgreSQL
+        CheckConstraint(
+            "amount > 0", name="check_amount_positive"
+        ),  # Ensure the amount is positive
+        CheckConstraint(
+            "status IN ('Pending', 'Approved', 'Rejected')",
+            name="check_status_valid_values",
+        ),  # Ensure valid status values
+        Index(
+            "ix_refund_email_phone", "email", "phone_number", postgresql_using="btree"
+        ),  # Index for email + phone_number with btree in PostgreSQL
     )

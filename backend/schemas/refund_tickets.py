@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -10,8 +10,12 @@ class RefundTicketCreate(BaseModel):
     reason: str
     amount: float = Field(..., gt=0)  # Refund amount must be positive
     status: str = "pending"  # Default to pending, can be 'approved' or 'rejected'
-    created_at: datetime = Field(default_factory=datetime.utcnow)  # Auto-set current timestamp
-    resolved_at: Optional[datetime] = None  # This can be set later when the refund is resolved
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow
+    )  # Auto-set current timestamp
+    resolved_at: Optional[datetime] = (
+        None  # This can be set later when the refund is resolved
+    )
 
     class Config:
         orm_mode = True  # Tell Pydantic to treat the model as a dict
@@ -23,7 +27,9 @@ class RefundTicketUpdate(BaseModel):
     order_id: Optional[int] = None
     reason: Optional[str] = None
     amount: Optional[float] = Field(None, gt=0)
-    status: Optional[str] = None  # You can update the status (pending, approved, rejected)
+    status: Optional[str] = (
+        None  # You can update the status (pending, approved, rejected)
+    )
     resolved_at: Optional[datetime] = None
 
     class Config:
