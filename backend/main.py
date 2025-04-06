@@ -16,6 +16,7 @@ from schemas.laptops import *
 from schemas.newsletter import *
 from schemas.orders import *
 from schemas.refund_tickets import *
+from schemas.reviews import *
 
 from services.firebase_auth import *
 from fastapi.staticfiles import StaticFiles
@@ -319,6 +320,29 @@ def get_laptop(laptop_id: int):
 
     return results["hits"]["hits"][0]["_source"]
 
+
+@app.post("/reviews/", response_model=ReviewCreate)
+async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
+    # Check if the laptop with the provided laptop_id exists
+    laptop = db.query(Laptop).filter(Laptop.id == review.laptop_id).first()
+
+    if not laptop:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    # Create the review entry
+    new_review = Review(
+        laptop_id=review.laptop_id,
+        user_name=review.user_name,
+        rating=review.rating,
+        review_text=review.review_text,
+        created_at=datetime.utcnow(),
+    )
+
+    db.add(new_review)
+    db.commit()  # Commit the transaction
+    db.refresh(new_review)  # Refresh the object to get the updated state from the DB
+
+    return new_review  # Return the review that was created
 
 @app.get("/reviews")
 def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5)):
