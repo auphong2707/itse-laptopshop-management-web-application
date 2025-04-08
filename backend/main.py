@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from firebase_admin import auth
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from db.models import *
 from db.session import *
@@ -21,7 +22,19 @@ from PIL import Image, ImageDraw, ImageFont
 
 import shutil
 
+from routes.cart import router as cart_router
+
+
 app = FastAPI()
+app.include_router(cart_router, tags=["cart"])
+security = HTTPBearer()
+
+
+@app.get("/secure")
+def secure_endpoint(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    return {"token": token}
+
 
 load_dotenv()
 
