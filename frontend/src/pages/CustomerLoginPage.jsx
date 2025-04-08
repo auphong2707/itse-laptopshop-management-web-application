@@ -37,7 +37,7 @@ const login = async (email, password) => {
 
     // Get the Firebase Auth ID token
     const token = await user.getIdToken();
-
+    console.log("Token:", token);
     // Send token to FastAPI backend
     const response = await fetch("http://localhost:8000/login", {
       method: "POST",
