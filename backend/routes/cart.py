@@ -68,3 +68,33 @@ def view_cart(uid: str = Depends(get_current_user_id)):
     cart_items_raw = redis_client.hgetall(cart_key)
     cart_items = {int(k): int(v) for k, v in cart_items_raw.items()}
     return cart_items
+
+
+@router.put("/update")
+def update_cart_item(
+    item: CartItemUpdate,
+    uid: str = Depends(get_current_user_id),
+):
+
+    cart_key = f"cart:{uid}"
+    laptop_id_str = str(item.laptop_id)
+
+    if not redis_client.hexists(cart_key, laptop_id_str):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Laptop ID {item.laptop_id} not found in cart.",
+        )
+
+    if item.new_quantity == 0:
+        redis_client.hdel(cart_key, laptop_id_str)
+        return {
+            "message": "Item removed from cart due to zero quantity",
+            "laptop_id": item.laptop_id,
+        }
+    else:
+        redis_client.hset(cart_key, laptop_id_str, item.new_quantity)
+        return {
+            "message": "Cart item quantity updated successfully",
+            "laptop_id": item.laptop_id,
+            "new_quantity": item.new_quantity,
+        }
