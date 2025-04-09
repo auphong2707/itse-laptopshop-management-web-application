@@ -29,9 +29,7 @@ const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
                 alignItems: "center",
               }}
             >
-              <Link 
-                to={`/laptops/all?subBrand=${tabName.replace(" ", "+")}`}
-              >
+              <Link to={`/laptops/all?subBrand=${tabName.replace(" ", "+")}`}>
                 <Image
                   src={tabBanners[index]}
                   alt={tabName}

@@ -271,7 +271,7 @@ const CustomerPage = () => {
             <Link to="/">Home</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>
-          <Link to="/customer">My Dashboard</Link>
+            <Link to="/customer">My Dashboard</Link>
           </Breadcrumb.Item>
         </Breadcrumb>
         <Title level={2}>My Dashboard</Title>

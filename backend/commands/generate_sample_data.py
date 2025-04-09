@@ -243,8 +243,6 @@ def generate_subscriptions(
     print(f"INSERT subscription queries successfully written to {sql_output_path}")
 
 
-
-
 def generate_posts(
     sql_output_path="./backend/commands/insert_sample_data.sql", num_posts=20
 ):

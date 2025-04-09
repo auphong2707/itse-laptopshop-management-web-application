@@ -10,7 +10,6 @@ import Purchase from "./components/Purchase";
 import SupportSection from "./components/SupportSection";
 import ImageGallery from "./components/ImageGallery";
 
-
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
@@ -30,7 +29,7 @@ const ProductHeader = ({ title, series }) => (
         <Link to="/laptops/all">Laptops</Link>
       </Breadcrumb.Item>
       <Breadcrumb.Item>
-      <Link to={`/laptops/${series?.toLowerCase()}`}>{series}</Link>
+        <Link to={`/laptops/${series?.toLowerCase()}`}>{series}</Link>
       </Breadcrumb.Item>
     </Breadcrumb>
     <Title level={2} style={{ fontWeight: "bold" }}>
@@ -46,7 +45,6 @@ ProductHeader.propTypes = {
   title: PropTypes.string.isRequired,
   series: PropTypes.string,
 };
-
 
 const ExtraInfo = ({ productId }) => (
   <div
@@ -169,11 +167,18 @@ const transformData = (data) => {
     ram_type: data["ram_type"].toUpperCase(),
     storage_type: data["storage_type"].toUpperCase(),
     vga: data["vga"] ? data["vga"].toUpperCase() : "N/A",
-    default_os: data["default_os"] ? data["default_os"]
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ") : "N/A",
-    webcam_resolution: data["webcam_resolution"] ? data["webcam_resolution"].toUpperCase() : "N/A",
+    default_os: data["default_os"]
+      ? data["default_os"]
+          .split(" ")
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
+          .join(" ")
+      : "N/A",
+    webcam_resolution: data["webcam_resolution"]
+      ? data["webcam_resolution"].toUpperCase()
+      : "N/A",
   };
 };
 
