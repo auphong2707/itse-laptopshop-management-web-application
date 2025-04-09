@@ -118,3 +118,13 @@ def remove_from_cart(laptop_id: int, uid: str = Depends(get_current_user_id)):
         "message": "Item removed from cart successfully",
         "laptop_id": laptop_id,
     }
+
+
+@router.delete("/clear")
+def clear_cart(uid: str = Depends(get_current_user_id)):
+    """
+    Clear all items from the cart
+    """
+    cart_key = f"cart:{uid}"
+    redis_client.delete(cart_key)
+    return {"message": "Cart cleared successfully"}
