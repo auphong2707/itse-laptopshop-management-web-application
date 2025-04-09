@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
 NUM_LAPTOPS = 0
 NUM_POSTS = 0
@@ -243,8 +244,6 @@ def generate_subscriptions(
     print(f"INSERT subscription queries successfully written to {sql_output_path}")
 
 
-
-
 def generate_posts(
     sql_output_path="./backend/commands/insert_sample_data.sql", num_posts=20
 ):
@@ -295,7 +294,7 @@ def generate_posts(
     print(f"INSERT post queries written for {num_posts} posts to {sql_output_path}")
 
 
-def generate_images(
+def generate_laptop_images(
     template_dir="./backend/static/templates",
     output_dir="./backend/static/laptop_images",
 ):
@@ -309,26 +308,34 @@ def generate_images(
     except:
         font = ImageFont.load_default()
 
-    for laptop_id in tqdm(range(1, NUM_LAPTOPS + 1), desc="Generating laptop images"):
-        for i in range(1, 4):  # 3 images per laptop
-            src_path = os.path.join(template_dir, f"laptop{i}.jpg")
-            dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
+    def generate_image(laptop_id, i):
+        src_path = os.path.join(template_dir, f"laptop{i}.jpg")
+        dest_path = os.path.join(output_dir, f"{laptop_id}_img{i}.jpg")
 
-            if not os.path.exists(src_path):
-                print(f"[WARN] Template image {src_path} not found, skipping")
-                continue
+        if not os.path.exists(src_path):
+            print(f"[WARN] Template image {src_path} not found, skipping")
+            return
 
-            with Image.open(src_path) as img:
-                draw = ImageDraw.Draw(img)
-                draw.text(
-                    (30, 30),
-                    f"ID: {laptop_id}",
-                    font=font,
-                    fill="black",
-                    stroke_fill="white",
-                    stroke_width=3,
-                )
-                img.save(dest_path)
+        with Image.open(src_path) as img:
+            draw = ImageDraw.Draw(img)
+            draw.text(
+                (30, 30),
+                f"ID: {laptop_id}",
+                font=font,
+                fill="black",
+                stroke_fill="white",
+                stroke_width=3,
+            )
+            img.save(dest_path)
+
+    with ThreadPoolExecutor() as executor:
+        tasks = [
+            executor.submit(generate_image, laptop_id, i)
+            for laptop_id in range(1, NUM_LAPTOPS + 1)
+            for i in range(1, 4)  # 3 images per laptop
+        ]
+        for task in tqdm(tasks, desc="Generating laptop images"):
+            task.result()
 
     print(f"Generated mock images for {NUM_LAPTOPS} laptops.")
 
@@ -443,7 +450,7 @@ def generate_orders(
 if __name__ == "__main__":
     clear_old_commands()
     generate_laptop_insert_queries()
-    generate_images()
+    generate_laptop_images()
     generate_reviews()
     generate_subscriptions()
     generate_posts()
