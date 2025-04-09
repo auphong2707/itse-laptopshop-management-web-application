@@ -98,3 +98,23 @@ def update_cart_item(
             "laptop_id": item.laptop_id,
             "new_quantity": item.new_quantity,
         }
+
+
+@router.delete("/remove/{laptop_id}")
+def remove_from_cart(laptop_id: int, uid: str = Depends(get_current_user_id)):
+    """
+    Remove specific item from cart
+    """
+    cart_key = f"cart:{uid}"
+    laptop_id_str = str(laptop_id)
+
+    deleted_count = redis_client.hdel(cart_key, laptop_id_str)
+    if deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Laptop ID {laptop_id} not found in cart.",
+        )
+    return {
+        "message": "Item removed from cart successfully",
+        "laptop_id": laptop_id,
+    }
