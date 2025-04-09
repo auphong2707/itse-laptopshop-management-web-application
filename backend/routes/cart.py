@@ -60,3 +60,11 @@ def add_to_cart(item: CartItemAdd, uid: str = Depends(get_current_user_id)):
         "laptop_id": item.laptop_id,
         "new_quantity": int(current_quantity) if current_quantity else item.quantity,
     }
+
+
+@router.get("/view")
+def view_cart(uid: str = Depends(get_current_user_id)):
+    cart_key = f"cart:{uid}"
+    cart_items_raw = redis_client.hgetall(cart_key)
+    cart_items = {int(k): int(v) for k, v in cart_items_raw.items()}
+    return cart_items
