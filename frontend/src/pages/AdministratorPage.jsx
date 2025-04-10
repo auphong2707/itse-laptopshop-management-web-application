@@ -18,6 +18,7 @@ import { Divider } from "antd";
 import { CloseOutlined, EditOutlined } from "@ant-design/icons";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
+import RefundTable from "./components/RefundTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -715,12 +716,14 @@ const AdminTabs = () => {
   const getActiveKey = () => {
     if (location.pathname.includes("/admin/detail")) return "0";
     if (location.pathname.includes("/admin/delete")) return "1";
+    if (location.pathname.includes("/admin/refund")) return "2";
     return "0"; // Default to "Detail"
   };
 
   const handleTabChange = (key) => {
     if (key === "0") navigate("/admin/detail");
     if (key === "1") navigate("/admin/delete");
+    if (key === "2") navigate("/admin/refund");
   };
 
   return (
@@ -734,7 +737,16 @@ const AdminTabs = () => {
       >
         <Tabs.TabPane key="0" tab="Detail" />
         <Tabs.TabPane key="1" tab="Deleting Products" />
+        <Tabs.TabPane key="2" tab="Refund Request" />
       </Tabs>
+    </div>
+  );
+};
+
+const RefundRequest = () => {
+  return (
+    <div style={{ paddingTop: "2rem" }}>
+      <RefundTable />
     </div>
   );
 };
@@ -770,4 +782,4 @@ const AdministratorPage = () => {
 };
 
 export default AdministratorPage;
-export { Detail, DeletingProducts };
+export { Detail, DeletingProducts, RefundRequest };
