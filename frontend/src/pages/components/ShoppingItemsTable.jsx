@@ -1,47 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Image, InputNumber, Button, Layout, Space } from "antd";
+import { useState, useEffect } from "react";
+import { Typography, Image, InputNumber, Button } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { getAuth } from "firebase/auth";
+import axios from "axios";
 
 const { Text } = Typography;
 
-//Hàm format tiền
 const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
 
-// Giả sử đây là mảng dữ liệu sản phẩm (chứa tên, giá, v.v.)
-const productsData = [
-  {
-    id: 1,
-    name: "MSI MEG Trident X 10SD",
-    price: 34720000,
-    image: "https://example.com/image1.jpg", // Thay URL ảnh thật nếu cần
-  },
-  {
-    id: 2,
-    name: "Laptop ABC",
-    price: 15000000,
-    image: "https://example.com/image2.jpg",
-  },
-  {
-    id: 3,
-    name: "Laptop XYZ",
-    price: 22000000,
-    image: "https://example.com/image3.jpg",
-  },
-];
+const Items = ({ product, index, onSubtotalChange, onRemove }) => {
+  const [quantity, setQuantity] = useState(product.quantity || 0);
+  const rawSubtotal = formatPrice(product.sale_price * quantity);
 
-// Component phụ (hiển thị thông tin sản phẩm)
-const Items = ({ product, index, onSubtotalChange }) => {
-  const [quantity, setQuantity] = useState(0);
-  const rawSubtotal = formatPrice(product.price * quantity);
-
-  const handleQuantityChange = (value) => {
+  const handleQuantityChange = async (value) => {
     if (!isNaN(value) && value >= 0) {
       setQuantity(value);
-      onSubtotalChange(product.price * value, index);
+      onSubtotalChange(product.sale_price * value, index);
+  
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) throw new Error("User not authenticated");
+  
+        const token = await user.getIdToken();
+  
+        await axios.put(
+          "http://localhost:8000/cart/update",
+          {
+            laptop_id: product.id,
+            new_quantity: value,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } catch (err) {
+        console.error("Error updating quantity in cart:", err);
+      }
     }
   };
+  
+
+  useEffect(() => {
+    onSubtotalChange(product.sale_price * quantity, index);
+  }, []);
+  
 
   return (
     <div
@@ -54,10 +61,10 @@ const Items = ({ product, index, onSubtotalChange }) => {
         borderBottom: "1px solid #eee",
       }}
     >
-      {/* Ảnh sản phẩm */}
+      {/* Product Image */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Image
-          src={product.image} // Thay bằng ảnh thật
+          src={product.imageUrl}
           width={80}
           height={80}
           style={{ objectFit: "contain", borderRadius: "5px" }}
@@ -65,21 +72,21 @@ const Items = ({ product, index, onSubtotalChange }) => {
         />
       </div>
 
-      {/* Tên sản phẩm */}
+      {/* Product Name */}
       <Text style={{ fontSize: "14px", fontWeight: "bold" }}>
         {product.name}
       </Text>
 
-      {/* Giá tiền đơn vị */}
+      {/* Product Price */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Text style={{ fontSize: "16px", fontWeight: "bold" }}>
-          {formatPrice(product.price)}
+          {formatPrice(product.sale_price)}
         </Text>
       </div>
       {/* Bộ chọn số lượng */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <InputNumber
-          min={0}
+          min={1}
           value={quantity}
           onChange={handleQuantityChange}
           style={{
@@ -89,7 +96,7 @@ const Items = ({ product, index, onSubtotalChange }) => {
           }}
         />
       </div>
-      {/* Tổng tiền */}
+      {/* Total price for products */}
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Text style={{ fontSize: "16px", fontWeight: "bold" }}>
           {rawSubtotal}
@@ -106,17 +113,74 @@ const Items = ({ product, index, onSubtotalChange }) => {
         }}
       >
         <Button type="text" icon={<EyeOutlined />} style={{ color: "#888" }} />
-        <Button type="text" icon={<DeleteOutlined />} danger />
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          danger
+          onClick={() => onRemove(product.id)}
+        />
+
       </div>
     </div>
   );
 };
 
-// Component chính (bảng hiển thị danh mục + Items)
 const ShoppingItemsTable = ({ setTotalPrice }) => {
-  const [subTotals, setSubTotals] = useState(
-    Array(productsData.length).fill(0),
-  );
+  const [cartItems, setCartItems] = useState([]);
+  const [subTotals, setSubTotals] = useState([]);
+  
+  useEffect(() => {
+    const auth = getAuth();
+  
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+  
+          // 1. Get cart
+          const cartResponse = await axios.get("http://localhost:8000/cart/view", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          const cartData = cartResponse.data;
+  
+          // 2. Fetch product info
+          const productFetches = Object.keys(cartData).map((id) =>
+            axios.get(`http://localhost:8000/laptops/id/${id}`)
+          );
+  
+          const productResponses = await Promise.all(productFetches);
+  
+          // 3. Combine product info
+          const productsWithQty = productResponses.map((res) => {
+            const product = res.data;
+            const quantity = cartData[product.id];
+            const imageUrls = JSON.parse(product.product_image_mini || "[]").map(
+              (url) => `http://localhost:8000${url}`
+            );
+  
+            return {
+              ...product,
+              quantity,
+              imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
+            };
+          });
+  
+          setCartItems(productsWithQty);
+          setSubTotals(productsWithQty.map((item) => item.sale_price * item.quantity));
+        } catch (err) {
+          console.error("Error fetching cart:", err);
+        }
+      } else {
+        console.warn("No user logged in");
+      }
+    });
+  
+    return () => unsubscribe(); // clean up the listener
+  }, []);
+  
 
   const handleSubtotalChange = (newSubtotal, index) => {
     const newSubTotals = [...subTotals];
@@ -124,54 +188,90 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
     setSubTotals(newSubTotals);
   };
 
+  const handleRemoveItem = async (laptopId) => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+  
+      const token = await user.getIdToken();
+  
+      await axios.delete(`http://localhost:8000/cart/remove/${laptopId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Remove from UI
+      const updatedItems = cartItems.filter((item) => item.id !== laptopId);
+      setCartItems(updatedItems);
+      setSubTotals(updatedItems.map((item) => item.sale_price * item.quantity));
+    } catch (err) {
+      console.error("Error removing item from cart:", err);
+    }
+  };
+
+  const handleClearCart = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+  
+      const token = await user.getIdToken();
+  
+      await axios.delete("http://localhost:8000/cart/clear", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Clear UI state
+      setCartItems([]);
+      setSubTotals([]);
+      setTotalPrice(0);
+  
+    } catch (err) {
+      console.error("Error clearing cart:", err);
+    }
+  };
+
   useEffect(() => {
     const sum = subTotals.reduce((acc, val) => acc + val, 0);
-    // setTotalPrice ở đây để đẩy giá trị tổng lên ShoppingCartPage
     setTotalPrice(sum);
   }, [subTotals, setTotalPrice]);
 
   return (
-    <div
-      style={{
-        paddingTop: "0px",
-        paddingBottom: "20px",
-        paddingLeft: "20px",
-        paddingRight: "20px",
-        borderRadius: "8px",
-      }}
-      bordered={false}
-    >
+    <div style={{ padding: "20px", borderRadius: "8px" }}>
       {/* Header */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 2fr 1fr 1fr 1fr 0.5fr",
           fontWeight: "bold",
-          paddingTop: "10px",
           paddingBottom: "15px",
           borderBottom: "1.5px solid #ddd",
           gap: "15px",
         }}
       >
-        <Text style={{ display: "flex", justifyContent: "center" }}>Item</Text>
-        <Text style={{ display: "flex", justifyContent: "center" }}>Name</Text>
-        <Text style={{ display: "flex", justifyContent: "center" }}>Price</Text>
-        <Text style={{ display: "flex", justifyContent: "center" }}>Qty</Text>
-        <Text style={{ display: "flex", justifyContent: "center" }}>
-          Subtotal
-        </Text>
+        <Text style={{ textAlign: "center" }}>Item</Text>
+        <Text style={{ textAlign: "center" }}>Name</Text>
+        <Text style={{ textAlign: "center" }}>Price</Text>
+        <Text style={{ textAlign: "center" }}>Qty</Text>
+        <Text style={{ textAlign: "center" }}>Subtotal</Text>
       </div>
 
-      {/* Danh sách sản phẩm (.map) */}
-      {productsData.map((prod, index) => (
+      {/* Render cart items dynamically */}
+      {cartItems.map((prod, index) => (
         <Items
           key={prod.id}
           product={prod}
           index={index}
           onSubtotalChange={handleSubtotalChange}
+          onRemove={handleRemoveItem}
         />
       ))}
 
+      {/* Total price */}
       <div
         style={{
           display: "grid",
@@ -186,65 +286,34 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
         <Text />
         <Text />
         <Text />
-        <Text
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            fontSize: "17px",
-          }}
-        >
-          Total price:{" "}
-        </Text>
-        <Text
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            fontSize: "17px",
-          }}
-        >
+        <Text style={{ textAlign: "center", fontSize: "17px" }}>Total price:</Text>
+        <Text style={{ textAlign: "center", fontSize: "17px" }}>
           {formatPrice(subTotals.reduce((acc, val) => acc + val, 0))}
         </Text>
       </div>
 
+      {/* Buttons */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
           paddingTop: "20px",
-          paddingBottom: "15px",
-          paddingLeft: "15px",
-          paddingRight: "15px",
         }}
       >
-        {/* Nút Clear Shopping Cart */}
         <Button
           type="primary"
-          style={{
-            backgroundColor: "#000", // màu nền đen
-            borderColor: "#000", // viền đen (trùng màu nền)
-            borderRadius: "9999px", // bo tròn
-            fontWeight: "bold",
-          }}
+          style={{ borderRadius: "9999px", fontWeight: "bold" }}
+          onClick={handleClearCart}
         >
           Clear Shopping Cart
         </Button>
-
-        {/* Nút Continue Shopping */}
-        <Button
-          type="primary"
-          style={{
-            backgroundColor: "#000",
-            borderColor: "#000",
-            borderRadius: "9999px",
-            fontWeight: "bold",
-          }}
-        >
+        <Button type="primary" style={{ borderRadius: "9999px", fontWeight: "bold" }}>
           Continue Shopping
         </Button>
       </div>
     </div>
   );
 };
+
 
 export default ShoppingItemsTable;
