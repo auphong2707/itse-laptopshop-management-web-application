@@ -11,13 +11,11 @@ from sqlalchemy import (
     CheckConstraint,
     Enum,
     Index,
+    Text,
 )
 from sqlalchemy.orm import declarative_base, relationship
-
 from sqlalchemy.dialects.postgresql import JSON
-
 from datetime import datetime
-
 import enum
 
 Base = declarative_base()
@@ -116,14 +114,21 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(String, nullable=False)
-    total_price = Column(Float, nullable=False)
-    status = Column(String, default="pending")
-    created_at = Column(DateTime, server_default=func.current_timestamp())
+    user_id = Column(String(255), nullable=False)  # Firebase UID length
+
+    user_name = Column(Text, nullable=True)
+    user_email = Column(Text, nullable=True)
+    shipping_address = Column(
+        Text, nullable=True
+    )  # Store as structured JSON or simple Text
+    phone_number = Column(Text, nullable=True)
+
+    total_price = Column(DECIMAL(10, 2), nullable=False)  # Match precision
+    status = Column(String(50), nullable=False, default="pending")
+    # Use TIMESTAMP(timezone=True) for timezone awareness
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(
-        DateTime,
-        server_default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
     items = relationship(
@@ -138,8 +143,9 @@ class OrderItem(Base):
     order_id = Column(
         Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
     )
-    product_id = Column(Integer, nullable=False)
+    product_id = Column(Integer, nullable=False)  # Consider ForeignKey("laptops.id")
     quantity = Column(Integer, nullable=False)
+    price_at_purchase = Column(DECIMAL(10, 2), nullable=False)  # Store the price
 
     order = relationship("Order", back_populates="items")
 
