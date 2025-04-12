@@ -1,4 +1,3 @@
-import React from "react";
 import { Typography, Image, Button } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 

@@ -127,7 +127,7 @@ const ProductCard = ({
           style={{
             position: "absolute",
             top: 5,
-            right: -5,
+            right: -20,
             zIndex: 1,
             backgroundColor: "#fff",
             borderColor: "#ccc",
