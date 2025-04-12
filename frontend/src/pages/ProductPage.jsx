@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { data, Link, useParams } from "react-router-dom";
-import { Layout, Typography, Breadcrumb, Table, Image } from "antd";
+import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
 import PropTypes from "prop-types";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
@@ -193,6 +193,14 @@ const ProductPage = () => {
   }, [id]);
 
   console.log(productData);
+  const [rating, setRating] = useState(0);
+  const imageUrl =
+  JSON.parse(productData.product_image_mini || "[]")[0]
+    ? `http://localhost:8000${
+        JSON.parse(productData.product_image_mini)[0]
+      }`
+    : "/placeholder.png"; // fallback ảnh nếu không có
+
 
   return (
     <Layout>
@@ -233,8 +241,92 @@ const ProductPage = () => {
         />
       </Content>
 
-      {/* Advertisement */}
-      <ImageGallery imageSources={imageSources} height="600px" />
+      <div
+        style={{
+          backgroundColor: "#d3d3d3",
+          padding: "2rem",
+          margin: "2rem auto",
+          maxWidth: "80%",
+          borderRadius: "8px",
+        }}
+      >
+        <Title level={4} style={{ fontWeight: "bold" }}>
+          SUBMIT REVIEWS AND RATINGS
+        </Title>
+        <hr style={{ marginBottom: "1.5rem" }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+          <Image
+            src={imageUrl}
+            alt="Product"
+            width={80}
+            height={60}
+            style={{ borderRadius: "4px" }}
+            preview={false}
+          />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Text style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "0.25rem", lineHeight: "1.4" }}>
+            {productData.name || "PRODUCT’S NAME"}
+          </Text>
+          <Rate value={rating} onChange={setRating} style={{ fontSize: "24px" }} />
+        </div>
+
+        </div>
+
+        <textarea
+          rows={4}
+          placeholder="Write your review..."
+          style={{
+            width: "100%",
+            padding: "1rem",
+            marginBottom: "1rem",
+            border: "1px solid #000",
+            borderRadius: "4px",
+            fontSize: "16px",
+          }}
+        />
+
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+          <input
+            type="text"
+            placeholder="Name"
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              border: "1px solid #000",
+              borderRadius: "4px",
+              fontSize: "16px",
+            }}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              border: "1px solid #000",
+              borderRadius: "4px",
+              fontSize: "16px",
+            }}
+          />
+        </div>
+
+        <button
+          style={{
+            padding: "0.6rem 1.5rem",
+            backgroundColor: "#4e6ef2",
+            color: "#fff",
+            border: "none",
+            borderRadius: "20px",
+            fontWeight: "bold",
+            float: "right",
+            cursor: "pointer",
+          }}
+        >
+          SUBMIT
+        </button>
+      </div>
+
 
       <SupportSection />
 
