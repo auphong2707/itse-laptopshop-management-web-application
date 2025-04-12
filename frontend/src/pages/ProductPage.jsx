@@ -250,12 +250,15 @@ const ProductPage = () => {
           borderRadius: "8px",
         }}
       >
-        <Title level={4} style={{ fontWeight: "bold" }}>
-          SUBMIT REVIEWS AND RATINGS
-        </Title>
-        <hr style={{ marginBottom: "1.5rem" }} />
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center"}}>
+          <Title level={4} style={{ fontWeight: "bold",  margin: 0 }}>
+            SUBMIT REVIEWSANDRATINGS
+          </Title>
+        </div>
+        <hr style={{ marginTop:"25px" ,marginBottom: "1.5rem" }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "24px" }}>
           <Image
             src={imageUrl}
             alt="Product"
@@ -283,6 +286,7 @@ const ProductPage = () => {
             border: "1px solid #000",
             borderRadius: "4px",
             fontSize: "16px",
+            fontFamily: "sans-serif",
           }}
         />
 
@@ -321,6 +325,7 @@ const ProductPage = () => {
             fontWeight: "bold",
             float: "right",
             cursor: "pointer",
+            marginTop: "8px",
           }}
         >
           SUBMIT
