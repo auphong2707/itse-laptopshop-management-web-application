@@ -194,6 +194,44 @@ const ProductPage = () => {
 
   console.log(productData);
   const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [reviewName, setReviewName] = useState("");
+  const [reviewEmail, setReviewEmail] = useState("");
+  const handleSubmitReview = async () => {
+    const review = {
+      name: reviewName,
+      email: reviewEmail,
+      rating: rating,
+      review_text: reviewText,
+      product_id: parseInt(id),
+    };
+  
+    try {
+      const res = await fetch("http://localhost:8000/submit_review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(review),
+      });
+  
+      if (res.ok) {
+        alert("Review submitted successfully!");
+        // Reset form
+        setRating(0);
+        setReviewText("");
+        setReviewName("");
+        setReviewEmail("");
+      } else {
+        const errorData = await res.json();
+        alert("Failed to submit review: " + errorData.detail);
+      }
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      alert("Something went wrong!");
+    }
+  };
+  
   const imageUrl =
   JSON.parse(productData.product_image_mini || "[]")[0]
     ? `http://localhost:8000${
@@ -252,7 +290,7 @@ const ProductPage = () => {
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center"}}>
           <Title level={4} style={{ fontWeight: "bold",  margin: 0 }}>
-            SUBMIT REVIEWSANDRATINGS
+            SUBMIT REVIEWS AND RATINGS
           </Title>
         </div>
         <hr style={{ marginTop:"25px" ,marginBottom: "1.5rem" }} />
@@ -277,6 +315,8 @@ const ProductPage = () => {
         </div>
 
         <textarea
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
           rows={4}
           placeholder="Write your review..."
           style={{
@@ -290,32 +330,40 @@ const ProductPage = () => {
           }}
         />
 
+
         <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-          <input
-            type="text"
-            placeholder="Name"
-            style={{
-              flex: 1,
-              padding: "0.75rem",
-              border: "1px solid #000",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            style={{
-              flex: 1,
-              padding: "0.75rem",
-              border: "1px solid #000",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
+        <input
+          type="text"
+          placeholder="Name"
+          value={reviewName}
+          onChange={(e) => setReviewName(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "0.75rem",
+            border: "1px solid #000",
+            borderRadius: "4px",
+            fontSize: "16px",
+          }}
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={reviewEmail}
+          onChange={(e) => setReviewEmail(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "0.75rem",
+            border: "1px solid #000",
+            borderRadius: "4px",
+            fontSize: "16px",
+          }}
+        />
+
         </div>
 
         <button
+          onClick={handleSubmitReview}
           style={{
             padding: "0.6rem 1.5rem",
             backgroundColor: "#4e6ef2",
