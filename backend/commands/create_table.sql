@@ -120,14 +120,6 @@ BEFORE UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
-CREATE TABLE delete_log (
-    id INTEGER,
-    table_name TEXT,
-    deleted_at TIMESTAMP DEFAULT NOW(),
-    PRIMARY KEY (id, table_name)
-);
-
-
 -- ORDERS
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,

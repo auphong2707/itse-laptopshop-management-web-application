@@ -87,19 +87,13 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    # Log the deletion in the delete_log table
-    db.execute(
-        text(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())"
-        ),
-        {"id": laptop_id},
-    )
-
-    # Delete the laptop
+    # Delete the laptop in postgresql database
     db.delete(laptop)
-
-    # Commit both operations together
     db.commit()
+
+    # Delete the laptop in Elasticsearch
+    es.delete(index="laptops", id=laptop_id)
+
     return {"message": "Laptop deleted successfully"}
 
 
@@ -648,19 +642,13 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    # Log the deletion in the delete_log table
-    db.execute(
-        text(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'orders', NOW())"
-        ),
-        {"id": order_id},
-    )
-
     # Delete the order
     db.delete(order)
-
-    # Commit both operations together
     db.commit()
+
+    # Delete the order in Elasticsearch
+    es.delete(index="orders", id=order_id)
+
     return {"message": "Order deleted successfully"}
 
 
