@@ -208,7 +208,7 @@ const ProductPage = () => {
           height: "100%",
         }}
       >
-        <Purchase price={productData.sale_price} laptopId={id}/>
+        <Purchase price={productData.sale_price} laptopId={id} />
         {/* Left Side: Product Tabs */}
         <div style={{ width: "70%", paddingLeft: "7%" }}>
           <ProductTabs

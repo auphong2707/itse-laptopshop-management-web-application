@@ -149,7 +149,7 @@ const ShoppingItemsTable = ({ setTotalPrice, cartItems }) => {
           product={prod}
           index={index}
           onSubtotalChange={handleSubtotalChange}
-          initialQuantity={prod.quantity} 
+          initialQuantity={prod.quantity}
         />
       ))}
 
