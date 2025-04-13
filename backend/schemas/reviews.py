@@ -4,6 +4,7 @@ from typing import Optional
 class ReviewCreate(BaseModel):
     laptop_id: int
     user_name: Optional[str] = None
+    email: Optional[str] = None
     rating: int  # Rating should be between 1 and 5
     review_text: Optional[str] = None
 

@@ -199,11 +199,11 @@ const ProductPage = () => {
   const [reviewEmail, setReviewEmail] = useState("");
   const handleSubmitReview = async () => {
     const review = {
-      name: reviewName,
+      user_name: reviewName,
       email: reviewEmail,
       rating: rating,
       review_text: reviewText,
-      product_id: parseInt(id),
+      laptop_id: parseInt(id),
     };
   
     try {
@@ -224,7 +224,7 @@ const ProductPage = () => {
         setReviewEmail("");
       } else {
         const errorData = await res.json();
-        alert("Failed to submit review: " + errorData.detail);
+        alert("Failed to submit review: " + (errorData.detail || JSON.stringify(errorData)));
       }
     } catch (err) {
       console.error("Error submitting review:", err);

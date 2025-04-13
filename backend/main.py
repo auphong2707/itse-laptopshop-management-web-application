@@ -346,9 +346,10 @@ async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
     new_review = Review(
         laptop_id=review.laptop_id,
         user_name=review.user_name,
+        email=review.email,
         rating=review.rating,
         review_text=review.review_text,
-        created_at=datetime.utcnow(),
+        created_at=datetime.utcnow().isoformat()
     )
 
     db.add(new_review)
