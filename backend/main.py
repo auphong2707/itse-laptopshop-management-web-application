@@ -282,6 +282,40 @@ def filter_laptops(
         "results": [hit["_source"] for hit in results["hits"]["hits"]],
     }
 
+@app.get("/laptops/low-stock")
+def get_low_stock_laptops(
+    threshold: int = Query(50, description="Maximum quantity to be considered low stock"),
+    limit: int = Query(30, description="Number of results to return"),
+    page: int = Query(1, description="Page number for pagination")
+):
+    """
+    Returns laptops with quantity less than or equal to the threshold (default 50).
+    Supports pagination.
+    """
+
+    query_body = {
+        "query": {
+            "range": {
+                "quantity": {
+                    "lte": threshold
+                }
+            }
+        },
+        "sort": [{"quantity": {"order": "asc"}}],
+        "size": limit,
+        "from": (page - 1) * limit
+    }
+
+    results = es.search(index="laptops", body=query_body, track_total_hits=True)
+    total_count = results["hits"]["total"]["value"]
+
+    return {
+        "page": page,
+        "limit": limit,
+        "total_count": total_count,
+        "results": [hit["_source"] for hit in results["hits"]["hits"]],
+    }
+
 
 @app.get("/laptops/latest")
 def get_latest_laptops(

@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Tag, Button, Image } from 'antd';
 import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
 
-const StockAlertTable = ({ data }) => {
+const StockAlertTable = ({ data, loading, pagination, onPageChange }) => {
   const columns = [
     {
         title: 'ID',
@@ -89,7 +89,11 @@ const StockAlertTable = ({ data }) => {
       columns={columns}
       dataSource={data}
       rowKey="id"
-      pagination={{ pageSize: 10 }}
+      loading={loading}
+      pagination={{
+        ...pagination,
+        onChange: onPageChange,
+      }}
     />
   );
 };
