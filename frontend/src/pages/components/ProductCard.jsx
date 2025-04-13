@@ -78,6 +78,7 @@ const ProductCard = ({
   const handleOk = () => {
     handleDelete(productId); // Proceed with deleting the product
     setModalVisible(false); // Close the modal after deletion
+    window.location.reload(); // Refresh the page
   };
 
   const handleCancel = () => {
