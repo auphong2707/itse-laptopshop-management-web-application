@@ -207,7 +207,7 @@ const ProductPage = () => {
     };
   
     try {
-      const res = await fetch("http://localhost:8000/submit_review", {
+      const res = await fetch("http://localhost:8000/reviews", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
