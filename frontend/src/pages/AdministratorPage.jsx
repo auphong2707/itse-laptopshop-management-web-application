@@ -15,11 +15,12 @@ import {
   Tabs,
 } from "antd";
 import { Divider } from "antd";
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import AdminCatalog from "./components/AdminCatalog.jsx";
 import RefundTable from "./components/RefundTable.jsx";
+import StockAlertTable from "./components/StockAlertTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -541,6 +542,32 @@ const Detail = () => {
   );
 };
 
+const StockAlert = () => {
+  const stockData = [
+    {
+      id: 1,
+      image: 'https://example.com/macbook.jpg',
+      name: 'MacBook Air M2',
+      brand: 'Apple',
+      quantity: 2,
+    },
+    {
+      id: 2,
+      image: 'https://example.com/thinkpad.jpg',
+      name: 'ThinkPad X1 Carbon',
+      brand: 'Lenovo',
+      quantity: 0,
+    },
+  ];
+  
+
+  return (
+    <div>
+      <StockAlertTable data={stockData} />
+    </div>
+  );
+};
+
 const AdminTabs = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -549,6 +576,7 @@ const AdminTabs = () => {
     if (location.pathname.includes("/admin/catalog")) return "0";
     if (location.pathname.includes("/admin/detail")) return "1";
     if (location.pathname.includes("/admin/refund")) return "2";
+    if (location.pathname.includes("/admin/stock-alerts")) return "3";
     return "0";
   };
 
@@ -556,6 +584,7 @@ const AdminTabs = () => {
     if (key === "0") navigate("/admin/catalog/all");
     if (key === "1") navigate("/admin/detail");
     if (key === "2") navigate("/admin/refund");
+    if (key === "3") navigate("/admin/stock-alerts");
   };
 
   return (
@@ -570,6 +599,7 @@ const AdminTabs = () => {
         <Tabs.TabPane key="0" tab="All Products" />
         <Tabs.TabPane key="1" tab="Detail" />
         <Tabs.TabPane key="2" tab="Refund Request" />
+        <Tabs.TabPane key="3" tab="Stock Alerts" />
       </Tabs>
     </div>
   );
@@ -614,4 +644,4 @@ const AdministratorPage = () => {
 };
 
 export default AdministratorPage;
-export { Detail, AdminCatalog, RefundRequest };
+export { Detail, AdminCatalog, RefundRequest, StockAlert };
