@@ -1,6 +1,10 @@
 import React from 'react';
 import { Table, Tag, Button, Image } from 'antd';
-import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
+
+const handleEdit = (record) => {
+    window.location.href = `http://localhost:5173/admin/detail/${record.id}`;
+};
 
 const StockAlertTable = ({ data, loading, pagination, onPageChange }) => {
   const columns = [
@@ -74,7 +78,6 @@ const StockAlertTable = ({ data, loading, pagination, onPageChange }) => {
         width: '100px',
         render: (_, record) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <Button icon={<ReloadOutlined />} onClick={() => handleRestock(record)}>Restock</Button>
             <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)}>Edit</Button>
             </div>
         ),
