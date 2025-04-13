@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Button, Select, Typography, Flex } from "antd";
+import React, { useState } from "react";
+import { Button, Select, Typography, Flex, message } from "antd";
+import { getAuth } from "firebase/auth";
+import axios from "axios";
 
 const { Text } = Typography;
 
@@ -11,14 +13,46 @@ const formatPrice = (price, quantity) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-const Purchase = ({ price }) => {
+const Purchase = ({ price, laptopId }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (value) => {
     setQuantity(value);
   };
 
-  price = formatPrice(price, quantity);
+  const handleAddToCart = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+  
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+  
+      const token = await user.getIdToken();
+      console.log("Token:", token);
+  
+      const response = await axios.post(
+        "http://localhost:8000/cart/add",
+        {
+          laptop_id: laptopId,
+          quantity: quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      console.log("Added to cart:", response.data);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+    }
+  };  
+
+  const formattedPrice = formatPrice(price, quantity);
 
   return (
     <div
@@ -39,12 +73,10 @@ const Purchase = ({ price }) => {
         style={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
         gap="16px"
       >
-        {/* Price Display */}
         <Text style={{ fontSize: "16px" }}>
-          On Sale from <strong>{price}₫</strong>
+          On Sale from <strong>{formattedPrice}₫</strong>
         </Text>
 
-        {/* Quantity Selector */}
         <Select
           defaultValue={1}
           onChange={handleQuantityChange}
@@ -57,7 +89,6 @@ const Purchase = ({ price }) => {
           ))}
         </Select>
 
-        {/* Buttons */}
         <Button
           type="primary"
           style={{
@@ -76,11 +107,11 @@ const Purchase = ({ price }) => {
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "#0044cc")}
           onMouseLeave={(e) => (e.currentTarget.style.background = "#0057ff")}
+          onClick={handleAddToCart}
         >
           Add to Cart
         </Button>
 
-        {/* PayPal Button */}
         <Button
           type="primary"
           style={{

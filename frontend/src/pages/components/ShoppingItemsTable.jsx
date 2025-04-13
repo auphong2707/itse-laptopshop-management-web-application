@@ -9,31 +9,9 @@ const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
 
-// Giả sử đây là mảng dữ liệu sản phẩm (chứa tên, giá, v.v.)
-const productsData = [
-  {
-    id: 1,
-    name: "MSI MEG Trident X 10SD",
-    price: 34720000,
-    image: "https://example.com/image1.jpg", // Thay URL ảnh thật nếu cần
-  },
-  {
-    id: 2,
-    name: "Laptop ABC",
-    price: 15000000,
-    image: "https://example.com/image2.jpg",
-  },
-  {
-    id: 3,
-    name: "Laptop XYZ",
-    price: 22000000,
-    image: "https://example.com/image3.jpg",
-  },
-];
-
 // Component phụ (hiển thị thông tin sản phẩm)
-const Items = ({ product, index, onSubtotalChange }) => {
-  const [quantity, setQuantity] = useState(0);
+const Items = ({ product, index, onSubtotalChange, initialQuantity }) => {
+  const [quantity, setQuantity] = useState(initialQuantity || 0);
   const rawSubtotal = formatPrice(product.price * quantity);
 
   const handleQuantityChange = (value) => {
@@ -113,7 +91,9 @@ const Items = ({ product, index, onSubtotalChange }) => {
 };
 
 // Component chính (bảng hiển thị danh mục + Items)
-const ShoppingItemsTable = ({ setTotalPrice }) => {
+const ShoppingItemsTable = ({ setTotalPrice, cartItems }) => {
+  const productsData = cartItems || [];
+
   const [subTotals, setSubTotals] = useState(
     Array(productsData.length).fill(0),
   );
@@ -169,6 +149,7 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
           product={prod}
           index={index}
           onSubtotalChange={handleSubtotalChange}
+          initialQuantity={prod.quantity} 
         />
       ))}
 
