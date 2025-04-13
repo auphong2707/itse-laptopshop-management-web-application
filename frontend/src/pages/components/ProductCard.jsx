@@ -14,7 +14,7 @@ import {
   InfoCircleFilled,
   CloseOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
@@ -58,34 +58,26 @@ const ProductCard = ({
 }) => {
   const [productData, setProductData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [deletionStatus, setDeletionStatus] = useState(""); // State to track deletion status
   const user = useAuthUser();
   const isAdmin = user?.role === "admin"; // Boolean flag
+
+  const handleDelete = async (productId) => {
+    try {
+      await axios.delete(`http://localhost:8000/laptops/${productId}`);
+      message.success("Product deleted successfully");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      message.error("Failed to delete product");
+    }
+  };
 
   const showModal = () => {
     setModalVisible(true); // Show the modal
   };
 
-  const handleOk = async () => {
-    setLoading(true); // Set loading state to true before starting deletion
-    setDeletionStatus("Deleting product..."); // Update modal content to show "Deleting product"
-
-    try {
-      await handleDelete(productId); // Call the delete function
-      setDeletionStatus("The product has been deleted."); // Update modal content after successful deletion
-      message.success("Product deleted successfully");
-
-      setTimeout(() => {
-        setLoading(false);
-        window.location.reload();
-      }, 10000);
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      setDeletionStatus("Failed to delete the product."); // Update modal content if deletion fails
-      message.error("Failed to delete the product");
-      setLoading(false); // Set loading to false after completion
-    }
+  const handleOk = () => {
+    handleDelete(productId); // Proceed with deleting the product
+    setModalVisible(false); // Close the modal after deletion
   };
 
   const handleCancel = () => {
@@ -106,14 +98,6 @@ const ProductCard = ({
         });
       });
   }, [productId]);
-
-  const handleDelete = async (productId) => {
-    try {
-      await axios.delete(`http://localhost:8000/laptops/${productId}`);
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
 
   if (!productData) return null;
 
@@ -145,9 +129,8 @@ const ProductCard = ({
         okText="Yes, delete it"
         cancelText="Cancel"
         okType="danger"
-        loading={loading}
       >
-        <p>{deletionStatus || "Are you sure you want to delete this product? This action cannot be undone."}</p>
+        <p>{"Are you sure you want to delete this product? This action cannot be undone."}</p>
       </Modal>
 
       <Link
