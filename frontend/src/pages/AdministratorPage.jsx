@@ -550,7 +550,7 @@ const transformStockData = (data) => {
     name: item.name.toUpperCase(),
     quantity: item.quantity,
   }));
-}
+};
 
 const StockAlert = () => {
   const [stockData, setStockData] = useState([]);
@@ -569,10 +569,12 @@ const StockAlert = () => {
     try {
       // Update URL and scroll to top
       navigate(`?page=${page}&limit=${pageSize}`, { replace: false });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       const result = await axios
-        .get(`http://localhost:8000/laptops/low-stock?page=${page}&limit=${pageSize}`)
+        .get(
+          `http://localhost:8000/laptops/low-stock?page=${page}&limit=${pageSize}`,
+        )
         .then((res) => res.data);
 
       const transformedData = transformStockData(result.results);
@@ -593,8 +595,8 @@ const StockAlert = () => {
   // Load initial data from URL
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const page = parseInt(queryParams.get('page')) || 1;
-    const limit = parseInt(queryParams.get('limit')) || 20;
+    const page = parseInt(queryParams.get("page")) || 1;
+    const limit = parseInt(queryParams.get("limit")) || 20;
 
     fetchStockData(page, limit);
   }, [location.search]);
@@ -610,7 +612,6 @@ const StockAlert = () => {
     </div>
   );
 };
-
 
 const AdminTabs = () => {
   const navigate = useNavigate();

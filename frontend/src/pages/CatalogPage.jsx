@@ -1,10 +1,4 @@
-import {
-  Layout,
-  Breadcrumb,
-  Typography,
-  Select,
-  Pagination,
-} from "antd";
+import { Layout, Breadcrumb, Typography, Select, Pagination } from "antd";
 import { useEffect, useState, useMemo } from "react";
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";

@@ -90,9 +90,7 @@ const RefundTable = () => {
           <div>Image</div>
           <div>Product Name</div>
           <div>Refund Qty</div>
-          <div style={{ paddingLeft: "20px" }}> 
-            Purchase Date
-          </div>
+          <div style={{ paddingLeft: "20px" }}>Purchase Date</div>
           <div>Refund Date</div>
           <div />
         </div>
@@ -119,7 +117,15 @@ const RefundTable = () => {
                 preview={false}
               />
             </div>
-            <Text style={{ fontSize: "14px", textAlign: "left", paddingLeft: "40px" }}>{item.name}</Text>
+            <Text
+              style={{
+                fontSize: "14px",
+                textAlign: "left",
+                paddingLeft: "40px",
+              }}
+            >
+              {item.name}
+            </Text>
             <Text>{item.refundQuantity}</Text>
             <div style={{ paddingLeft: "20px", textAlign: "center" }}>
               <Text>{item.purchaseDate}</Text>

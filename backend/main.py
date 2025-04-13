@@ -6,7 +6,6 @@ from fastapi import FastAPI, Depends, HTTPException, Query, Body, status
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 from firebase_admin import auth
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -282,11 +281,14 @@ def filter_laptops(
         "results": [hit["_source"] for hit in results["hits"]["hits"]],
     }
 
+
 @app.get("/laptops/low-stock")
 def get_low_stock_laptops(
-    threshold: int = Query(50, description="Maximum quantity to be considered low stock"),
+    threshold: int = Query(
+        50, description="Maximum quantity to be considered low stock"
+    ),
     limit: int = Query(30, description="Number of results to return"),
-    page: int = Query(1, description="Page number for pagination")
+    page: int = Query(1, description="Page number for pagination"),
 ):
     """
     Returns laptops with quantity less than or equal to the threshold (default 50).
@@ -294,16 +296,10 @@ def get_low_stock_laptops(
     """
 
     query_body = {
-        "query": {
-            "range": {
-                "quantity": {
-                    "lte": threshold
-                }
-            }
-        },
+        "query": {"range": {"quantity": {"lte": threshold}}},
         "sort": [{"quantity": {"order": "asc"}}],
         "size": limit,
-        "from": (page - 1) * limit
+        "from": (page - 1) * limit,
     }
 
     results = es.search(index="laptops", body=query_body, track_total_hits=True)

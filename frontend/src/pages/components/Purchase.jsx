@@ -24,14 +24,14 @@ const Purchase = ({ price, laptopId }) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
-  
+
       if (!user) {
         throw new Error("User not authenticated");
       }
-  
+
       const token = await user.getIdToken();
       console.log("Token:", token);
-  
+
       const response = await axios.post(
         "http://localhost:8000/cart/add",
         {
@@ -43,14 +43,14 @@ const Purchase = ({ price, laptopId }) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-  
+
       console.log("Added to cart:", response.data);
     } catch (err) {
       console.error("Error adding to cart:", err);
     }
-  };  
+  };
 
   const formattedPrice = formatPrice(price, quantity);
 
