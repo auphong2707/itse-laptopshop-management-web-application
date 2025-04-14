@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from services.redis_config import redis_client
-from typing import Dict
-from services.firebase_auth import verify_firebase_token
 from firebase_admin.auth import InvalidIdTokenError
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from firebase_admin import auth

@@ -19,7 +19,6 @@ import styled from "styled-components";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
-
 const PaypalButton = styled(Button)`
   background-color: #ffcc00;
   color: #000;
@@ -60,39 +59,41 @@ const ShoppingCartPage = () => {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
-  
+
         if (!user) {
           console.error("User not signed in.");
           return;
         }
-  
+
         const token = await user.getIdToken();
-  
+
         const response = await axios.get("http://localhost:8000/cart/view", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         const cartData = response.data; // e.g., { "1": 2, "5": 1 }
-  
+
         // You probably need to fetch product details for these IDs
         const productDetails = await Promise.all(
           Object.entries(cartData).map(async ([id, quantity]) => {
-            const res = await axios.get(`http://localhost:8000/laptops/id/${id}`);
+            const res = await axios.get(
+              `http://localhost:8000/laptops/id/${id}`,
+            );
             return {
               ...res.data, // Product info
               quantity,
             };
-          })
+          }),
         );
-  
+
         setCartItems(productDetails);
       } catch (err) {
         console.error("Error fetching cart:", err);
       }
     };
-  
+
     fetchCart();
   }, []);
 
@@ -133,7 +134,10 @@ const ShoppingCartPage = () => {
             style={{ paddingLeft: "23px", paddingRight: "4px" }}
           >
             <div style={{ padding: "0px 0" }}>
-              <ShoppingItemsTable setTotalPrice={setTotalPrice} cartItems={cartItems}/>
+              <ShoppingItemsTable
+                setTotalPrice={setTotalPrice}
+                cartItems={cartItems}
+              />
             </div>
           </Col>
           {/* Right Box */}

@@ -6,7 +6,6 @@ from fastapi import FastAPI, Depends, HTTPException, Query, Body, status
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
 from sqlalchemy.exc import IntegrityError
 from firebase_admin import auth
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -88,19 +87,13 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
 
-    # Log the deletion in the delete_log table
-    db.execute(
-        text(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'laptops', NOW())"
-        ),
-        {"id": laptop_id},
-    )
-
-    # Delete the laptop
+    # Delete the laptop in postgresql database
     db.delete(laptop)
-
-    # Commit both operations together
     db.commit()
+
+    # Delete the laptop in Elasticsearch
+    es.delete(index="laptops", id=laptop_id)
+
     return {"message": "Laptop deleted successfully"}
 
 
@@ -284,6 +277,37 @@ def filter_laptops(
     return {
         "sort": sort,
         "page": page if limit is not None else None,
+        "limit": limit,
+        "total_count": total_count,
+        "results": [hit["_source"] for hit in results["hits"]["hits"]],
+    }
+
+
+@app.get("/laptops/low-stock")
+def get_low_stock_laptops(
+    threshold: int = Query(
+        50, description="Maximum quantity to be considered low stock"
+    ),
+    limit: int = Query(30, description="Number of results to return"),
+    page: int = Query(1, description="Page number for pagination"),
+):
+    """
+    Returns laptops with quantity less than or equal to the threshold (default 50).
+    Supports pagination.
+    """
+
+    query_body = {
+        "query": {"range": {"quantity": {"lte": threshold}}},
+        "sort": [{"quantity": {"order": "asc"}}],
+        "size": limit,
+        "from": (page - 1) * limit,
+    }
+
+    results = es.search(index="laptops", body=query_body, track_total_hits=True)
+    total_count = results["hits"]["total"]["value"]
+
+    return {
+        "page": page,
         "limit": limit,
         "total_count": total_count,
         "results": [hit["_source"] for hit in results["hits"]["hits"]],
@@ -673,19 +697,13 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    # Log the deletion in the delete_log table
-    db.execute(
-        text(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'orders', NOW())"
-        ),
-        {"id": order_id},
-    )
-
     # Delete the order
     db.delete(order)
-
-    # Commit both operations together
     db.commit()
+
+    # Delete the order in Elasticsearch
+    es.delete(index="orders", id=order_id)
+
     return {"message": "Order deleted successfully"}
 
 

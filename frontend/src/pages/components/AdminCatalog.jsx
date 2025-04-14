@@ -1,24 +1,15 @@
-import { Layout, Breadcrumb, Typography, Select, Pagination } from "antd";
+import { Typography, Select, Pagination } from "antd";
 import { useEffect, useState, useMemo } from "react";
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import BrandsSection from "./components/BrandsSection";
-import FilterSection from "./components/FilterSection";
+import BrandsSection from "./BrandsSection";
+import FilterSection from "./FilterSection";
 import styled from "styled-components";
-import ProductCard from "./components/ProductCard";
+import ProductCard from "./ProductCard";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { transformLaptopData } from "../utils/transformData";
+import { transformLaptopData } from "../../utils/transformData";
 import axios from "axios";
 
-const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
-
-const contentStyle = {
-  color: "#fff",
-  backgroundColor: "white",
-  height: "100%",
-};
 
 const CustomSelect = styled(Select)`
   .ant-select-selector {
@@ -28,16 +19,28 @@ const CustomSelect = styled(Select)`
 `;
 
 const brands = [
-  { name: "asus", logo: "/brand-logo/asus-logo.png", link: "/laptops/asus" },
+  {
+    name: "asus",
+    logo: "/brand-logo/asus-logo.png",
+    link: "/admin/catalog/asus",
+  },
   {
     name: "lenovo",
     logo: "/brand-logo/lenovo-logo.png",
-    link: "/laptops/lenovo",
+    link: "/admin/catalog/lenovo",
   },
-  { name: "acer", logo: "/brand-logo/acer-logo.png", link: "/laptops/acer" },
-  { name: "dell", logo: "/brand-logo/dell-logo.png", link: "/laptops/dell" },
-  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/laptops/hp" },
-  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/laptops/msi" },
+  {
+    name: "acer",
+    logo: "/brand-logo/acer-logo.png",
+    link: "/admin/catalog/acer",
+  },
+  {
+    name: "dell",
+    logo: "/brand-logo/dell-logo.png",
+    link: "/admin/catalog/dell",
+  },
+  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/admin/catalog/hp" },
+  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/admin/catalog/msi" },
 ];
 
 const subBrands = {
@@ -183,8 +186,7 @@ const convertToQueryString = (
   return query ? `${query}` : "";
 };
 
-const CatalogPage = () => {
-  console.log("Rendering CatalogPage");
+const AdminCatalog = () => {
   const { brand } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -331,135 +333,107 @@ const CatalogPage = () => {
   let to = Math.min(page * quantityPerPage, totalProducts);
 
   return (
-    <Layout>
-      <WebsiteHeader />
-      <Content className="responsive-padding" style={contentStyle}>
-        <img
-          src="/catalog_page_advertisement_1.png"
-          style={{ width: "100%", height: "auto", display: "block" }}
+    <div style={{ display: "flex", flexDirection: "row", gap: 10 }}>
+      <div style={{ width: 260, backgroundColor: "white" }}>
+        <BrandsSection brands={brands} />
+        <br></br>
+        <FilterSection
+          brand={brand}
+          subBrands={subBrands}
+          pendingFilters={pendingFilters}
+          updatePendingFilters={updatePendingFilters}
+          clearFilters={clearFilters}
+          applyFilters={applyFilters}
+          collapseState={collapseState}
+          updateCollapseState={updateCollapseState}
         />
+      </div>
 
-        <br></br>
+      <div style={{ width: "100%", backgroundColor: "white" }}>
+        <div
+          style={{
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text type="secondary">
+            Items {from}-{to} of {totalProducts}
+          </Text>
 
-        <Breadcrumb separator=">" style={{ marginBottom: "1rem" }}>
-          <Breadcrumb.Item>
-            <Link to="/">Home</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>
-            <Link to="/laptops/all">Laptops</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>{formatedBrand}</Breadcrumb.Item>
-        </Breadcrumb>
+          <div style={{ display: "flex", gap: 10 }}>
+            <CustomSelect
+              value={sortBy}
+              onChange={(value) => {
+                updateImmediateParams({ sortBy: value, page: 1 });
+              }}
+              style={{ width: 250, height: 50 }}
+            >
+              <Option value="latest">
+                <Text type="secondary" strong>
+                  Sort by:{" "}
+                </Text>
+                <Text strong> Latest</Text>
+              </Option>
+              <Option value="price-low">
+                <Text type="secondary" strong>
+                  Sort by:{" "}
+                </Text>
+                <Text strong> Price (Low to High)</Text>
+              </Option>
+              <Option value="price-high">
+                <Text type="secondary" strong>
+                  Sort by:{" "}
+                </Text>
+                <Text strong> Price (High to Low)</Text>
+              </Option>
+            </CustomSelect>
 
-        <Title level={1}>{formatedBrand} Laptop</Title>
-
-        <br></br>
-
-        <div style={{ display: "flex", flexDirection: "row", gap: 10 }}>
-          <div style={{ width: 260, backgroundColor: "white" }}>
-            <BrandsSection brands={brands} />
-            <br></br>
-            <FilterSection
-              brand={brand}
-              subBrands={subBrands}
-              pendingFilters={pendingFilters}
-              updatePendingFilters={updatePendingFilters}
-              clearFilters={clearFilters}
-              applyFilters={applyFilters}
-              collapseState={collapseState}
-              updateCollapseState={updateCollapseState}
-            />
-          </div>
-
-          <div style={{ width: "100%", backgroundColor: "white" }}>
-            <div
-              style={{
-                marginBottom: "20px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+            <CustomSelect
+              defaultValue={{ value: quantityPerPage }}
+              style={{ width: 180, height: 50 }}
+              onChange={(value) => {
+                updateImmediateParams({ quantityPerPage: value, page: 1 });
               }}
             >
-              <Text type="secondary">
-                Items {from}-{to} of {totalProducts}
-              </Text>
-
-              <div style={{ display: "flex", gap: 10 }}>
-                <CustomSelect
-                  value={sortBy}
-                  onChange={(value) => {
-                    updateImmediateParams({ sortBy: value, page: 1 });
-                  }}
-                  style={{ width: 250, height: 50 }}
-                >
-                  <Option value="latest">
-                    <Text type="secondary" strong>
-                      Sort by:{" "}
-                    </Text>
-                    <Text strong> Latest</Text>
-                  </Option>
-                  <Option value="price-low">
-                    <Text type="secondary" strong>
-                      Sort by:{" "}
-                    </Text>
-                    <Text strong> Price (Low to High)</Text>
-                  </Option>
-                  <Option value="price-high">
-                    <Text type="secondary" strong>
-                      Sort by:{" "}
-                    </Text>
-                    <Text strong> Price (High to Low)</Text>
-                  </Option>
-                </CustomSelect>
-
-                <CustomSelect
-                  defaultValue={{ value: quantityPerPage }}
-                  style={{ width: 180, height: 50 }}
-                  onChange={(value) => {
-                    updateImmediateParams({ quantityPerPage: value, page: 1 });
-                  }}
-                >
-                  <Option value={15}>
-                    <Text type="secondary" strong>
-                      Show:{" "}
-                    </Text>
-                    <Text strong>15 per page</Text>
-                  </Option>
-                  <Option value={35}>
-                    <Text type="secondary" strong>
-                      Show:{" "}
-                    </Text>
-                    <Text strong>35 per page</Text>
-                  </Option>
-                </CustomSelect>
-              </div>
-            </div>
-
-            <div className="grid-division">
-              {products.map((product, index) => (
-                <ProductCard {...product} />
-              ))}
-            </div>
-
-            <br></br>
-
-            <Pagination
-              align="center"
-              current={page}
-              onChange={(page) => {
-                updateImmediateParams("page", page);
-              }}
-              total={totalProducts}
-              pageSize={quantityPerPage}
-              showSizeChanger={false}
-            />
+              <Option value={15}>
+                <Text type="secondary" strong>
+                  Show:{" "}
+                </Text>
+                <Text strong>15 per page</Text>
+              </Option>
+              <Option value={35}>
+                <Text type="secondary" strong>
+                  Show:{" "}
+                </Text>
+                <Text strong>35 per page</Text>
+              </Option>
+            </CustomSelect>
           </div>
         </div>
-      </Content>
 
-      <WebsiteFooter />
-    </Layout>
+        <div className="grid-division">
+          {products.map((product, index) => (
+            <ProductCard {...product} />
+          ))}
+        </div>
+
+        <br></br>
+
+        <Pagination
+          align="center"
+          current={page}
+          onChange={(page) => {
+            updateImmediateParams("page", page);
+          }}
+          total={totalProducts}
+          pageSize={quantityPerPage}
+          showSizeChanger={false}
+        />
+      </div>
+    </div>
   );
 };
 
-export default CatalogPage;
+export default AdminCatalog;
