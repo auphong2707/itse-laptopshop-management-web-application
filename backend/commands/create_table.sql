@@ -129,21 +129,26 @@ CREATE TABLE delete_log (
 
 
 -- ORDERS
-DROP TABLE IF EXISTS orders CASCADE; -- Add CASCADE if needed during development to drop dependent tables easily
+DROP TABLE IF EXISTS orders CASCADE; 
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL, -- Firebase UID
 
     -- User details snapshot at time of order
-    user_name TEXT,
-    user_email TEXT,
-    shipping_address TEXT,
-    phone_number TEXT,
+    first_name TEXT,                 
+    last_name TEXT,                 
+    user_name TEXT,                  
+    user_email TEXT,                 
+    shipping_address TEXT,           
+    phone_number TEXT,               
+    company TEXT,                    
+    country VARCHAR(10),             
+    zip_code VARCHAR(20),            
 
-    total_price DECIMAL(10, 2) NOT NULL, -- Ensure precision matches calculations
-    status VARCHAR(50) NOT NULL DEFAULT 'pending', -- e.g., pending, processing, shipped, delivered, cancelled
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Use WITH TIME ZONE
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- Use WITH TIME ZONE
+    total_price DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS order_items;

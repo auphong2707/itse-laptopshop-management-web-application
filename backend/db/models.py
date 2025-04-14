@@ -116,16 +116,18 @@ class Order(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String(255), nullable=False)  # Firebase UID length
 
+    first_name = Column(Text, nullable=True)
+    last_name = Column(Text, nullable=True)
     user_name = Column(Text, nullable=True)
     user_email = Column(Text, nullable=True)
-    shipping_address = Column(
-        Text, nullable=True
-    )  # Store as structured JSON or simple Text
+    shipping_address = Column(Text, nullable=True)
     phone_number = Column(Text, nullable=True)
+    company = Column(Text, nullable=True)
+    country = Column(String(10), nullable=True)
+    zip_code = Column(String(20), nullable=True)
 
-    total_price = Column(DECIMAL(10, 2), nullable=False)  # Match precision
+    total_price = Column(DECIMAL(10, 2), nullable=False)
     status = Column(String(50), nullable=False, default="pending")
-    # Use TIMESTAMP(timezone=True) for timezone awareness
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(
         TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
