@@ -8,7 +8,7 @@ from firebase_admin.exceptions import FirebaseError
 try:
     cred = credentials.Certificate("secret/firebase-service-key.json")
     initialize_app(cred)
-    db = firestore.client()
+    db_firestore = firestore.client()
 except FileNotFoundError:
     print("File not found. Therefore, firebase service is unavailable.")
 
