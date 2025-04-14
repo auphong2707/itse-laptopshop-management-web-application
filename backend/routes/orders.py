@@ -36,6 +36,16 @@ except Exception as e:
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
+async def require_admin_role(user_id: str = Depends(get_current_user_id)):
+
+    user = auth.get_user(user_id)
+    if not user.custom_claims or user.custom_claims.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required"
+        )
+    return user_id
+
+
 @router.post("")
 def create_order_from_cart(
     db: Session = Depends(get_db),
