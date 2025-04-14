@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from firebase_admin import auth, firestore
 from firebase_admin.auth import InvalidIdTokenError
 from decimal import Decimal, InvalidOperation
-from typing import List, Dict  #
+from typing import List, Dict
+from pydantic import BaseModel
 
 from db.models import Laptop, Order, OrderItem
 from db.session import get_db
@@ -220,8 +221,51 @@ def create_order_from_cart(
         )
 
 
+class PaginatedOrdersResponse(BaseModel):
+    total_count: int
+    page: int
+    limit: int
+    orders: List[OrderResponse]
+
+
+@router.get("", response_model=PaginatedOrdersResponse)
+def get_my_orders(
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(10, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """
+    Retrieves a paginated list of orders for the currently authenticated user
+    from the PostgreSQL database.
+    """
+    offset = (page - 1) * limit
+
+    try:
+        # Query for the orders with pagination and eager loading of items
+        base_query = db.query(Order).filter(Order.user_id == user_id)
+
+        # Get total count for pagination
+        total_count = base_query.count()  # More efficient count
+
+        orders = (
+            base_query.order_by(Order.created_at.desc())
+            .options(joinedload(Order.items))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+
+        return PaginatedOrdersResponse(
+            total_count=total_count, page=page, limit=limit, orders=orders
+        )
+    except SQLAlchemyError as e:
+        print(f"Database error fetching user orders: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve orders.")
+
+
 @router.get("/{order_id}", response_model=OrderResponse)
-def get_single_order(
+def get_my_single_order(
     order_id: int,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
