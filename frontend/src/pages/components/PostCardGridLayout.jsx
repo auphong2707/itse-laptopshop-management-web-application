@@ -1,4 +1,5 @@
 import { Row, Col } from "antd";
+
 import PostCard from "./PostCard";
 
 const PostCardGridLayout = ({ postData }) => {

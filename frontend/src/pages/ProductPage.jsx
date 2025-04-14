@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { data, Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
 import PropTypes from "prop-types";
+
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
 import ProductImage from "./components/ProductImage";
 import ProductTabs from "./components/ProductTabs";
 import Purchase from "./components/Purchase";
 import SupportSection from "./components/SupportSection";
-import ImageGallery from "./components/ImageGallery";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -205,7 +205,7 @@ const ProductPage = () => {
       review_text: reviewText,
       laptop_id: parseInt(id),
     };
-  
+
     try {
       const res = await fetch("http://localhost:8000/reviews/", {
         method: "POST",
@@ -214,7 +214,7 @@ const ProductPage = () => {
         },
         body: JSON.stringify(review),
       });
-  
+
       if (res.ok) {
         alert("Review submitted successfully!");
         // Reset form
@@ -224,21 +224,20 @@ const ProductPage = () => {
         setReviewEmail("");
       } else {
         const errorData = await res.json();
-        alert("Failed to submit review: " + (errorData.detail || JSON.stringify(errorData)));
+        alert(
+          "Failed to submit review: " +
+            (errorData.detail || JSON.stringify(errorData)),
+        );
       }
     } catch (err) {
       console.error("Error submitting review:", err);
       alert("Something went wrong!");
     }
   };
-  
-  const imageUrl =
-  JSON.parse(productData.product_image_mini || "[]")[0]
-    ? `http://localhost:8000${
-        JSON.parse(productData.product_image_mini)[0]
-      }`
-    : "/placeholder.png"; // fallback ảnh nếu không có
 
+  const imageUrl = JSON.parse(productData.product_image_mini || "[]")[0]
+    ? `http://localhost:8000${JSON.parse(productData.product_image_mini)[0]}`
+    : "/placeholder.png"; // fallback ảnh nếu không có
 
   return (
     <Layout>
@@ -283,18 +282,30 @@ const ProductPage = () => {
         style={{
           padding: "2rem",
           width: "60%",
-          alignSelf: "center"
+          alignSelf: "center",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center"}}>
-          <Title level={4} style={{ fontWeight: "bold",  margin: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Title level={4} style={{ fontWeight: "bold", margin: 0 }}>
             SUBMIT REVIEWS AND RATINGS
           </Title>
         </div>
-        <hr style={{ marginTop:"25px" ,marginBottom: "1.5rem" }} />
+        <hr style={{ marginTop: "25px", marginBottom: "1.5rem" }} />
 
-
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "24px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+            marginBottom: "24px",
+          }}
+        >
           <Image
             src={imageUrl}
             alt="Product"
@@ -303,13 +314,23 @@ const ProductPage = () => {
             style={{ borderRadius: "4px" }}
             preview={false}
           />
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Text style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "0.25rem", lineHeight: "1.4" }}>
-            {productData.name || "PRODUCT’S NAME"}
-          </Text>
-          <Rate value={rating} onChange={setRating} style={{ fontSize: "24px" }} />
-        </div>
-
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text
+              style={{
+                fontSize: "18px",
+                fontWeight: "bold",
+                marginBottom: "0.25rem",
+                lineHeight: "1.4",
+              }}
+            >
+              {productData.name || "PRODUCT’S NAME"}
+            </Text>
+            <Rate
+              value={rating}
+              onChange={setRating}
+              style={{ fontSize: "24px" }}
+            />
+          </div>
         </div>
 
         <textarea
@@ -328,36 +349,34 @@ const ProductPage = () => {
           }}
         />
 
-
         <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={reviewName}
-          onChange={(e) => setReviewName(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "0.75rem",
-            border: "1px solid #000",
-            borderRadius: "4px",
-            fontSize: "16px",
-          }}
-        />
+          <input
+            type="text"
+            placeholder="Name"
+            value={reviewName}
+            onChange={(e) => setReviewName(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              border: "1px solid #000",
+              borderRadius: "4px",
+              fontSize: "16px",
+            }}
+          />
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={reviewEmail}
-          onChange={(e) => setReviewEmail(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "0.75rem",
-            border: "1px solid #000",
-            borderRadius: "4px",
-            fontSize: "16px",
-          }}
-        />
-
+          <input
+            type="email"
+            placeholder="Email"
+            value={reviewEmail}
+            onChange={(e) => setReviewEmail(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              border: "1px solid #000",
+              borderRadius: "4px",
+              fontSize: "16px",
+            }}
+          />
         </div>
 
         <button
@@ -377,7 +396,6 @@ const ProductPage = () => {
           SUBMIT
         </button>
       </div>
-
 
       <SupportSection />
 

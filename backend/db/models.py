@@ -88,7 +88,7 @@ class Review(Base):
         Integer, ForeignKey("laptops.id", ondelete="CASCADE"), nullable=False
     )
     user_name = Column(String, nullable=True)
-    email = Column(String, nullable=True)  
+    email = Column(String, nullable=True)
     rating = Column(Integer, nullable=False)
     review_text = Column(String, nullable=True)
     created_at = Column(String, nullable=False)

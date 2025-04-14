@@ -4,20 +4,19 @@ import {
   Col,
   Form,
   Typography,
-  Input,
   Button,
   Layout,
-  Space,
   Breadcrumb,
   Divider,
 } from "antd";
 import { Link } from "react-router-dom";
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import ShoppingItemsTable from "./components/ShoppingItemsTable";
 import styled from "styled-components";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
+
+import WebsiteHeader from "./components/WebsiteHeader";
+import WebsiteFooter from "./components/WebsiteFooter";
+import ShoppingItemsTable from "./components/ShoppingItemsTable";
 
 const PaypalButton = styled(Button)`
   background-color: #ffcc00;

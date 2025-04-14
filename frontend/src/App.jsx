@@ -3,6 +3,7 @@ import {
   RouterProvider,
   ScrollRestoration,
 } from "react-router-dom";
+
 import AdministratorPage, {
   AdminCatalog,
   Detail,

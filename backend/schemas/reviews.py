@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class ReviewCreate(BaseModel):
     laptop_id: int
     user_name: Optional[str] = None
@@ -10,6 +11,7 @@ class ReviewCreate(BaseModel):
 
     class Config:
         orm_mode = True  # Tells Pydantic to treat the model as a dict for the ORM
+
 
 class ReviewResponse(ReviewCreate):
     id: int

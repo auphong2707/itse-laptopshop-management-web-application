@@ -373,7 +373,7 @@ async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
         email=review.email,
         rating=review.rating,
         review_text=review.review_text,
-        created_at=datetime.utcnow().isoformat()
+        created_at=datetime.utcnow().isoformat(),
     )
 
     db.add(new_review)
@@ -381,6 +381,7 @@ async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
     db.refresh(new_review)  # Refresh the object to get the updated state from the DB
 
     return new_review  # Return the review that was created
+
 
 @app.get("/reviews")
 def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5)):
