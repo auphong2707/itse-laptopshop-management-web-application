@@ -26,10 +26,11 @@ from PIL import Image, ImageDraw, ImageFont
 import shutil
 
 from routes.cart import router as cart_router
-
+from routes.orders import router as orders_router
 
 app = FastAPI()
 app.include_router(cart_router, tags=["cart"])
+app.include_router(orders_router, tags=["orders"])
 security = HTTPBearer()
 
 
@@ -538,130 +539,130 @@ def subscribe_to_newsletter(data: NewsletterCreate, db: Session = Depends(get_db
     return {"message": "Subscribed successfully", "email": subscription.email}
 
 
-@app.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
-def place_order(
-    order_data: OrderCreate,
-    db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user),
-):
-    # Create the order
-    new_order = Order(
-        user_id=user_id,
-        total_price=order_data.total_price,
-    )
-    db.add(new_order)
-    db.flush()  # Ensures new_order.id is available before committing
+# @app.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
+# def place_order(
+#     order_data: OrderCreate,
+#     db: Session = Depends(get_db),
+#     user_id: str = Depends(get_current_user),
+# ):
+#     # Create the order
+#     new_order = Order(
+#         user_id=user_id,
+#         total_price=order_data.total_price,
+#     )
+#     db.add(new_order)
+#     db.flush()  # Ensures new_order.id is available before committing
 
-    # Create and link order items
-    for item in order_data.items:
-        order_item = OrderItem(
-            order_id=new_order.id, laptop_id=item.product_id, quantity=item.quantity
-        )
-        db.add(order_item)
+#     # Create and link order items
+#     for item in order_data.items:
+#         order_item = OrderItem(
+#             order_id=new_order.id, laptop_id=item.product_id, quantity=item.quantity
+#         )
+#         db.add(order_item)
 
-    db.commit()
-    db.refresh(new_order)
+#     db.commit()
+#     db.refresh(new_order)
 
-    # Prepare response
-    return OrderResponse(
-        order_id=new_order.id,
-        user_id=new_order.user_id,
-        items=order_data.items,
-        total_price=new_order.total_price,
-        status=new_order.status,
-        created_at=new_order.created_at,
-        updated_at=new_order.updated_at,
-    )
-
-
-@app.get("/orders")
-def get_orders(limit: int = Query(10), page: int = Query(1)):
-    """
-    Get all orders for the current user using Elasticsearch.
-    """
-    query_body = {
-        "sort": [{"created_at": {"order": "desc"}}],
-        "size": limit,
-        "from": (page - 1) * limit,
-    }
-
-    results = es.search(index="orders", body=query_body, track_total_hits=True)
-    total_count = results["hits"]["total"]["value"]
-    orders = results["hits"]["hits"]
-
-    for key, value in enumerate(orders):
-        orders[key]["_source"]["items"] = json.loads(value["_source"]["items"])
-
-    return {"total_count": total_count, "page": page, "limit": limit, "orders": orders}
+#     # Prepare response
+#     return OrderResponse(
+#         order_id=new_order.id,
+#         user_id=new_order.user_id,
+#         items=order_data.items,
+#         total_price=new_order.total_price,
+#         status=new_order.status,
+#         created_at=new_order.created_at,
+#         updated_at=new_order.updated_at,
+#     )
 
 
-@app.get("/orders/{order_id}")
-def get_order(order_id: int):
-    """
-    Get a specific order by ID for the current user using Elasticsearch.
-    """
-    query_body = {"query": {"bool": {"must": [{"term": {"id": order_id}}]}}}
+# @app.get("/orders")
+# def get_orders(limit: int = Query(10), page: int = Query(1)):
+#     """
+#     Get all orders for the current user using Elasticsearch.
+#     """
+#     query_body = {
+#         "sort": [{"created_at": {"order": "desc"}}],
+#         "size": limit,
+#         "from": (page - 1) * limit,
+#     }
 
-    results = es.search(index="orders", body=query_body)
-    if not results["hits"]["hits"]:
-        raise HTTPException(status_code=404, detail="Order not found")
+#     results = es.search(index="orders", body=query_body, track_total_hits=True)
+#     total_count = results["hits"]["total"]["value"]
+#     orders = results["hits"]["hits"]
 
-    order = results["hits"]["hits"][0]["_source"]
-    order["items"] = json.loads(order["items"])
+#     for key, value in enumerate(orders):
+#         orders[key]["_source"]["items"] = json.loads(value["_source"]["items"])
 
-    return order
-
-
-@app.patch("/orders/{order_id}/status", response_model=OrderResponse)
-def update_order_status(
-    order_id: int, status_data: UpdateStatus, db: Session = Depends(get_db)
-):
-    order = db.query(Order).filter(Order.id == order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-
-    order.status = status_data.status
-    db.commit()
-    db.refresh(order)
-
-    print(order)
-
-    return OrderResponse(
-        order_id=order.id,
-        items=[
-            OrderItemBase(product_id=item.id, quantity=item.quantity)
-            for item in order.items
-        ],
-        total_price=order.total_price,
-        status=order.status,
-        created_at=order.created_at,
-        updated_at=order.updated_at,
-    )
+#     return {"total_count": total_count, "page": page, "limit": limit, "orders": orders}
 
 
-@app.delete("/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_order(order_id: int, db: Session = Depends(get_db)):
-    """
-    Delete an order from the database and log the deletion.
-    """
-    order = db.query(Order).filter(Order.id == order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+# @app.get("/orders/{order_id}")
+# def get_order(order_id: int):
+#     """
+#     Get a specific order by ID for the current user using Elasticsearch.
+#     """
+#     query_body = {"query": {"bool": {"must": [{"term": {"id": order_id}}]}}}
 
-    # Log the deletion in the delete_log table
-    db.execute(
-        text(
-            "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'orders', NOW())"
-        ),
-        {"id": order_id},
-    )
+#     results = es.search(index="orders", body=query_body)
+#     if not results["hits"]["hits"]:
+#         raise HTTPException(status_code=404, detail="Order not found")
 
-    # Delete the order
-    db.delete(order)
+#     order = results["hits"]["hits"][0]["_source"]
+#     order["items"] = json.loads(order["items"])
 
-    # Commit both operations together
-    db.commit()
-    return {"message": "Order deleted successfully"}
+#     return order
+
+
+# @app.patch("/orders/{order_id}/status", response_model=OrderResponse)
+# def update_order_status(
+#     order_id: int, status_data: UpdateStatus, db: Session = Depends(get_db)
+# ):
+#     order = db.query(Order).filter(Order.id == order_id).first()
+#     if not order:
+#         raise HTTPException(status_code=404, detail="Order not found")
+
+#     order.status = status_data.status
+#     db.commit()
+#     db.refresh(order)
+
+#     print(order)
+
+#     return OrderResponse(
+#         order_id=order.id,
+#         items=[
+#             OrderItemBase(product_id=item.id, quantity=item.quantity)
+#             for item in order.items
+#         ],
+#         total_price=order.total_price,
+#         status=order.status,
+#         created_at=order.created_at,
+#         updated_at=order.updated_at,
+#     )
+
+
+# @app.delete("/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+# def delete_order(order_id: int, db: Session = Depends(get_db)):
+#     """
+#     Delete an order from the database and log the deletion.
+#     """
+#     order = db.query(Order).filter(Order.id == order_id).first()
+#     if not order:
+#         raise HTTPException(status_code=404, detail="Order not found")
+
+#     # Log the deletion in the delete_log table
+#     db.execute(
+#         text(
+#             "INSERT INTO delete_log (id, table_name, deleted_at) VALUES (:id, 'orders', NOW())"
+#         ),
+#         {"id": order_id},
+#     )
+
+#     # Delete the order
+#     db.delete(order)
+
+#     # Commit both operations together
+#     db.commit()
+#     return {"message": "Order deleted successfully"}
 
 
 # Create a refund ticket

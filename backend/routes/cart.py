@@ -15,10 +15,6 @@ router = APIRouter(prefix="/cart", tags=["cart"])
 def get_current_user_id(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> str:
-    """
-    Verifies the Firebase token from the Authorization header and returns the user ID (UID).
-    Raises HTTPException 401 if verification fails.
-    """
     token = credentials.credentials
     if not token:
         raise HTTPException(
