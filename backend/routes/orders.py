@@ -246,3 +246,77 @@ def get_single_order(
             detail="Order not found or access denied.",
         )
     return order
+
+
+@router.patch("/{order_id}/cancel", response_model=OrderResponse)
+def cancel_my_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """
+    Allows the currently authenticated user to cancel their own order,
+    if it is in a cancellable state (e.g., 'pending').
+    """
+    try:
+        order = (
+            db.query(Order)
+            .filter(Order.id == order_id, Order.user_id == user_id)
+            .first()
+        )
+
+        if not order:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Order not found or access denied.",
+            )
+
+        cancellable_statuses = ["pending", "processing"]
+
+        if order.status not in cancellable_statuses:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Order cannot be cancelled. Current status: {order.status}",
+            )
+
+        # --- estore Stock ---
+        order_items_to_restore = (
+            db.query(OrderItem).filter(OrderItem.order_id == order_id).all()
+        )
+        for item in order_items_to_restore:
+            laptop = (
+                db.query(Laptop)
+                .filter(Laptop.id == item.product_id)
+                .with_for_update()
+                .first()
+            )
+            if laptop:
+                laptop.quantity += item.quantity
+            else:
+                # Log warning: Product might have been deleted?
+                print(
+                    f"Warning: Product ID {item.product_id} not found while restoring stock for cancelled order {order_id}"
+                )
+
+        order.status = "cancelled"
+        db.commit()
+        db.refresh(order)
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error cancelling order: {e}")
+        raise HTTPException(
+            status_code=500, detail="Could not cancel order due to a database error."
+        )
+    except HTTPException as e:
+        db.rollback()
+        raise e
+    except Exception as e:
+        db.rollback()
+        print(f"Unexpected error cancelling order: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while cancelling the order.",
+        )
+
+    return order
