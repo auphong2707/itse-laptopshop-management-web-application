@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from firebase_admin import auth, firestore
@@ -218,3 +218,31 @@ def create_order_from_cart(
         raise HTTPException(
             status_code=500, detail=f"An unexpected error occurred: {e}"
         )
+
+
+@router.get("/{order_id}", response_model=OrderResponse)
+def get_single_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """
+    Fetches a single order by authenticated user ID.
+    """
+    try:
+        order = (
+            db.query(Order)
+            .options(joinedload(Order.items))
+            .filter(Order.id == order_id, Order.user_id == user_id)
+            .first()
+        )
+    except SQLAlchemyError as e:
+        print(f"Database error fetching single order: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve order details.")
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found or access denied.",
+        )
+    return order
