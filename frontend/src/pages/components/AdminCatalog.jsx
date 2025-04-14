@@ -1,12 +1,14 @@
 import { Typography, Select, Pagination } from "antd";
 import { useEffect, useState, useMemo } from "react";
+import styled from "styled-components";
+import { useParams, useSearchParams } from "react-router-dom";
+import axios from "axios";
+
 import BrandsSection from "./BrandsSection";
 import FilterSection from "./FilterSection";
-import styled from "styled-components";
 import ProductCard from "./ProductCard";
-import { Link, useParams, useSearchParams } from "react-router-dom";
 import { transformLaptopData } from "../../utils/transformData";
-import axios from "axios";
+
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -329,8 +331,8 @@ const AdminCatalog = () => {
       .catch((error) => console.log(error));
   }, [brand, page, quantityPerPage, sortBy, appliedFilters]);
 
-  let from = (page - 1) * quantityPerPage + 1;
-  let to = Math.min(page * quantityPerPage, totalProducts);
+  const from = (page - 1) * quantityPerPage + 1;
+  const to = Math.min(page * quantityPerPage, totalProducts);
 
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 10 }}>

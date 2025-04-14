@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Tabs } from "antd";
 
 const ProductTabs = ({ tabLabels, tabContents }) => {
@@ -12,7 +12,6 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
         justifyContent: "start",
         alignItems: "center",
         padding: "1rem 8.5%",
-        borderBottom: "2px solid #ddd",
       }}
     >
       {/* Tabs Section */}
