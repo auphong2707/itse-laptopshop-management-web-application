@@ -12,7 +12,6 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
         justifyContent: "start",
         alignItems: "center",
         padding: "1rem 8.5%",
-        borderBottom: "2px solid #ddd",
       }}
     >
       {/* Tabs Section */}

@@ -281,11 +281,9 @@ const ProductPage = () => {
 
       <div
         style={{
-          backgroundColor: "#d3d3d3",
           padding: "2rem",
-          margin: "2rem auto",
-          maxWidth: "80%",
-          borderRadius: "8px",
+          width: "60%",
+          alignSelf: "center"
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center"}}>
