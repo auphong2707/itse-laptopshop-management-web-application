@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from firebase_admin import auth, firestore
-from firebase_admin.auth import InvalidIdTokenError
+from firebase_admin import auth
 from decimal import Decimal, InvalidOperation
-from typing import List, Dict, Optional
+from typing import List, Optional
 from pydantic import BaseModel
 
 from db.models import Laptop, Order, OrderItem
 from db.session import get_db
 from schemas.orders import (
     OrderResponse,
-    OrderItemBase,
     UpdateStatus,
 )
 from datetime import datetime
