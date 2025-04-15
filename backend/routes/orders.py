@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from firebase_admin import auth, firestore
 from firebase_admin.auth import InvalidIdTokenError
 from decimal import Decimal, InvalidOperation
-from typing import List, Dict
+from typing import List, Dict, Optional
 from pydantic import BaseModel
 
 from db.models import Laptop, Order, OrderItem
@@ -15,6 +15,7 @@ from schemas.orders import (
     OrderItemBase,
     UpdateStatus,
 )
+from datetime import datetime
 
 from routes.cart import get_current_user_id
 
@@ -374,3 +375,58 @@ def cancel_my_order(
         )
 
     return order
+
+
+# == Admin operation == #
+
+
+@router.get(
+    "/admin/list",
+    response_model=PaginatedOrdersResponse,
+    dependencies=[Depends(require_admin_role)],
+)
+def admin_get_all_orders(
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    status: Optional[str] = Query(None, description="Filter by order status"),
+    user_id_filter: Optional[str] = Query(
+        None, alias="userId", description="Filter by User ID (Firebase UID)"
+    ),
+    start_date: Optional[datetime] = Query(
+        None, description="Filter orders created on or after this date (ISO Format)"
+    ),
+    end_date: Optional[datetime] = Query(
+        None, description="Filter orders created on or before this date (ISO Format)"
+    ),
+    db: Session = Depends(get_db),
+    admin_user_id: str = Depends(require_admin_role),  #
+):
+    """
+    [Admin] Retrieves a paginated list of all orders, with optional filters.
+    Requires admin privileges.
+    """
+    offset = (page - 1) * limit
+    try:
+        query = db.query(Order).options(joinedload(Order.items))
+
+        if status:
+            query = query.filter(Order.status == status)
+        if user_id_filter:
+            query = query.filter(Order.user_id == user_id_filter)
+        if start_date:
+            query = query.filter(Order.created_at >= start_date)
+        if end_date:
+            query = query.filter(Order.created_at <= end_date)
+
+        total_count = query.count()
+
+        orders = (
+            query.order_by(Order.created_at.desc()).offset(offset).limit(limit).all()
+        )
+
+        return PaginatedOrdersResponse(
+            total_count=total_count, page=page, limit=limit, orders=orders
+        )
+    except SQLAlchemyError as e:
+        print(f"Database error fetching all orders for admin: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve orders.")
