@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -9,6 +9,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+
 import logo from "/vite.svg";
 
 const { Text } = Typography;

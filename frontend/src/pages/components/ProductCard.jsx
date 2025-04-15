@@ -1,13 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { Card, Typography, Rate, Tooltip, Image } from "antd";
-import { CheckCircleFilled, InfoCircleFilled } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Typography,
+  Rate,
+  Tooltip,
+  Image,
+  Button,
+  Modal,
+  message,
+} from "antd";
+import {
+  CheckCircleFilled,
+  InfoCircleFilled,
+  CloseOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import axios from "axios";
 
 const { Title, Text, Paragraph } = Typography;
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const useAuthUser = () => {
+  const [user, setUser] = useState(null);
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const tokenResult = await currentUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+        setUser({ ...currentUser, role });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
+  return user;
 };
 
 const ProductCard = ({
@@ -21,6 +57,34 @@ const ProductCard = ({
   productId,
 }) => {
   const [productData, setProductData] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const user = useAuthUser();
+  const isAdmin = user?.role === "admin"; // Boolean flag
+
+  const handleDelete = async (productId) => {
+    try {
+      await axios.delete(`http://localhost:8000/laptops/${productId}`);
+      message.success("Product deleted successfully");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      message.error("Failed to delete product");
+    }
+  };
+
+  const showModal = () => {
+    setModalVisible(true); // Show the modal
+  };
+
+  const handleOk = () => {
+    handleDelete(productId); // Proceed with deleting the product
+    setModalVisible(false); // Close the modal after deletion
+    window.location.reload(); // Refresh the page
+  };
+
+  const handleCancel = () => {
+    setModalVisible(false); // Just close the modal without deleting
+    message.error("Product deletion cancelled");
+  };
 
   useEffect(() => {
     fetch(`http://localhost:8000/laptops/id/${productId}`)
@@ -31,17 +95,51 @@ const ProductCard = ({
         );
         setProductData({
           ...data,
-          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg", // Use the first image
+          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
         });
       });
   }, [productId]);
 
-  if (!productData) return null; // Wait until data is loaded
+  if (!productData) return null;
 
   return (
-    <div style={{ padding: 3 }}>
+    <div style={{ padding: 3, position: "relative" }}>
+      {isAdmin && (
+        <Button
+          size="small"
+          shape="circle"
+          icon={<CloseOutlined />}
+          style={{
+            position: "absolute",
+            top: 5,
+            right: -20,
+            zIndex: 1,
+            backgroundColor: "#fff",
+            borderColor: "#ccc",
+          }}
+          onClick={showModal}
+        />
+      )}
+
+      {/* Modal to confirm deletion */}
+      <Modal
+        title="Confirm Deletion"
+        visible={modalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Yes, delete it"
+        cancelText="Cancel"
+        okType="danger"
+      >
+        <p>
+          {
+            "Are you sure you want to delete this product? This action cannot be undone."
+          }
+        </p>
+      </Modal>
+
       <Link
-        to={`/product/${productId}`}
+        to={isAdmin ? `/admin/detail/${productId}` : `/product/${productId}`}
         style={{ textDecoration: "none", color: "inherit" }}
       >
         <Card
@@ -56,9 +154,7 @@ const ProductCard = ({
         >
           {/* Availability Check */}
           {inStock ? (
-            <div
-              style={{ align: "center", marginBottom: 10, color: "#78A962" }}
-            >
+            <div style={{ marginBottom: 10, color: "#78A962" }}>
               <CheckCircleFilled style={{ fontSize: 12 }} />
               <Text
                 strong
@@ -68,9 +164,7 @@ const ProductCard = ({
               </Text>
             </div>
           ) : (
-            <div
-              style={{ alignC: "center", marginBottom: 10, color: "#C94D3F" }}
-            >
+            <div style={{ marginBottom: 10, color: "#C94D3F" }}>
               <InfoCircleFilled style={{ fontSize: 12 }} />
               <Text
                 strong
@@ -136,6 +230,10 @@ ProductCard.propTypes = {
   productName: PropTypes.string,
   originalPrice: PropTypes.number,
   salePrice: PropTypes.number,
+  productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  user: PropTypes.shape({
+    role: PropTypes.string,
+  }),
 };
 
 const getRandomProductCardData = () => {
@@ -158,5 +256,4 @@ const getRandomProductCardData = () => {
 };
 
 export default ProductCard;
-
 export { getRandomProductCardData };

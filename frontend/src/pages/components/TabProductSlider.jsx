@@ -1,6 +1,6 @@
-import React from "react";
 import { Tabs, Image, ConfigProvider } from "antd";
 import { Link } from "react-router-dom";
+
 import ProductSlider from "./ProductSlider";
 
 const { TabPane } = Tabs;

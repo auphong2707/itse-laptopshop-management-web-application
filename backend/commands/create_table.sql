@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
     laptop_id INTEGER NOT NULL,
     user_name TEXT,
+    email TEXT,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -119,14 +120,6 @@ CREATE TRIGGER set_posts_updated_at
 BEFORE UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
-
-CREATE TABLE delete_log (
-    id INTEGER,
-    table_name TEXT,
-    deleted_at TIMESTAMP DEFAULT NOW(),
-    PRIMARY KEY (id, table_name)
-);
-
 
 -- ORDERS
 DROP TABLE IF EXISTS orders CASCADE; 

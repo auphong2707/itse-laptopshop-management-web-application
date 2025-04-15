@@ -1,11 +1,15 @@
-import React from "react";
 import {
   createBrowserRouter,
   RouterProvider,
   ScrollRestoration,
 } from "react-router-dom";
-import AdministratorPage from "./pages/AdministratorPage";
-import { DeletingProducts, Detail } from "./pages/AdministratorPage";
+
+import AdministratorPage, {
+  AdminCatalog,
+  Detail,
+  RefundRequest,
+  StockAlert,
+} from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import HomePage from "./pages/HomePage";
@@ -62,6 +66,10 @@ const router = createBrowserRouter([
     ),
     children: [
       {
+        path: "catalog/:brand",
+        element: <AdminCatalog />,
+      },
+      {
         path: "detail",
         element: <Detail />,
       },
@@ -70,8 +78,12 @@ const router = createBrowserRouter([
         element: <Detail />,
       },
       {
-        path: "delete",
-        element: <DeletingProducts />,
+        path: "refund",
+        element: <RefundRequest />,
+      },
+      {
+        path: "stock-alerts",
+        element: <StockAlert />,
       },
     ],
   },

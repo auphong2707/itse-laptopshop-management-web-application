@@ -1,4 +1,3 @@
-import React from "react";
 import { Image } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";

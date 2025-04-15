@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -15,9 +15,13 @@ import {
   Tabs,
 } from "antd";
 import { Divider } from "antd";
-import { CloseOutlined, EditOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
+
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
+import AdminCatalog from "./components/AdminCatalog.jsx";
+import RefundTable from "./components/RefundTable.jsx";
+import StockAlertTable from "./components/StockAlertTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -539,171 +543,73 @@ const Detail = () => {
   );
 };
 
-const DeletingProducts = () => {
-  const [query, setQuery] = useState("");
-  const [products, setProducts] = useState([]);
+const transformStockData = (data) => {
+  return data.map((item) => ({
+    id: item.id,
+    brand: item.brand.toUpperCase(),
+    image: "http://localhost:8000" + JSON.parse(item.product_image_mini)[0],
+    name: item.name.toUpperCase(),
+    quantity: item.quantity,
+  }));
+};
+
+const StockAlert = () => {
+  const [stockData, setStockData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+    total: 0,
+  });
+
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSearch = async (e) => {
-    const searchQuery = e.target.value;
-    setQuery(searchQuery);
-
-    if (searchQuery.trim() === "") {
-      setProducts([]); // Clear results if input is empty
-      return;
-    }
-
+  const fetchStockData = async (page = 1, pageSize = 20) => {
+    setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:8000/laptops/search/`,
-        {
-          params: { query: searchQuery, limit: 10 },
-        },
-      );
-      setProducts(response.data.results);
-    } catch (error) {
-      console.error("Error searching for products:", error);
-      setProducts([]); // Clear results on error
+      // Update URL and scroll to top
+      navigate(`?page=${page}&limit=${pageSize}`, { replace: false });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      const result = await axios
+        .get(
+          `http://localhost:8000/laptops/low-stock?page=${page}&limit=${pageSize}`,
+        )
+        .then((res) => res.data);
+
+      const transformedData = transformStockData(result.results);
+
+      setStockData(transformedData);
+      setPagination({
+        current: page,
+        pageSize: pageSize,
+        total: result.total_count,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (productId) => {
-    try {
-      await axios.delete(`http://localhost:8000/laptops/${productId}`);
-      setProducts(products.filter((product) => product.id !== productId)); // Remove from state
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
+  // Load initial data from URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const page = parseInt(queryParams.get("page")) || 1;
+    const limit = parseInt(queryParams.get("limit")) || 20;
 
-  const handleEdit = (productId) => {
-    navigate(`/admin/detail/${productId}`);
-  };
+    fetchStockData(page, limit);
+  }, [location.search]);
 
   return (
-    <div style={{ padding: "2rem 0" }}>
-      <input
-        type="text"
-        value={query}
-        onChange={handleSearch}
-        placeholder="Search for item"
-        style={{
-          width: "50%",
-          padding: "0.5rem",
-          marginBottom: "1rem",
-          border: "1px solid #ddd",
-          borderRadius: "12px",
-        }}
+    <div>
+      <StockAlertTable
+        data={stockData}
+        loading={loading}
+        pagination={pagination}
+        onPageChange={fetchStockData}
       />
-      {products.map((product) => {
-        // Parse and extract the first image
-        let imageUrl = "";
-        try {
-          const images = JSON.parse(product.product_image_mini || "[]");
-          if (images.length > 0) {
-            imageUrl = `http://localhost:8000${images[0]}`;
-          }
-        } catch (error) {
-          console.error("Error parsing product images:", error);
-        }
-
-        return (
-          <div
-            key={product.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "1rem",
-              borderBottom: "1px solid #ddd",
-              width: "50%",
-            }}
-          >
-            <img
-              src={imageUrl}
-              alt={product.name}
-              style={{
-                width: "80px",
-                height: "80px",
-                objectFit: "cover",
-                marginRight: "1rem",
-              }}
-            />
-            <span
-              style={{
-                flexGrow: 1,
-                fontWeight: "bold",
-                marginRight: "0.5rem",
-              }}
-            >
-              {product.name}
-            </span>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-              }}
-            >
-              <button
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  border: "none",
-                  background: "#f5f5f5",
-                  cursor: "pointer",
-                  color: "#a6a6a6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "background-color 0.3s, transform 0.3s",
-                }}
-                onClick={() => handleDelete(product.id)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#ddd";
-                  e.currentTarget.style.transform = "scale(1.1)";
-                  e.currentTarget.style.color = "#595959";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f5f5f5";
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.color = "#a6a6a6";
-                }}
-              >
-                <CloseOutlined />
-              </button>
-              <button
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  border: "none",
-                  background: "#f5f5f5",
-                  cursor: "pointer",
-                  color: "#a6a6a6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "background-color 0.3s, transform 0.3s",
-                }}
-                onClick={() => handleEdit(product.id)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#ddd";
-                  e.currentTarget.style.transform = "scale(1.1)";
-                  e.currentTarget.style.color = "#595959";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f5f5f5";
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.color = "#a6a6a6";
-                }}
-              >
-                <EditOutlined />
-              </button>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 };
@@ -713,14 +619,18 @@ const AdminTabs = () => {
   const location = useLocation();
 
   const getActiveKey = () => {
-    if (location.pathname.includes("/admin/detail")) return "0";
-    if (location.pathname.includes("/admin/delete")) return "1";
-    return "0"; // Default to "Detail"
+    if (location.pathname.includes("/admin/catalog")) return "0";
+    if (location.pathname.includes("/admin/detail")) return "1";
+    if (location.pathname.includes("/admin/refund")) return "2";
+    if (location.pathname.includes("/admin/stock-alerts")) return "3";
+    return "0";
   };
 
   const handleTabChange = (key) => {
-    if (key === "0") navigate("/admin/detail");
-    if (key === "1") navigate("/admin/delete");
+    if (key === "0") navigate("/admin/catalog/all");
+    if (key === "1") navigate("/admin/detail");
+    if (key === "2") navigate("/admin/refund");
+    if (key === "3") navigate("/admin/stock-alerts");
   };
 
   return (
@@ -732,9 +642,19 @@ const AdminTabs = () => {
         tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
         style={{ width: "100%" }}
       >
-        <Tabs.TabPane key="0" tab="Detail" />
-        <Tabs.TabPane key="1" tab="Deleting Products" />
+        <Tabs.TabPane key="0" tab="All Products" />
+        <Tabs.TabPane key="1" tab="Detail" />
+        <Tabs.TabPane key="2" tab="Refund Request" />
+        <Tabs.TabPane key="3" tab="Stock Alerts" />
       </Tabs>
+    </div>
+  );
+};
+
+const RefundRequest = () => {
+  return (
+    <div style={{ paddingTop: "2rem" }}>
+      <RefundTable />
     </div>
   );
 };
@@ -770,4 +690,4 @@ const AdministratorPage = () => {
 };
 
 export default AdministratorPage;
-export { Detail, DeletingProducts };
+export { Detail, AdminCatalog, RefundRequest, StockAlert };

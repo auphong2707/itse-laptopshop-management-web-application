@@ -1,4 +1,4 @@
-import { Row, Col, Typography, Layout, Input, Button, message } from "antd";
+import { Row, Col, Typography, Layout, Input, Button } from "antd";
 import {
   CustomerServiceOutlined,
   UserOutlined,
@@ -6,7 +6,7 @@ import {
   FacebookOutlined,
   InstagramOutlined,
 } from "@ant-design/icons";
-import { useState, useRef } from "react";
+import { useState } from "react";
 const { Title, Text, Paragraph, Link } = Typography;
 const { Footer } = Layout;
 

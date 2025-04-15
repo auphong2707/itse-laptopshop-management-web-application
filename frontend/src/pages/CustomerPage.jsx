@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Layout, Typography, Breadcrumb, Tabs, Row, Col } from "antd";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
+
 import WebsiteHeader from "./components/WebsiteHeader";
 import WebsiteFooter from "./components/WebsiteFooter";
-import styled from "styled-components";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
