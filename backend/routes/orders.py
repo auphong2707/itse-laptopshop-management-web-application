@@ -474,3 +474,33 @@ def admin_update_order_status(
         raise HTTPException(status_code=500, detail="Could not update order status.")
 
     return order
+
+
+@router.delete(
+    "/admin/{order_id}",
+    dependencies=[Depends(require_admin_role)],
+)
+def admin_delete_order(order_id: int, db: Session = Depends(get_db)):
+    """
+    [Admin] Permanently deletes a specific order.
+    Requires admin privileges.
+    """
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Order not found"
+            )
+
+        db.delete(order)
+        db.commit()
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error deleting order (Admin): {e}")
+        raise HTTPException(status_code=500, detail="Could not delete order.")
+
+    return {
+        "message": "Order removed successfully",
+        "laptop_id": order_id,
+    }
