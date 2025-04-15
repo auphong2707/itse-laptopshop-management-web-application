@@ -399,7 +399,6 @@ def admin_get_all_orders(
         None, description="Filter orders created on or before this date (ISO Format)"
     ),
     db: Session = Depends(get_db),
-    admin_user_id: str = Depends(require_admin_role),  #
 ):
     """
     [Admin] Retrieves a paginated list of all orders, with optional filters.
@@ -430,3 +429,48 @@ def admin_get_all_orders(
     except SQLAlchemyError as e:
         print(f"Database error fetching all orders for admin: {e}")
         raise HTTPException(status_code=500, detail="Could not retrieve orders.")
+
+
+@router.patch(
+    "/admin/{order_id}/status",
+    response_model=OrderResponse,
+    dependencies=[Depends(require_admin_role)],
+)
+def admin_update_order_status(
+    order_id: int, status_data: UpdateStatus, db: Session = Depends(get_db)
+):
+    """
+    [Admin] Updates the status of any specific order.
+    Requires admin privileges.
+    """
+
+    allowed_statuses = [
+        "pending",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+    ]
+    if status_data.status not in allowed_statuses:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid status value: {status_data.status}"
+        )
+
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Order not found"
+            )
+
+        order.status = status_data.status
+        db.commit()
+        db.refresh(order)
+
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error updating order status (Admin): {e}")
+        raise HTTPException(status_code=500, detail="Could not update order status.")
+
+    return order
