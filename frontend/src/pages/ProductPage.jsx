@@ -13,11 +13,6 @@ import SupportSection from "../components/product_page/SupportSection";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
-const imageSources = [
-  "/product_page_banner_1.png",
-  "/product_page_banner_1.png",
-  "/product_page_banner_1.png",
-];
 
 const ProductHeader = ({ title, series }) => (
   <>
@@ -67,6 +62,10 @@ const ExtraInfo = ({ productId }) => (
   </div>
 );
 
+ExtraInfo.propTypes = {
+  productId: PropTypes.number.isRequired,
+};
+
 const AboutProduct = ({ title, series, description, id }) => (
   <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
     <ProductHeader title={title} series={series} />
@@ -76,6 +75,13 @@ const AboutProduct = ({ title, series, description, id }) => (
     <ExtraInfo productId={id} />
   </div>
 );
+
+AboutProduct.propTypes = {
+  title: PropTypes.string.isRequired,
+  series: PropTypes.string,
+  description: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
+};
 
 const Specs = ({ data, id }) => (
   <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
@@ -157,6 +163,11 @@ const Specs = ({ data, id }) => (
     <ExtraInfo productId={id} />
   </div>
 );
+
+Specs.propTypes = {
+  data: PropTypes.object.isRequired,
+  id: PropTypes.number.isRequired,
+};
 
 const transformData = (data) => {
   return {
