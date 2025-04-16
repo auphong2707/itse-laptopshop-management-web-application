@@ -6,8 +6,8 @@ import axios from "axios";
 
 import WebsiteHeader from "../components/general/WebsiteHeader";
 import WebsiteFooter from "../components/general/WebsiteFooter";
-import BrandsSection from "../components/BrandsSection";
-import FilterSection from "../components/FilterSection";
+import BrandsSection from "../components/catalog_page/BrandsSection";
+import FilterSection from "../components/catalog_page/FilterSection";
 import ProductCard from "../components/ProductCard";
 import { transformLaptopData } from "../utils/transformData";
 

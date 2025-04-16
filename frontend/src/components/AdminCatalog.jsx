@@ -4,8 +4,8 @@ import styled from "styled-components";
 import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-import BrandsSection from "./BrandsSection";
-import FilterSection from "./FilterSection";
+import BrandsSection from "./catalog_page/BrandsSection";
+import FilterSection from "./catalog_page/FilterSection";
 import ProductCard from "./ProductCard";
 import { transformLaptopData } from "../utils/transformData";
 
