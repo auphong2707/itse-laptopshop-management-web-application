@@ -11,7 +11,6 @@ import FilterSection from "../components/catalog_page/FilterSection";
 import ProductCard from "../components/ProductCard";
 import { transformLaptopData } from "../utils/transformData";
 
-
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -186,7 +185,6 @@ const convertToQueryString = (
 };
 
 const CatalogPage = () => {
-  console.log("Rendering CatalogPage");
   const { brand } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -294,10 +292,6 @@ const CatalogPage = () => {
     sortBy,
   );
 
-  if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
-    return <div>Not Found</div>;
-  }
-
   const formatedBrand = formatBrand(brand);
 
   // Additional state
@@ -327,7 +321,11 @@ const CatalogPage = () => {
       .then((data) => transformLaptopData(data))
       .then((data) => setProducts(data))
       .catch((error) => console.log(error));
-  }, [brand, page, quantityPerPage, sortBy, appliedFilters]);
+  }, [query]);
+
+  if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
+    return <div>Not Found</div>;
+  }
 
   const from = (page - 1) * quantityPerPage + 1;
   const to = Math.min(page * quantityPerPage, totalProducts);
@@ -448,8 +446,9 @@ const CatalogPage = () => {
             <Pagination
               align="center"
               current={page}
-              onChange={(page) => {
-                updateImmediateParams("page", page);
+              onChange={(value) => {
+                console.log(value);
+                updateImmediateParams({ page: value });
               }}
               total={totalProducts}
               pageSize={quantityPerPage}

@@ -9,7 +9,6 @@ import FilterSection from "../catalog_page/FilterSection";
 import ProductCard from "../ProductCard";
 import { transformLaptopData } from "../../utils/transformData";
 
-
 const { Text } = Typography;
 const { Option } = Select;
 
@@ -426,8 +425,8 @@ const AdminCatalog = () => {
         <Pagination
           align="center"
           current={page}
-          onChange={(page) => {
-            updateImmediateParams("page", page);
+          onChange={(value) => {
+            updateImmediateParams({ page: value });
           }}
           total={totalProducts}
           pageSize={quantityPerPage}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import PropTypes from "prop-types";
 import "swiper/css";
 import axios from "axios";
 import {
@@ -51,6 +52,8 @@ const RequiredLabel = ({ label }) => (
 const OptionalLabel = ({ label }) => (
   <span style={{ fontWeight: "bold" }}>{label}</span>
 );
+
+
 
 const transformFormData = (values) => {
   return {
@@ -687,6 +690,16 @@ const AdministratorPage = () => {
       <WebsiteFooter />
     </Layout>
   );
+};
+
+CustomDivider.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+RequiredLabel.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+OptionalLabel.propTypes = {
+  label: PropTypes.string.isRequired,
 };
 
 export default AdministratorPage;
