@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, Body, HTTPException, Depends
 from firebase_admin import auth, firestore
-from db.models import ExtendedUserCreate  # make sure your model is defined properly
+from services.firebase_auth import ExtendedUserCreate
 from services.firebase_auth import verify_firebase_token  # if you use Depends for auth
 
 accounts_router = APIRouter(prefix="/accounts", tags=["accounts"])
