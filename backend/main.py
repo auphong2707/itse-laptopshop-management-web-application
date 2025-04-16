@@ -28,9 +28,11 @@ import shutil
 from routes.laptops import laptops_router
 from routes.cart import cart_router
 from routes.orders import orders_router
+from routes.reviews import reviews_router
 
 app = FastAPI()
 app.include_router(laptops_router, tags=["laptops"])
+app.include_router(reviews_router, tags=["reviews"])
 app.include_router(cart_router, tags=["cart"])
 app.include_router(orders_router, tags=["orders"])
 security = HTTPBearer()
@@ -66,42 +68,6 @@ es = Elasticsearch("http://elasticsearch:9200")
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Laptop Management API!"}
-
-
-@app.post("/reviews/", response_model=ReviewCreate)
-async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
-    # Check if the laptop with the provided laptop_id exists
-    laptop = db.query(Laptop).filter(Laptop.id == review.laptop_id).first()
-
-    if not laptop:
-        raise HTTPException(status_code=404, detail="Laptop not found")
-
-    # Create the review entry
-    new_review = Review(
-        laptop_id=review.laptop_id,
-        user_name=review.user_name,
-        email=review.email,
-        rating=review.rating,
-        review_text=review.review_text,
-        created_at=datetime.utcnow().isoformat(),
-    )
-
-    db.add(new_review)
-    db.commit()  # Commit the transaction
-    db.refresh(new_review)  # Refresh the object to get the updated state from the DB
-
-    return new_review  # Return the review that was created
-
-
-@app.get("/reviews")
-def get_reviews(rating: list = Query([1, 2, 3, 4, 5]), limit: int = Query(5)):
-    """
-    Get reviews
-    """
-    filter_query = {"bool": {"filter": [{"terms": {"rating": rating}}]}}
-
-    results = es.search(index="reviews", body={"query": filter_query, "size": limit})
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
 
 @app.get("/posts")
