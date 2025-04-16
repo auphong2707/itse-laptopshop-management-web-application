@@ -19,9 +19,9 @@ import { CloseOutlined } from "@ant-design/icons";
 
 import WebsiteHeader from "../components/general/WebsiteHeader";
 import WebsiteFooter from "../components/general/WebsiteFooter";
-import AdminCatalog from "../components/AdminCatalog.jsx";
-import RefundTable from "../components/RefundTable.jsx";
-import StockAlertTable from "../components/StockAlertTable.jsx";
+import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
+import RefundTable from "../components/administrator_page/RefundTable.jsx";
+import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
