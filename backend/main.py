@@ -24,13 +24,15 @@ from fastapi.staticfiles import StaticFiles
 import shutil
 
 from routes.laptops import laptops_router
+from routes.reviews import reviews_router
+from routes.posts import posts_router
 from routes.cart import cart_router
 from routes.orders import orders_router
-from routes.reviews import reviews_router
 
 app = FastAPI()
 app.include_router(laptops_router, tags=["laptops"])
 app.include_router(reviews_router, tags=["reviews"])
+app.include_router(posts_router, tags=["posts"])
 app.include_router(cart_router, tags=["cart"])
 app.include_router(orders_router, tags=["orders"])
 security = HTTPBearer()
@@ -66,15 +68,6 @@ es = Elasticsearch("http://elasticsearch:9200")
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Laptop Management API!"}
-
-
-@app.get("/posts")
-def get_posts(limit: int = Query(12)):
-    """
-    Get posts
-    """
-    results = es.search(index="posts", body={"query": {"match_all": {}}, "size": limit})
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
 
 @app.post("/accounts/check")
