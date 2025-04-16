@@ -1,11 +1,17 @@
 # routes/laptops.py
 
+import json
+import os
+import shutil
 from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy.orm import Session
 from elasticsearch import Elasticsearch
 from db.models import Laptop
 from schemas.laptops import LaptopCreate, LaptopUpdate
 from db.session import get_db
+from fastapi import UploadFile, File
+from PIL import Image, ImageDraw, ImageFont
+
 
 laptops_router = APIRouter(prefix="/laptops", tags=["laptops"])
 es = Elasticsearch("http://elasticsearch:9200")
@@ -197,3 +203,65 @@ def get_laptop(laptop_id: int):
     if not results["hits"]["hits"]:
         raise HTTPException(status_code=404, detail="Laptop not found")
     return results["hits"]["hits"][0]["_source"]
+
+@laptops_router.post("/{laptop_id}/upload_images")
+def upload_images_to_laptop(
+    laptop_id: int, files: list[UploadFile] = File(...), db: Session = Depends(get_db)
+):
+    """
+    Upload new images for a laptop. If the laptop already has images,
+    the new images are appended. For example, if there are already 3 images,
+    the next file will be saved as id_img4.jpg and added to the URL list.
+    """
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if not laptop:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+
+    existing_urls = []
+    if laptop.product_image_mini:
+        try:
+            existing_urls = json.loads(laptop.product_image_mini)
+            if not isinstance(existing_urls, list):
+                existing_urls = []
+        except json.JSONDecodeError:
+            existing_urls = []
+
+    os.makedirs("static/laptop_images", exist_ok=True)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 150)
+    except Exception:
+        font = ImageFont.load_default()
+
+    new_urls = []
+    starting_index = len(existing_urls)
+    for i, file in enumerate(files):
+        new_index = starting_index + i + 1
+        filename = f"{laptop_id}_img{new_index}.jpg"
+        filepath = os.path.join("static/laptop_images", filename)
+
+        # Save the uploaded file
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Reopen image to draw watermark
+        with Image.open(filepath) as img:
+            draw = ImageDraw.Draw(img)
+            draw.text(
+                (30, 30),
+                f"ID: {laptop_id}",
+                fill="black",
+                stroke_fill="white",
+                stroke_width=3,
+                font=font,
+            )
+            img.save(filepath)
+
+        new_urls.append(f"/static/laptop_images/{filename}")
+
+    # Append new URLs to the existing list and update DB
+    all_urls = existing_urls + new_urls
+    laptop.product_image_mini = json.dumps(all_urls)
+    db.commit()
+
+    return {"message": "Images uploaded successfully", "image_urls": all_urls}
