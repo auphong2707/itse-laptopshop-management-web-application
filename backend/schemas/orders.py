@@ -1,25 +1,42 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 from datetime import datetime
+from decimal import Decimal
 
 
 class OrderItemBase(BaseModel):
     product_id: int
     quantity: int
+    price_at_purchase: Decimal = Field(..., decimal_places=2)
+
+    class Config:
+        from_attributes = True
 
 
-class OrderCreate(BaseModel):
-    items: List[OrderItemBase]
-    total_price: float
-
-
-class OrderResponse(BaseModel):
-    order_id: int
-    items: List[OrderItemBase]
-    total_price: float
+class OrderBase(BaseModel):
+    user_id: str
+    total_price: Decimal = Field(..., decimal_places=2)
     status: str
     created_at: datetime
     updated_at: datetime
+
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    user_name: Optional[str] = None
+    user_email: Optional[str] = None
+    shipping_address: Optional[str] = None
+    phone_number: Optional[str] = None
+    company: Optional[str] = None
+    country: Optional[str] = None
+    zip_code: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class OrderResponse(OrderBase):
+    id: int
+    items: List[OrderItemBase]
 
     class Config:
         from_attributes = True

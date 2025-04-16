@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Select, Typography, Flex } from "antd";
+import { Button, InputNumber, Typography, Flex } from "antd";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -77,17 +77,13 @@ const Purchase = ({ price, laptopId }) => {
           On Sale from <strong>{formattedPrice}₫</strong>
         </Text>
 
-        <Select
-          defaultValue={1}
+        <InputNumber
+          min={1}
+          max={100}
+          value={quantity}
           onChange={handleQuantityChange}
-          style={{ width: 60 }}
-        >
-          {[...Array(10).keys()].map((i) => (
-            <Select.Option key={i + 1} value={i + 1}>
-              {i + 1}
-            </Select.Option>
-          ))}
-        </Select>
+          style={{ width: 60, textAlign: "center" }}
+        />
 
         <Button
           type="primary"

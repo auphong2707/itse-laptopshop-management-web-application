@@ -377,76 +377,6 @@ def generate_post_images(
     print(f"Generated {num_posts} post images in '{output_dir}'")
 
 
-def generate_orders(
-    sql_output_path="./backend/commands/insert_sample_data.sql", num_orders=100
-):
-    global NUM_LAPTOPS
-    if NUM_LAPTOPS == 0:
-        print("No laptops available to generate orders.")
-        return
-
-    user_ids = [
-        "user_001",
-        "user_002",
-        "user_003",
-        "user_004",
-        "user_005",
-        "user_006",
-        "user_007",
-        "user_008",
-    ]
-    order_statuses = ["pending", "processing", "shipped", "delivered", "cancelled"]
-
-    order_values = []
-    order_item_values = []
-
-    current_order_id = 1
-    current_order_item_id = 1
-
-    for _ in range(num_orders):
-        user_id = random.choice(user_ids)
-        num_items = random.randint(1, 4)
-        item_ids = random.sample(range(1, NUM_LAPTOPS + 1), num_items)
-
-        order_items = []
-        total_price = 0.0
-        for product_id in item_ids:
-            quantity = random.randint(1, 3)
-            price = random.uniform(300, 2000)
-            total_price += price * quantity
-
-            order_items.append((current_order_id, product_id, quantity))
-            current_order_item_id += 1
-
-        status = random.choice(order_statuses)
-        order_values.append(
-            f"({current_order_id}, '{user_id}', {round(total_price, 2)}, '{status}')"
-        )
-
-        for order_id, product_id, quantity in order_items:
-            order_item_values.append(f"({order_id}, {product_id}, {quantity})")
-
-        current_order_id += 1
-
-    # Write orders (without created_at and updated_at)
-    order_insert = "INSERT INTO orders (id, user_id, total_price, status) VALUES "
-    order_insert += ",\n".join(order_values) + ";"
-
-    # Write order items
-    order_item_insert = (
-        "INSERT INTO order_items (order_id, product_id, quantity) VALUES "
-    )
-    order_item_insert += ",\n".join(order_item_values) + ";"
-
-    with open(sql_output_path, "a") as sql_file:
-        sql_file.write(order_insert + "\n")
-        sql_file.write(order_item_insert + "\n")
-
-    print(
-        f"INSERT order and order_item queries successfully written to {sql_output_path}"
-    )
-
-
 if __name__ == "__main__":
     clear_old_commands()
     generate_laptop_insert_queries()
@@ -454,5 +384,5 @@ if __name__ == "__main__":
     generate_reviews()
     generate_subscriptions()
     generate_posts()
-    generate_orders()
+    # generate_orders()
     generate_post_images(num_posts=NUM_POSTS)

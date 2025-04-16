@@ -122,26 +122,49 @@ FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- ORDERS
+DROP TABLE IF EXISTS orders CASCADE; 
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL, -- Firebase UID
+
+    -- User details snapshot at time of order
+    first_name TEXT,                 
+    last_name TEXT,                 
+    user_name TEXT,                  
+    user_email TEXT,                 
+    shipping_address TEXT,           
+    phone_number TEXT,               
+    company TEXT,                    
+    country VARCHAR(10),             
+    zip_code VARCHAR(20),            
+
     total_price DECIMAL(10, 2) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS order_items;
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL, -- Should reference laptops.id
     quantity INTEGER NOT NULL,
+    price_at_purchase DECIMAL(10, 2) NOT NULL, -- **IMPORTANT: Store the price paid per item**
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    -- Optional: Add FOREIGN KEY (product_id) REFERENCES laptops(id) ON DELETE SET NULL (or RESTRICT)
 );
 
--- Add updated_at column to orders table
-ALTER TABLE orders ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+-- Ensure updated_at updates on modification for orders
+DROP TRIGGER IF EXISTS set_orders_updated_at ON orders; -- Add drop for idempotency
+CREATE OR REPLACE FUNCTION set_updated_at() -- Ensure this function exists
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Ensure updated_at updates on modification
 CREATE TRIGGER set_orders_updated_at
 BEFORE UPDATE ON orders
 FOR EACH ROW
