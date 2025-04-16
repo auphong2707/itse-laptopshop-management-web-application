@@ -16,7 +16,7 @@ import axios from "axios";
 
 import WebsiteHeader from "../components/general/WebsiteHeader";
 import WebsiteFooter from "../components/general/WebsiteFooter";
-import ShoppingItemsTable from "../components/ShoppingItemsTable";
+import ShoppingItemsTable from "../components/shopping_cart_page/ShoppingItemsTable";
 
 const PaypalButton = styled(Button)`
   background-color: #ffcc00;
