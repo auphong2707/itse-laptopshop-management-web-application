@@ -26,6 +26,7 @@ from routes.posts import posts_router
 from routes.cart import cart_router
 from routes.orders import orders_router
 from routes.accounts import accounts_router
+from routes.newsletter import newsletter_router
 
 app = FastAPI()
 app.include_router(laptops_router, tags=["laptops"])
@@ -34,6 +35,7 @@ app.include_router(posts_router, tags=["posts"])
 app.include_router(cart_router, tags=["cart"])
 app.include_router(orders_router, tags=["orders"])
 app.include_router(accounts_router, tags=["accounts"])
+app.include_router(newsletter_router, tags=["newsletter"])
 security = HTTPBearer()
 
 
@@ -67,22 +69,6 @@ def secure_endpoint(credentials: HTTPAuthorizationCredentials = Depends(security
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Laptop Management API!"}
-
-
-@app.post("/newsletter/subscribe")
-def subscribe_to_newsletter(data: NewsletterCreate, db: Session = Depends(get_db)):
-    """
-    Subscribe an email to the newsletter
-    """
-    existing = db.query(NewsletterSubscription).filter_by(email=data.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already subscribed")
-
-    subscription = NewsletterSubscription(email=data.email)
-    db.add(subscription)
-    db.commit()
-    db.refresh(subscription)
-    return {"message": "Subscribed successfully", "email": subscription.email}
 
 
 # Create a refund ticket
