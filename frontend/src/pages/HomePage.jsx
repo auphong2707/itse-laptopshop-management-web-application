@@ -4,11 +4,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 import WebsiteHeader from "../components/general/WebsiteHeader";
-import ImageGallery from "../components/ImageGallery";
-import ProductSlider from "../components/ProductSlider";
-import TabProductSlider from "../components/TabProductSlider";
-import PostCardGridLayout from "../components/PostCardGridLayout";
-import TestimonialSlider from "../components/TestimonialSlider";
+import ImageGallery from "../components/homepage/ImageGallery";
+import ProductSlider from "../components/homepage/ProductSlider";
+import TabProductSlider from "../components/homepage/TabProductSlider";
+import PostCardGridLayout from "../components/homepage/PostCardGridLayout";
+import TestimonialSlider from "../components/homepage/TestimonialSlider";
 import WebsiteFooter from "../components/general/WebsiteFooter";
 import { transformLaptopData } from "../utils/transformData";
 
