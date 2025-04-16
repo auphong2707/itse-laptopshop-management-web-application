@@ -17,8 +17,8 @@ import {
 import { Divider } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader.jsx";
+import WebsiteFooter from "../components/WebsiteFooter.jsx";
 import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";

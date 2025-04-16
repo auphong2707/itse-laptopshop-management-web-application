@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
 import PropTypes from "prop-types";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 import ProductImage from "../components/product_page/ProductImage";
 import ProductTabs from "../components/product_page/ProductTabs";
 import Purchase from "../components/product_page/Purchase";

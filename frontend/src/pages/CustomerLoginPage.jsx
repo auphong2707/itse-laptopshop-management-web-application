@@ -13,8 +13,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 import { auth } from "../utils/firebase";
 
 const { Content } = Layout;

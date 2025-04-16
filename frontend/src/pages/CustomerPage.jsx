@@ -3,8 +3,8 @@ import { Layout, Typography, Breadcrumb, Tabs, Row, Col } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;

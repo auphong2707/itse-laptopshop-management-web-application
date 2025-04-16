@@ -4,8 +4,8 @@ import styled from "styled-components";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 import BrandsSection from "../components/catalog_page/BrandsSection";
 import FilterSection from "../components/catalog_page/FilterSection";
 import ProductCard from "../components/ProductCard";

@@ -14,8 +14,8 @@ import styled from "styled-components";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
-import WebsiteHeader from "../components/general/WebsiteHeader";
-import WebsiteFooter from "../components/general/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 import ShoppingItemsTable from "../components/shopping_cart_page/ShoppingItemsTable";
 
 const PaypalButton = styled(Button)`
