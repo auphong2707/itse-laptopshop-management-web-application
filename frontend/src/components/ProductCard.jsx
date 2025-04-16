@@ -16,34 +16,12 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 
 const { Title, Text, Paragraph } = Typography;
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
-
-const useAuthUser = () => {
-  const [user, setUser] = useState(null);
-  const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        const tokenResult = await currentUser.getIdTokenResult();
-        const role = tokenResult.claims.role;
-        setUser({ ...currentUser, role });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
-
-  return user;
 };
 
 const ProductCard = ({
@@ -55,11 +33,11 @@ const ProductCard = ({
   originalPrice,
   salePrice,
   productId,
+  isAdmin = false,
+  showDeleteButton = false,
 }) => {
   const [productData, setProductData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const user = useAuthUser();
-  const isAdmin = user?.role === "admin"; // Boolean flag
 
   const handleDelete = async (productId) => {
     try {
@@ -104,7 +82,7 @@ const ProductCard = ({
 
   return (
     <div style={{ padding: 3, position: "relative" }}>
-      {isAdmin && (
+      {showDeleteButton && (
         <Button
           size="small"
           shape="circle"
@@ -231,9 +209,8 @@ ProductCard.propTypes = {
   originalPrice: PropTypes.number,
   salePrice: PropTypes.number,
   productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  user: PropTypes.shape({
-    role: PropTypes.string,
-  }),
+  isAdmin: PropTypes.bool,
+  showDeleteButton: PropTypes.bool,
 };
 
 const getRandomProductCardData = () => {

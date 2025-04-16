@@ -6,7 +6,7 @@ import ProductSlider from "./ProductSlider";
 
 const { TabPane } = Tabs;
 
-const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
+const TabProductSlider = ({ tabLabels, tabBanners, tabProductData, isAdmin }) => {
   return (
     <ConfigProvider
       theme={{
@@ -41,7 +41,7 @@ const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
                 />
               </Link>
               <div style={{ minWidth: "15px" }}></div>
-              <ProductSlider productData={tabProductData[index]} />
+              <ProductSlider productData={tabProductData[index]} isAdmin={isAdmin} />
             </div>
           </TabPane>
         ))}
@@ -53,6 +53,7 @@ TabProductSlider.propTypes = {
   tabLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
   tabBanners: PropTypes.arrayOf(PropTypes.string).isRequired,
   tabProductData: PropTypes.arrayOf(PropTypes.array).isRequired,
+  isAdmin: PropTypes.bool.isRequired,
 };
 
 export default TabProductSlider;
