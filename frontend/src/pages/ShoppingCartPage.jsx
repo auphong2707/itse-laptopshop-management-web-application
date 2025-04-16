@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -11,6 +11,12 @@ import {
 } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { getAuth } from "firebase/auth";
+import axios from "axios";
+
+import WebsiteHeader from "../components/general/WebsiteHeader";
+import WebsiteFooter from "../components/general/WebsiteFooter";
+import ShoppingItemsTable from "../components/ShoppingItemsTable";
 
 const PaypalButton = styled(Button)`
   background-color: #ffcc00;
@@ -44,12 +50,51 @@ const contentStyle = {
 
 const ShoppingCartPage = () => {
   const [form] = Form.useForm();
+  const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const handleSignIn = (values) => {
-    // Handle sign-in logic here (e.g., call API)
-    console.log("Sign-in form values:", values);
-  };
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
+          console.error("User not signed in.");
+          return;
+        }
+
+        const token = await user.getIdToken();
+
+        const response = await axios.get("http://localhost:8000/cart/view", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const cartData = response.data; // e.g., { "1": 2, "5": 1 }
+
+        // You probably need to fetch product details for these IDs
+        const productDetails = await Promise.all(
+          Object.entries(cartData).map(async ([id, quantity]) => {
+            const res = await axios.get(
+              `http://localhost:8000/laptops/id/${id}`,
+            );
+            return {
+              ...res.data, // Product info
+              quantity,
+            };
+          }),
+        );
+
+        setCartItems(productDetails);
+      } catch (err) {
+        console.error("Error fetching cart:", err);
+      }
+    };
+
+    fetchCart();
+  }, []);
 
   return (
     <Layout>
@@ -88,7 +133,10 @@ const ShoppingCartPage = () => {
             style={{ paddingLeft: "23px", paddingRight: "4px" }}
           >
             <div style={{ padding: "0px 0" }}>
-              <ShoppingItemsTable setTotalPrice={setTotalPrice} />
+              <ShoppingItemsTable
+                setTotalPrice={setTotalPrice}
+                cartItems={cartItems}
+              />
             </div>
           </Col>
           {/* Right Box */}
