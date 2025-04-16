@@ -25,9 +25,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 import shutil
 
-from routes.laptops import router as laptops_router
-from routes.cart import router as cart_router
-from routes.orders import router as orders_router
+from routes.laptops import laptops_router
+from routes.cart import cart_router
+from routes.orders import orders_router
 
 app = FastAPI()
 app.include_router(laptops_router, tags=["laptops"])

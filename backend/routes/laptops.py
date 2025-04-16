@@ -7,10 +7,10 @@ from db.models import Laptop
 from schemas.laptops import LaptopCreate, LaptopUpdate
 from db.session import get_db
 
-router = APIRouter(prefix="/laptops", tags=["laptops"])
+laptops_router = APIRouter(prefix="/laptops", tags=["laptops"])
 es = Elasticsearch("http://elasticsearch:9200")
 
-@router.post("/")
+@laptops_router.post("/")
 def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     new_laptop = Laptop(**laptop.dict())
     db.add(new_laptop)
@@ -19,7 +19,7 @@ def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     return {"message": "Laptop added successfully", "laptop": new_laptop}
 
 
-@router.delete("/{laptop_id}")
+@laptops_router.delete("/{laptop_id}")
 def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
     if not laptop:
@@ -30,7 +30,7 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
     return {"message": "Laptop deleted successfully"}
 
 
-@router.put("/{laptop_id}")
+@laptops_router.put("/{laptop_id}")
 def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)):
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
     if not laptop:
@@ -45,7 +45,7 @@ def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Dep
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
 
-@router.get("/search/")
+@laptops_router.get("/search/")
 def search_laptops(query: str = Query(...), limit: int = Query(10)):
     search_query = {
         "bool": {
@@ -61,7 +61,7 @@ def search_laptops(query: str = Query(...), limit: int = Query(10)):
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
 
-@router.get("/filter")
+@laptops_router.get("/filter")
 def filter_laptops(
     price_min: int = Query(None),
     price_max: int = Query(None),
@@ -150,7 +150,7 @@ def filter_laptops(
     }
 
 
-@router.get("/low-stock")
+@laptops_router.get("/low-stock")
 def get_low_stock_laptops(
     threshold: int = Query(50),
     limit: int = Query(30),
@@ -173,7 +173,7 @@ def get_low_stock_laptops(
     }
 
 
-@router.get("/latest")
+@laptops_router.get("/latest")
 def get_latest_laptops(
     brand: str = Query("all"), subbrand: str = Query("all"), limit: int = Query(35)
 ):
@@ -190,7 +190,7 @@ def get_latest_laptops(
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
 
-@router.get("/id/{laptop_id}")
+@laptops_router.get("/id/{laptop_id}")
 def get_laptop(laptop_id: int):
     query = {"query": {"term": {"id": laptop_id}}}
     results = es.search(index="laptops", body=query)

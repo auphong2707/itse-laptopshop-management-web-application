@@ -32,7 +32,7 @@ except Exception as e:
     db_firestore = None
 
 # --- Create Router ---
-router = APIRouter(prefix="/orders", tags=["orders"])
+orders_router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 async def require_admin_role(user_id: str = Depends(get_current_user_id)):
@@ -45,7 +45,7 @@ async def require_admin_role(user_id: str = Depends(get_current_user_id)):
     return user_id
 
 
-@router.post("")
+@orders_router.post("")
 def create_order_from_cart(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
@@ -237,7 +237,7 @@ class PaginatedOrdersResponse(BaseModel):
     orders: List[OrderResponse]
 
 
-@router.get("", response_model=PaginatedOrdersResponse)
+@orders_router.get("", response_model=PaginatedOrdersResponse)
 def get_my_orders(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(10, ge=1, le=100, description="Items per page"),
@@ -273,7 +273,7 @@ def get_my_orders(
         raise HTTPException(status_code=500, detail="Could not retrieve orders.")
 
 
-@router.get("/{order_id}", response_model=OrderResponse)
+@orders_router.get("/{order_id}", response_model=OrderResponse)
 def get_my_single_order(
     order_id: int,
     db: Session = Depends(get_db),
@@ -301,7 +301,7 @@ def get_my_single_order(
     return order
 
 
-@router.patch("/{order_id}/cancel", response_model=OrderResponse)
+@orders_router.patch("/{order_id}/cancel", response_model=OrderResponse)
 def cancel_my_order(
     order_id: int,
     db: Session = Depends(get_db),
@@ -378,7 +378,7 @@ def cancel_my_order(
 # == Admin operation == #
 
 
-@router.get(
+@orders_router.get(
     "/admin/list",
     response_model=PaginatedOrdersResponse,
     dependencies=[Depends(require_admin_role)],
@@ -429,7 +429,7 @@ def admin_get_all_orders(
         raise HTTPException(status_code=500, detail="Could not retrieve orders.")
 
 
-@router.patch(
+@orders_router.patch(
     "/admin/{order_id}/status",
     response_model=OrderResponse,
     dependencies=[Depends(require_admin_role)],
@@ -474,7 +474,7 @@ def admin_update_order_status(
     return order
 
 
-@router.delete(
+@orders_router.delete(
     "/admin/{order_id}",
     dependencies=[Depends(require_admin_role)],
 )
