@@ -49,7 +49,6 @@ const contentStyle = {
 };
 
 const ShoppingCartPage = () => {
-  const [form] = Form.useForm();
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
