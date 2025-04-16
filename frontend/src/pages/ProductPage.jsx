@@ -5,10 +5,10 @@ import PropTypes from "prop-types";
 
 import WebsiteHeader from "../components/general/WebsiteHeader";
 import WebsiteFooter from "../components/general/WebsiteFooter";
-import ProductImage from "../components/ProductImage";
-import ProductTabs from "../components/ProductTabs";
-import Purchase from "../components/Purchase";
-import SupportSection from "../components/SupportSection";
+import ProductImage from "../components/product_page/ProductImage";
+import ProductTabs from "../components/product_page/ProductTabs";
+import Purchase from "../components/product_page/Purchase";
+import SupportSection from "../components/product_page/SupportSection";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
