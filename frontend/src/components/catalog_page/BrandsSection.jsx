@@ -92,7 +92,7 @@ BrandsSection.propTypes = {
       name: PropTypes.string.isRequired,
       logo: PropTypes.string.isRequired,
       link: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 };
 

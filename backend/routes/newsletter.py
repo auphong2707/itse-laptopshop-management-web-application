@@ -6,6 +6,7 @@ from db.session import get_db  # your session dependency
 
 newsletter_router = APIRouter(prefix="/newsletter", tags=["newsletter"])
 
+
 @newsletter_router.post("/subscribe")
 def subscribe_to_newsletter(data: NewsletterCreate, db: Session = Depends(get_db)):
     """

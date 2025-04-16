@@ -6,6 +6,7 @@ from services.firebase_auth import verify_firebase_token  # if you use Depends f
 
 accounts_router = APIRouter(prefix="/accounts", tags=["accounts"])
 
+
 @accounts_router.post("/check")
 def check_email_and_phone(data: dict = Body(...)):
     email = data.get("email")

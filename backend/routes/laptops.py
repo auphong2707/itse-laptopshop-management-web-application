@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 laptops_router = APIRouter(prefix="/laptops", tags=["laptops"])
 es = Elasticsearch("http://elasticsearch:9200")
 
+
 @laptops_router.post("/")
 def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
     new_laptop = Laptop(**laptop.dict())
@@ -37,7 +38,9 @@ def delete_laptop(laptop_id: int, db: Session = Depends(get_db)):
 
 
 @laptops_router.put("/{laptop_id}")
-def update_laptop(laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)):
+def update_laptop(
+    laptop_id: int, laptop_update: LaptopUpdate, db: Session = Depends(get_db)
+):
     laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
     if not laptop:
         raise HTTPException(status_code=404, detail="Laptop not found")
@@ -90,18 +93,30 @@ def filter_laptops(
     if brand and "all" not in brand:
         filter_query["bool"]["filter"].append({"terms": {"brand.keyword": brand}})
     if sub_brand:
-        filter_query["bool"]["filter"].append({"terms": {"sub_brand.keyword": sub_brand}})
+        filter_query["bool"]["filter"].append(
+            {"terms": {"sub_brand.keyword": sub_brand}}
+        )
     if ram_amount:
         filter_query["bool"]["filter"].append({"terms": {"ram_amount": ram_amount}})
     if storage_amount:
-        filter_query["bool"]["filter"].append({"terms": {"storage_amount": storage_amount}})
+        filter_query["bool"]["filter"].append(
+            {"terms": {"storage_amount": storage_amount}}
+        )
     if cpu:
         should_query["bool"]["should"].extend(
-            [{"wildcard": {"cpu.keyword": f"*{c.lower()}*"}} for c in cpu if isinstance(c, str)]
+            [
+                {"wildcard": {"cpu.keyword": f"*{c.lower()}*"}}
+                for c in cpu
+                if isinstance(c, str)
+            ]
         )
     if vga:
         should_query["bool"]["should"].extend(
-            [{"wildcard": {"vga.keyword": f"*{v.lower()}*"}} for v in vga if isinstance(v, str)]
+            [
+                {"wildcard": {"vga.keyword": f"*{v.lower()}*"}}
+                for v in vga
+                if isinstance(v, str)
+            ]
         )
     if screen_size:
         filter_query["bool"]["filter"].append(
@@ -191,7 +206,11 @@ def get_latest_laptops(
 
     results = es.search(
         index="laptops",
-        body={"query": filter_query, "sort": [{"inserted_at": {"order": "desc"}}], "size": limit},
+        body={
+            "query": filter_query,
+            "sort": [{"inserted_at": {"order": "desc"}}],
+            "size": limit,
+        },
     )
     return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
 
@@ -203,6 +222,7 @@ def get_laptop(laptop_id: int):
     if not results["hits"]["hits"]:
         raise HTTPException(status_code=404, detail="Laptop not found")
     return results["hits"]["hits"][0]["_source"]
+
 
 @laptops_router.post("/{laptop_id}/upload_images")
 def upload_images_to_laptop(

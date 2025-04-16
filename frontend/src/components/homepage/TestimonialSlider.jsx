@@ -100,7 +100,7 @@ TestimonialSlider.propTypes = {
     PropTypes.shape({
       testimonial: PropTypes.string.isRequired,
       author: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 };
 

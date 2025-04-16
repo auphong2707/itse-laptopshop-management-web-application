@@ -12,7 +12,6 @@ import TestimonialSlider from "../components/homepage/TestimonialSlider";
 import WebsiteFooter from "../components/WebsiteFooter";
 import { transformLaptopData } from "../utils/transformData";
 
-
 const { Content } = Layout;
 const { Text } = Typography;
 

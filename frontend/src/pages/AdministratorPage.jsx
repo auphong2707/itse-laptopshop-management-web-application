@@ -53,8 +53,6 @@ const OptionalLabel = ({ label }) => (
   <span style={{ fontWeight: "bold" }}>{label}</span>
 );
 
-
-
 const transformFormData = (values) => {
   return {
     brand: values.brand || "",

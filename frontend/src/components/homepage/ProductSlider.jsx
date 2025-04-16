@@ -4,8 +4,8 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import PropTypes from "prop-types";
-import ProductCard from "../ProductCard";
 
+import ProductCard from "../ProductCard";
 
 const ProductSlider = ({ productData }) => {
   return (

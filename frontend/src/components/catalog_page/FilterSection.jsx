@@ -63,10 +63,10 @@ const FilterSection = ({
       options: PropTypes.arrayOf(
         PropTypes.shape({
           name: PropTypes.string.isRequired,
-        })
+        }),
       ).isRequired,
     };
-  
+
     return (
       <StyledCollapse
         defaultActiveKey={["1"]}
@@ -111,17 +111,16 @@ const FilterSection = ({
     onChange,
     category,
   }) => {
-  
-  SliderFilter.propTypes = {
-    title: PropTypes.string.isRequired,
-    min: PropTypes.number.isRequired,
-    max: PropTypes.number.isRequired,
-    step: PropTypes.number,
-    unit: PropTypes.string.isRequired,
-    value: PropTypes.arrayOf(PropTypes.number).isRequired,
-    onChange: PropTypes.func.isRequired,
-    category: PropTypes.string.isRequired,
-  };
+    SliderFilter.propTypes = {
+      title: PropTypes.string.isRequired,
+      min: PropTypes.number.isRequired,
+      max: PropTypes.number.isRequired,
+      step: PropTypes.number,
+      unit: PropTypes.string.isRequired,
+      value: PropTypes.arrayOf(PropTypes.number).isRequired,
+      onChange: PropTypes.func.isRequired,
+      category: PropTypes.string.isRequired,
+    };
     const [minValue, setMinValue] = useState(value[0]);
     const [maxValue, setMaxValue] = useState(value[1]);
 

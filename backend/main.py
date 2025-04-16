@@ -1,12 +1,8 @@
-import os
 from elasticsearch import Elasticsearch
-from fastapi import FastAPI, Depends, HTTPException, Query, Body
+from fastapi import FastAPI, Depends
 
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from firebase_admin import auth
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from db.models import *

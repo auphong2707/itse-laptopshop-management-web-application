@@ -13,7 +13,6 @@ import SupportSection from "../components/product_page/SupportSection";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
-
 const ProductHeader = ({ title, series }) => (
   <>
     <Breadcrumb separator=">" style={{ marginBottom: "1rem" }}>
