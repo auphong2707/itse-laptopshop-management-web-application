@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { Button, InputNumber, Typography, Flex } from "antd";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
@@ -134,6 +135,10 @@ const Purchase = ({ price, laptopId }) => {
       </Flex>
     </div>
   );
+};
+Purchase.propTypes = {
+  price: PropTypes.number.isRequired,
+  laptopId: PropTypes.string.isRequired,
 };
 
 export default Purchase;

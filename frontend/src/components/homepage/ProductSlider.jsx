@@ -1,13 +1,9 @@
 // Swiper core and required modules
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-
-// Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
-
 import PropTypes from "prop-types";
-
 import ProductCard from "../ProductCard";
 
 

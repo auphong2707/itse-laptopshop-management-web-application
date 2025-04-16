@@ -1,5 +1,6 @@
 import { Typography, Button } from "antd";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const { Text } = Typography;
 
@@ -84,6 +85,15 @@ const BrandsSection = ({ brands }) => {
       </div>
     </div>
   );
+};
+BrandsSection.propTypes = {
+  brands: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      logo: PropTypes.string.isRequired,
+      link: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default BrandsSection;

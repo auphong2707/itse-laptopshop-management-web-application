@@ -1,4 +1,5 @@
 import { Card, Typography } from "antd";
+import PropTypes from "prop-types";
 
 const { Paragraph, Text } = Typography;
 
@@ -32,5 +33,10 @@ const PostCard = ({ img, title, date }) => (
     </div>
   </Card>
 );
+PostCard.propTypes = {
+  img: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+};
 
 export default PostCard;

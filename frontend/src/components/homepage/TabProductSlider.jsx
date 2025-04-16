@@ -1,5 +1,6 @@
 import { Tabs, Image, ConfigProvider } from "antd";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 import ProductSlider from "./ProductSlider";
 
@@ -47,6 +48,11 @@ const TabProductSlider = ({ tabLabels, tabBanners, tabProductData }) => {
       </Tabs>
     </ConfigProvider>
   );
+};
+TabProductSlider.propTypes = {
+  tabLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  tabBanners: PropTypes.arrayOf(PropTypes.string).isRequired,
+  tabProductData: PropTypes.arrayOf(PropTypes.array).isRequired,
 };
 
 export default TabProductSlider;
