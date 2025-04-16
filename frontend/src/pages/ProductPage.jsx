@@ -3,12 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
 import PropTypes from "prop-types";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import ProductImage from "./components/ProductImage";
-import ProductTabs from "./components/ProductTabs";
-import Purchase from "./components/Purchase";
-import SupportSection from "./components/SupportSection";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
+import ProductImage from "../components/ProductImage";
+import ProductTabs from "../components/ProductTabs";
+import Purchase from "../components/Purchase";
+import SupportSection from "../components/SupportSection";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;

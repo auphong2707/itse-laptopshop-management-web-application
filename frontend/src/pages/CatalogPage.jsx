@@ -4,11 +4,11 @@ import styled from "styled-components";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import BrandsSection from "./components/BrandsSection";
-import FilterSection from "./components/FilterSection";
-import ProductCard from "./components/ProductCard";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
+import BrandsSection from "../components/BrandsSection";
+import FilterSection from "../components/FilterSection";
+import ProductCard from "../components/ProductCard";
 import { transformLaptopData } from "../utils/transformData";
 
 

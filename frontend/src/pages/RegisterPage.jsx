@@ -13,8 +13,8 @@ import {
   Divider,
 } from "antd";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 
 const { Content } = Layout;
 const { Title } = Typography;

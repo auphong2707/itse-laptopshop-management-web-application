@@ -7,7 +7,7 @@ import axios from "axios";
 import BrandsSection from "./BrandsSection";
 import FilterSection from "./FilterSection";
 import ProductCard from "./ProductCard";
-import { transformLaptopData } from "../../utils/transformData";
+import { transformLaptopData } from "../utils/transformData";
 
 
 const { Text } = Typography;

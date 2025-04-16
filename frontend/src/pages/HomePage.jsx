@@ -3,13 +3,13 @@ import { Layout, Typography, Image } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import ImageGallery from "./components/ImageGallery";
-import ProductSlider from "./components/ProductSlider";
-import TabProductSlider from "./components/TabProductSlider";
-import PostCardGridLayout from "./components/PostCardGridLayout";
-import TestimonialSlider from "./components/TestimonialSlider";
-import WebsiteFooter from "./components/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import ImageGallery from "../components/ImageGallery";
+import ProductSlider from "../components/ProductSlider";
+import TabProductSlider from "../components/TabProductSlider";
+import PostCardGridLayout from "../components/PostCardGridLayout";
+import TestimonialSlider from "../components/TestimonialSlider";
+import WebsiteFooter from "../components/WebsiteFooter";
 import { transformLaptopData } from "../utils/transformData";
 
 
