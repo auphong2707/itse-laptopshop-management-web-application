@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { Layout, Typography, Image } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useUser } from "../utils/UserContext";
 
+import { useUser } from "../utils/UserContext";
 import WebsiteHeader from "../components/WebsiteHeader";
 import ImageGallery from "../components/homepage/ImageGallery";
 import ProductSlider from "../components/homepage/ProductSlider";

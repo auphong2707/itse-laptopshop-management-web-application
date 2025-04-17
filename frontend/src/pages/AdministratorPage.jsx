@@ -114,7 +114,7 @@ const transformFormData = (values) => {
 const Detail = () => {
   const [form] = Form.useForm();
   const { id } = useParams();
-  const [productData, setProductData] = useState({});
+  const [_, setProductData] = useState({});
   const [pictures, setPictures] = useState([]);
 
   useEffect(() => {

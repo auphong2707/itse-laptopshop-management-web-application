@@ -437,7 +437,7 @@ const CatalogPage = () => {
 
             <div className="grid-division">
               {products.map((product, index) => (
-                <ProductCard {...product} />
+                <ProductCard key={index} {...product} />
               ))}
             </div>
 
