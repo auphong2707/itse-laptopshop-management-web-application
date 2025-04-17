@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   Typography,
@@ -36,7 +36,6 @@ const ProductCard = ({
   isAdmin = false,
   showDeleteButton = false,
 }) => {
-  const [productData, setProductData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleDelete = async (productId) => {
@@ -50,35 +49,19 @@ const ProductCard = ({
   };
 
   const showModal = () => {
-    setModalVisible(true); // Show the modal
+    setModalVisible(true);
   };
 
   const handleOk = () => {
-    handleDelete(productId); // Proceed with deleting the product
-    setModalVisible(false); // Close the modal after deletion
-    window.location.reload(); // Refresh the page
+    handleDelete(productId);
+    setModalVisible(false);
+    window.location.reload();
   };
 
   const handleCancel = () => {
-    setModalVisible(false); // Just close the modal without deleting
+    setModalVisible(false);
     message.error("Product deletion cancelled");
   };
-
-  useEffect(() => {
-    fetch(`http://localhost:8000/laptops/id/${productId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const imageUrls = JSON.parse(data.product_image_mini || "[]").map(
-          (url) => `http://localhost:8000${url}`,
-        );
-        setProductData({
-          ...data,
-          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
-        });
-      });
-  }, [productId]);
-
-  if (!productData) return null;
 
   return (
     <div style={{ padding: 3, position: "relative" }}>
@@ -155,7 +138,7 @@ const ProductCard = ({
 
           {/* Product Image */}
           <Image
-            src={productData.imageUrl}
+            src={imgSource}
             height={120}
             width="100%"
             preview={false}

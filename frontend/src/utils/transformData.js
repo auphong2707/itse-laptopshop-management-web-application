@@ -4,7 +4,9 @@ const transformLaptopData = (data) => {
       productName: item.name.toUpperCase(),
       numRate: item.num_rate,
       originalPrice: item.original_price,
-      imgSource: item.product_image_mini,
+      imgSource: JSON.parse(item.product_image_mini || "[]").map(
+        (url) => `http://localhost:8000${url}`,
+      )[0],
       inStock: item.quantity > 0,
       rate: item.rate,
       salePrice: item.sale_price,
