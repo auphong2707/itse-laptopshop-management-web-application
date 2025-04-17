@@ -8,6 +8,7 @@ import {
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
+import PropTypes from "prop-types";
 
 const ProductImage = ({ imageUrls }) => {
   return (
@@ -106,6 +107,15 @@ const IconButton = ({ icon, tooltip }) => {
       {icon}
     </div>
   );
+};
+
+IconButton.propTypes = {
+  icon: PropTypes.element.isRequired,
+  tooltip: PropTypes.string.isRequired,
+};
+
+ProductImage.propTypes = {
+  imageUrls: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default ProductImage;

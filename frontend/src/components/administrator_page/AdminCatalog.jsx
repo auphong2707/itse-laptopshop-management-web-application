@@ -4,11 +4,10 @@ import styled from "styled-components";
 import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-import BrandsSection from "./BrandsSection";
-import FilterSection from "./FilterSection";
-import ProductCard from "./ProductCard";
+import BrandsSection from "../catalog_page/BrandsSection";
+import FilterSection from "../catalog_page/FilterSection";
+import ProductCard from "../ProductCard";
 import { transformLaptopData } from "../../utils/transformData";
-
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -417,7 +416,7 @@ const AdminCatalog = () => {
 
         <div className="grid-division">
           {products.map((product, index) => (
-            <ProductCard {...product} />
+            <ProductCard {...product} isAdmin={true} showDeleteButton={true} />
           ))}
         </div>
 
@@ -426,8 +425,8 @@ const AdminCatalog = () => {
         <Pagination
           align="center"
           current={page}
-          onChange={(page) => {
-            updateImmediateParams("page", page);
+          onChange={(value) => {
+            updateImmediateParams({ page: value });
           }}
           total={totalProducts}
           pageSize={quantityPerPage}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { Tabs } from "antd";
 
 const ProductTabs = ({ tabLabels, tabContents }) => {
@@ -53,6 +54,10 @@ const ProductTabs = ({ tabLabels, tabContents }) => {
       ></div>
     </div>
   );
+};
+ProductTabs.propTypes = {
+  tabLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+  tabContents: PropTypes.arrayOf(PropTypes.node).isRequired,
 };
 
 export default ProductTabs;

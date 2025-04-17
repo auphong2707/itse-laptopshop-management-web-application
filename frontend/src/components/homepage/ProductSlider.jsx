@@ -1,17 +1,13 @@
 // Swiper core and required modules
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-
-// Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
-
 import PropTypes from "prop-types";
 
-import ProductCard from "./ProductCard";
+import ProductCard from "../ProductCard";
 
-
-const ProductSlider = ({ productData }) => {
+const ProductSlider = ({ productData, isAdmin }) => {
   return (
     <Swiper
       modules={[Navigation]} // Use the Navigation module
@@ -24,7 +20,7 @@ const ProductSlider = ({ productData }) => {
     >
       {productData.map((product, index) => (
         <SwiperSlide key={index}>
-          <ProductCard {...product} />
+          <ProductCard {...product} isAdmin={isAdmin} />
         </SwiperSlide>
       ))}
     </Swiper>
@@ -33,6 +29,7 @@ const ProductSlider = ({ productData }) => {
 
 ProductSlider.propTypes = {
   productData: PropTypes.arrayOf(PropTypes.object),
+  isAdmin: PropTypes.bool.isRequired,
 };
 
 export default ProductSlider;

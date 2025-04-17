@@ -13,8 +13,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
 import { auth } from "../utils/firebase";
 
 const { Content } = Layout;
@@ -39,7 +39,7 @@ const login = async (email, password) => {
     const token = await user.getIdToken();
     console.log("Token:", token);
     // Send token to FastAPI backend
-    const response = await fetch("http://localhost:8000/login", {
+    const response = await fetch("http://localhost:8000/accounts/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

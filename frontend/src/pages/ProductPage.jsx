@@ -3,21 +3,15 @@ import { Link, useParams } from "react-router-dom";
 import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
 import PropTypes from "prop-types";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import ProductImage from "./components/ProductImage";
-import ProductTabs from "./components/ProductTabs";
-import Purchase from "./components/Purchase";
-import SupportSection from "./components/SupportSection";
+import WebsiteHeader from "../components/WebsiteHeader";
+import WebsiteFooter from "../components/WebsiteFooter";
+import ProductImage from "../components/product_page/ProductImage";
+import ProductTabs from "../components/product_page/ProductTabs";
+import Purchase from "../components/product_page/Purchase";
+import SupportSection from "../components/product_page/SupportSection";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
-
-const imageSources = [
-  "/product_page_banner_1.png",
-  "/product_page_banner_1.png",
-  "/product_page_banner_1.png",
-];
 
 const ProductHeader = ({ title, series }) => (
   <>
@@ -67,6 +61,10 @@ const ExtraInfo = ({ productId }) => (
   </div>
 );
 
+ExtraInfo.propTypes = {
+  productId: PropTypes.number.isRequired,
+};
+
 const AboutProduct = ({ title, series, description, id }) => (
   <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
     <ProductHeader title={title} series={series} />
@@ -76,6 +74,13 @@ const AboutProduct = ({ title, series, description, id }) => (
     <ExtraInfo productId={id} />
   </div>
 );
+
+AboutProduct.propTypes = {
+  title: PropTypes.string.isRequired,
+  series: PropTypes.string,
+  description: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
+};
 
 const Specs = ({ data, id }) => (
   <div style={{ maxWidth: "80%", paddingLeft: "5.5%", paddingRight: "0%" }}>
@@ -157,6 +162,11 @@ const Specs = ({ data, id }) => (
     <ExtraInfo productId={id} />
   </div>
 );
+
+Specs.propTypes = {
+  data: PropTypes.object.isRequired,
+  id: PropTypes.number.isRequired,
+};
 
 const transformData = (data) => {
   return {

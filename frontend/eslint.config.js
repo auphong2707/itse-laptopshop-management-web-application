@@ -46,7 +46,6 @@ export default [
       "prefer-const": "warn",
       "no-var": "error",
       eqeqeq: ["warn", "always"],
-      "no-console": "warn",
 
       // Import Order
       "import/order": [

@@ -3,15 +3,15 @@ import { Layout, Typography, Image } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import ImageGallery from "./components/ImageGallery";
-import ProductSlider from "./components/ProductSlider";
-import TabProductSlider from "./components/TabProductSlider";
-import PostCardGridLayout from "./components/PostCardGridLayout";
-import TestimonialSlider from "./components/TestimonialSlider";
-import WebsiteFooter from "./components/WebsiteFooter";
+import { useUser } from "../utils/UserContext";
+import WebsiteHeader from "../components/WebsiteHeader";
+import ImageGallery from "../components/homepage/ImageGallery";
+import ProductSlider from "../components/homepage/ProductSlider";
+import TabProductSlider from "../components/homepage/TabProductSlider";
+import PostCardGridLayout from "../components/homepage/PostCardGridLayout";
+import TestimonialSlider from "../components/homepage/TestimonialSlider";
+import WebsiteFooter from "../components/WebsiteFooter";
 import { transformLaptopData } from "../utils/transformData";
-
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -99,6 +99,8 @@ const transformPostData = (data) => {
 
 const HomePage = () => {
   const [newProductData, setNewProductData] = React.useState([]);
+  const user = useUser();
+  const isAdmin = user?.role === "admin";
 
   const brands = {
     asus: ["rog", "tuf", "zenbook", "vivobook"],
@@ -257,7 +259,7 @@ const HomePage = () => {
               See All New Products
             </Typography.Link>
           </div>
-          <ProductSlider productData={newProductData} />
+          <ProductSlider productData={newProductData} isAdmin={isAdmin} />
         </div>
 
         <br></br>
@@ -284,6 +286,7 @@ const HomePage = () => {
             "/tab-banners/asus/asus_vivobook_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["asus"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>
@@ -308,6 +311,7 @@ const HomePage = () => {
             "/tab-banners/lenovo/lenovo_ideapad_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["lenovo"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>
@@ -328,6 +332,7 @@ const HomePage = () => {
             "/tab-banners/acer/acer_aspire_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["acer"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>
@@ -352,6 +357,7 @@ const HomePage = () => {
             "/tab-banners/dell/dell_precision_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["dell"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>
@@ -376,6 +382,7 @@ const HomePage = () => {
             "/tab-banners/HP/hp_elitebook_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["hp"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>
@@ -391,6 +398,7 @@ const HomePage = () => {
             "/tab-banners/msi/msi_modern_banner.png",
           ]}
           tabProductData={Object.values(brandProductData["msi"])}
+          isAdmin={isAdmin}
         />
 
         <br></br>

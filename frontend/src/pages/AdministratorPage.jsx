@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import PropTypes from "prop-types";
 import "swiper/css";
 import axios from "axios";
 import {
@@ -17,11 +18,11 @@ import {
 import { Divider } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
-import WebsiteHeader from "./components/WebsiteHeader";
-import WebsiteFooter from "./components/WebsiteFooter";
-import AdminCatalog from "./components/AdminCatalog.jsx";
-import RefundTable from "./components/RefundTable.jsx";
-import StockAlertTable from "./components/StockAlertTable.jsx";
+import WebsiteHeader from "../components/WebsiteHeader.jsx";
+import WebsiteFooter from "../components/WebsiteFooter.jsx";
+import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
+import RefundTable from "../components/administrator_page/RefundTable.jsx";
+import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -113,7 +114,7 @@ const transformFormData = (values) => {
 const Detail = () => {
   const [form] = Form.useForm();
   const { id } = useParams();
-  const [productData, setProductData] = useState({});
+  const [_, setProductData] = useState({});
   const [pictures, setPictures] = useState([]);
 
   useEffect(() => {
@@ -687,6 +688,16 @@ const AdministratorPage = () => {
       <WebsiteFooter />
     </Layout>
   );
+};
+
+CustomDivider.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+RequiredLabel.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+OptionalLabel.propTypes = {
+  label: PropTypes.string.isRequired,
 };
 
 export default AdministratorPage;

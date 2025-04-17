@@ -36,7 +36,7 @@ const AccountMenu = () => {
       if (currentUser) {
         const tokenResult = await currentUser.getIdTokenResult();
         const role = tokenResult.claims.role;
-        console.log("Role:", role);
+
         setUser({ ...currentUser, role });
       } else {
         setUser(null);
@@ -50,7 +50,6 @@ const AccountMenu = () => {
     setOpen(false);
     if (e.key === "logout") {
       signOut(auth).then(() => {
-        console.log("User signed out");
         navigate("/customer/login");
       });
     } else if (e.key === "account") {

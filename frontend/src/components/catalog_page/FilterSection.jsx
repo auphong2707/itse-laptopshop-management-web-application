@@ -9,6 +9,7 @@ import {
 } from "antd";
 import { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { debounce } from "lodash";
 
 const { Text } = Typography;
@@ -56,6 +57,16 @@ const FilterSection = ({
       });
     };
 
+    CheckboxFilter.propTypes = {
+      title: PropTypes.string.isRequired,
+      category: PropTypes.string.isRequired,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+        }),
+      ).isRequired,
+    };
+
     return (
       <StyledCollapse
         defaultActiveKey={["1"]}
@@ -100,6 +111,16 @@ const FilterSection = ({
     onChange,
     category,
   }) => {
+    SliderFilter.propTypes = {
+      title: PropTypes.string.isRequired,
+      min: PropTypes.number.isRequired,
+      max: PropTypes.number.isRequired,
+      step: PropTypes.number,
+      unit: PropTypes.string.isRequired,
+      value: PropTypes.arrayOf(PropTypes.number).isRequired,
+      onChange: PropTypes.func.isRequired,
+      category: PropTypes.string.isRequired,
+    };
     const [minValue, setMinValue] = useState(value[0]);
     const [maxValue, setMaxValue] = useState(value[1]);
 
@@ -110,6 +131,7 @@ const FilterSection = ({
     }, [value]);
 
     // Debounced callback for smooth updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedOnChange = useCallback(
       debounce((newValue) => onChange(newValue), 300),
       [],
@@ -373,6 +395,20 @@ const FilterSection = ({
       </Button>
     </div>
   );
+};
+FilterSection.propTypes = {
+  pendingFilters: PropTypes.shape({
+    selectedFilters: PropTypes.object.isRequired,
+    priceRange: PropTypes.arrayOf(PropTypes.number).isRequired,
+    weightRange: PropTypes.arrayOf(PropTypes.number).isRequired,
+  }).isRequired,
+  brand: PropTypes.string.isRequired,
+  subBrands: PropTypes.object.isRequired,
+  updatePendingFilters: PropTypes.func.isRequired,
+  clearFilters: PropTypes.func.isRequired,
+  applyFilters: PropTypes.func.isRequired,
+  collapseState: PropTypes.object.isRequired,
+  updateCollapseState: PropTypes.func.isRequired,
 };
 
 export default FilterSection;

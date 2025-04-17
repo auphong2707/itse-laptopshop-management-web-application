@@ -1,5 +1,6 @@
 import { Table, Tag, Button, Image } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import PropTypes from "prop-types";
 
 const handleEdit = (record) => {
   window.location.href = `http://localhost:5173/admin/detail/${record.id}`;
@@ -104,6 +105,12 @@ const StockAlertTable = ({ data, loading, pagination, onPageChange }) => {
       }}
     />
   );
+};
+StockAlertTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+  pagination: PropTypes.object.isRequired,
+  onPageChange: PropTypes.func.isRequired,
 };
 
 export default StockAlertTable;

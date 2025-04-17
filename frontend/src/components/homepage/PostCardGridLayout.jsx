@@ -1,4 +1,5 @@
 import { Row, Col } from "antd";
+import PropTypes from "prop-types";
 
 import PostCard from "./PostCard";
 
@@ -12,6 +13,9 @@ const PostCardGridLayout = ({ postData }) => {
       ))}
     </Row>
   );
+};
+PostCardGridLayout.propTypes = {
+  postData: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default PostCardGridLayout;

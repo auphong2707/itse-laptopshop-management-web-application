@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Card,
   Typography,
@@ -16,34 +16,12 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import axios from "axios";
 
 const { Title, Text, Paragraph } = Typography;
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
-
-const useAuthUser = () => {
-  const [user, setUser] = useState(null);
-  const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        const tokenResult = await currentUser.getIdTokenResult();
-        const role = tokenResult.claims.role;
-        setUser({ ...currentUser, role });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
-
-  return user;
 };
 
 const ProductCard = ({
@@ -55,11 +33,10 @@ const ProductCard = ({
   originalPrice,
   salePrice,
   productId,
+  isAdmin = false,
+  showDeleteButton = false,
 }) => {
-  const [productData, setProductData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const user = useAuthUser();
-  const isAdmin = user?.role === "admin"; // Boolean flag
 
   const handleDelete = async (productId) => {
     try {
@@ -72,39 +49,23 @@ const ProductCard = ({
   };
 
   const showModal = () => {
-    setModalVisible(true); // Show the modal
+    setModalVisible(true);
   };
 
   const handleOk = () => {
-    handleDelete(productId); // Proceed with deleting the product
-    setModalVisible(false); // Close the modal after deletion
-    window.location.reload(); // Refresh the page
+    handleDelete(productId);
+    setModalVisible(false);
+    window.location.reload();
   };
 
   const handleCancel = () => {
-    setModalVisible(false); // Just close the modal without deleting
+    setModalVisible(false);
     message.error("Product deletion cancelled");
   };
 
-  useEffect(() => {
-    fetch(`http://localhost:8000/laptops/id/${productId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const imageUrls = JSON.parse(data.product_image_mini || "[]").map(
-          (url) => `http://localhost:8000${url}`,
-        );
-        setProductData({
-          ...data,
-          imageUrl: imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
-        });
-      });
-  }, [productId]);
-
-  if (!productData) return null;
-
   return (
     <div style={{ padding: 3, position: "relative" }}>
-      {isAdmin && (
+      {showDeleteButton && (
         <Button
           size="small"
           shape="circle"
@@ -176,12 +137,7 @@ const ProductCard = ({
           )}
 
           {/* Product Image */}
-          <Image
-            src={productData.imageUrl}
-            height={120}
-            width="100%"
-            preview={false}
-          />
+          <Image src={imgSource} height={120} width="100%" preview={false} />
 
           {/* Star Rating & Reviews */}
           <div style={{ marginTop: 2, width: "100%" }}>
@@ -231,9 +187,8 @@ ProductCard.propTypes = {
   originalPrice: PropTypes.number,
   salePrice: PropTypes.number,
   productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  user: PropTypes.shape({
-    role: PropTypes.string,
-  }),
+  isAdmin: PropTypes.bool,
+  showDeleteButton: PropTypes.bool,
 };
 
 const getRandomProductCardData = () => {

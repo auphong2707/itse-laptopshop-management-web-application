@@ -4,6 +4,7 @@ import {
   ScrollRestoration,
 } from "react-router-dom";
 
+import { UserProvider } from "./utils/UserContext";
 import AdministratorPage, {
   AdminCatalog,
   Detail,
@@ -118,9 +119,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div>
-      <RouterProvider router={router} />
-    </div>
+    <UserProvider>
+      <div>
+        <RouterProvider router={router} />
+      </div>
+    </UserProvider>
   );
 }
 

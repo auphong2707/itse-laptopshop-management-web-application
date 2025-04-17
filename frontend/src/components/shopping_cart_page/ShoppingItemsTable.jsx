@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { Typography, Image, InputNumber, Button } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { getAuth } from "firebase/auth";
@@ -319,6 +320,22 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
       </div>
     </div>
   );
+};
+Items.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    sale_price: PropTypes.number.isRequired,
+    quantity: PropTypes.number,
+    imageUrl: PropTypes.string,
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  onSubtotalChange: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+};
+
+ShoppingItemsTable.propTypes = {
+  setTotalPrice: PropTypes.func.isRequired,
 };
 
 export default ShoppingItemsTable;

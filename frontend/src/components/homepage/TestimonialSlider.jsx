@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import PropTypes from "prop-types";
 
 const { Text, Paragraph } = Typography;
 
@@ -27,7 +28,7 @@ const TestimonialSlider = ({ testimonialData }) => {
         italic
         strong
       >
-        ''
+        &apos;&apos;
       </Text>
       <div style={{ marginLeft: "130px", marginRight: "80px" }}>
         <Swiper
@@ -93,6 +94,14 @@ const TestimonialSlider = ({ testimonialData }) => {
       </Button>
     </div>
   );
+};
+TestimonialSlider.propTypes = {
+  testimonialData: PropTypes.arrayOf(
+    PropTypes.shape({
+      testimonial: PropTypes.string.isRequired,
+      author: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
 };
 
 export default TestimonialSlider;

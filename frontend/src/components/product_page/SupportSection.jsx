@@ -1,6 +1,6 @@
-import { Layout, Button, Typography } from "antd";
+import { Button, Typography } from "antd";
+import PropTypes from "prop-types";
 
-const { Content } = Layout;
 const { Text } = Typography;
 
 const SupportSection = () => {
@@ -76,6 +76,9 @@ const SupportButton = ({ text }) => {
       <span style={{ fontSize: "18px", fontWeight: "bold" }}>→</span>
     </Button>
   );
+};
+SupportButton.propTypes = {
+  text: PropTypes.string.isRequired,
 };
 
 export default SupportSection;

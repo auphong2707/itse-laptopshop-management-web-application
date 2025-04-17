@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { Row, Col, Typography, Layout, Input, Button } from "antd";
 import {
   CustomerServiceOutlined,
@@ -66,6 +67,11 @@ const CustomInput = ({ value, onChange }) => {
   );
 };
 
+CustomInput.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 const footerStyle = {
   borderBottom: "1px solid #f0f0f0",
   height: "100px",
@@ -112,7 +118,7 @@ const WebsiteFooter = () => {
         setMessageText("Something went wrong. Please try again.");
         setIsError(true);
       }
-    } catch (error) {
+    } catch {
       setMessageText("Unable to reach server. Please try again later.");
       setIsError(true);
     }
