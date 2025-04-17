@@ -3,8 +3,8 @@ import {
   RouterProvider,
   ScrollRestoration,
 } from "react-router-dom";
-import { UserProvider } from "./utils/UserContext";
 
+import { UserProvider } from "./utils/UserContext";
 import AdministratorPage, {
   AdminCatalog,
   Detail,

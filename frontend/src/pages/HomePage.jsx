@@ -99,7 +99,7 @@ const transformPostData = (data) => {
 
 const HomePage = () => {
   const [newProductData, setNewProductData] = React.useState([]);
-  const user = useUser(); 
+  const user = useUser();
   const isAdmin = user?.role === "admin";
 
   const brands = {

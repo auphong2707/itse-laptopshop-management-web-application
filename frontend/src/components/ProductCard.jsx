@@ -137,12 +137,7 @@ const ProductCard = ({
           )}
 
           {/* Product Image */}
-          <Image
-            src={imgSource}
-            height={120}
-            width="100%"
-            preview={false}
-          />
+          <Image src={imgSource} height={120} width="100%" preview={false} />
 
           {/* Star Rating & Reviews */}
           <div style={{ marginTop: 2, width: "100%" }}>

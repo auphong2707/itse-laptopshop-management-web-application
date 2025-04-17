@@ -416,7 +416,7 @@ const AdminCatalog = () => {
 
         <div className="grid-division">
           {products.map((product, index) => (
-            <ProductCard {...product} isAdmin={true} showDeleteButton={true}/>
+            <ProductCard {...product} isAdmin={true} showDeleteButton={true} />
           ))}
         </div>
 
