@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
+from decimal import Decimal, ROUND_HALF_UP
+import string
 
 NUM_LAPTOPS = 0
 NUM_POSTS = 0
@@ -70,98 +72,148 @@ def generate_laptop_insert_queries(
     sql_output_path="./backend/commands/insert_sample_data.sql",
 ):
     """
-    Generate insert queries from JSON data file
+    Generate insert queries from JSON data file AND store data for orders.
+    Handles value formatting inline.
     """
-    insert_query = """INSERT INTO laptops (brand, sub_brand, name, cpu, vga, ram_amount, ram_type, storage_amount, 
-        storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness, 
-        battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height, 
+    global NUM_LAPTOPS, LAPTOP_DATA_FOR_ORDERS
+    NUM_LAPTOPS = 0
+    LAPTOP_DATA_FOR_ORDERS = []
+
+    insert_query_base = """INSERT INTO laptops (brand, sub_brand, name, cpu, vga, ram_amount, ram_type, storage_amount,
+        storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness,
+        battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height,
         number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
 
-    def convert_value(value):
-        if isinstance(value, str) and value.lower() == "n/a":
-            return "NULL"
-        if value == "n/a" or value == "N/A":
-            return "NULL"
-        elif value is None:
-            return "NULL"
-        return f"'{value}'" if isinstance(value, str) else str(value)
+    all_values = []
 
     try:
+        # --- Load JSON data (keep as is) ---
         laptops = []
         json_file_paths = [
             os.path.join(json_data_directory, file)
             for file in os.listdir(json_data_directory)
             if file.endswith(".json")
         ]
+        print(f"Found {len(json_file_paths)} JSON files for laptops.")
         for json_file_path in json_file_paths:
             with open(json_file_path, "r") as file:
-                data = json.load(file)
-                laptops.extend(data)
-        global NUM_LAPTOPS
-        values = []
-        for laptop in laptops:
-            if laptop["price"] == "n/a":
+                laptops.extend(json.load(file))
+        print(f"Loaded {len(laptops)} potential laptop records.")
+
+        temp_id_counter = 0
+        for laptop_raw in laptops:
+            # --- Price validation and calculation (keep as is) ---
+            if not laptop_raw.get("price") or laptop_raw["price"] == "n/a":
                 continue
-            NUM_LAPTOPS += 1
-            value_tuple = (
-                convert_value(laptop["brand"]),
-                convert_value(get_sub_brand(laptop["brand"], laptop["name"])),
-                convert_value(laptop["name"]),
-                convert_value(laptop["cpu"]),
-                convert_value(laptop["vga"]),
-                convert_value(laptop["ram_amount"]),
-                convert_value(laptop["ram_type"]),
-                convert_value(laptop["storage_amount"]),
-                convert_value(laptop["storage_type"]),
-                convert_value(laptop["webcam_resolution"]),
-                convert_value(laptop["screen_size"]),
-                convert_value(laptop["screen_resolution"]),
-                convert_value(laptop["screen_refresh_rate"]),
-                convert_value(laptop["screen_brightness"]),
-                convert_value(laptop["battery_capacity"]),
-                convert_value(laptop["battery_cells"]),
-                convert_value(laptop["weight"]),
-                convert_value(laptop["default_os"]),
-                convert_value(laptop["warranty"]),
-                convert_value(laptop["width"]),
-                convert_value(laptop["depth"]),
-                convert_value(laptop["height"]),
-                convert_value(laptop["number_usb_a_ports"]),
-                convert_value(laptop["number_usb_c_ports"]),
-                convert_value(laptop["number_hdmi_ports"]),
-                convert_value(laptop["number_ethernet_ports"]),
-                convert_value(laptop["number_audio_jacks"]),
-                convert_value(
-                    json.dumps(
-                        [
-                            f"/static/laptop_images/{NUM_LAPTOPS}_img1.jpg",
-                            f"/static/laptop_images/{NUM_LAPTOPS}_img2.jpg",
-                            f"/static/laptop_images/{NUM_LAPTOPS}_img3.jpg",
-                        ]
-                    )
-                ),
-                str(random.randint(0, 20)),
-                convert_value(laptop["price"]),
-                convert_value(
-                    laptop["price"] - random.randint(0, 20) / 100 * laptop["price"]
-                ),
+            try:
+                original_price_decimal = Decimal(laptop_raw["price"])
+            except TypeError:
+                print(f"Skipping invalid price: {laptop_raw.get('name')}")
+                continue
+            temp_id_counter += 1
+            current_laptop_id = temp_id_counter
+            sale_discount_percent = Decimal(random.randint(0, 20)) / Decimal(100)
+            sale_price_decimal = (
+                original_price_decimal * (Decimal(1) - sale_discount_percent)
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            LAPTOP_DATA_FOR_ORDERS.append(
+                {
+                    "id": current_laptop_id,
+                    "original_price": original_price_decimal,
+                    "generated_sale_price": sale_price_decimal,
+                    "name": laptop_raw.get("name", "Unknown Laptop"),
+                }
             )
 
-            values.append(f"({', '.join(value_tuple)})")
+            # --- Inline Formatting Helper ---
+            def format_sql(value):
+                if isinstance(value, str) and value.lower() == "n/a":
+                    return "NULL"
+                if value == "n/a" or value == "N/A":
+                    return "NULL"
+                if value is None:
+                    return "NULL"
+                if isinstance(value, str):
+                    # --- Previous Fix Applied ---
+                    escaped_value = value.replace("'", "''")
+                    return f"'{escaped_value}'"
+                if isinstance(value, (int, float, Decimal)):
+                    return str(value)
+                return "NULL"
 
-        insert_query += ", ".join(values) + ";"
+            # --- FIX for JSON String Formatting ---
+            image_paths_list = [
+                f"/static/laptop_images/{current_laptop_id}_img{i}.jpg"
+                for i in range(1, 4)
+            ]
+            image_paths_json = json.dumps(image_paths_list)
+            escaped_image_paths_json = image_paths_json.replace("'", "''")
+            image_paths_sql_string = f"'{escaped_image_paths_json}'"
+            # --- END FIX ---
 
-        with open(sql_output_path, "a") as sql_file:
-            sql_file.write(insert_query + "\n")
+            # Prepare values tuple using inline formatting
+            value_tuple = (
+                format_sql(laptop_raw.get("brand")),
+                format_sql(
+                    get_sub_brand(laptop_raw.get("brand"), laptop_raw.get("name"))
+                ),
+                format_sql(laptop_raw.get("name")),
+                format_sql(laptop_raw.get("cpu")),
+                format_sql(laptop_raw.get("vga")),
+                format_sql(laptop_raw.get("ram_amount")),
+                format_sql(laptop_raw.get("ram_type")),
+                format_sql(laptop_raw.get("storage_amount")),
+                format_sql(laptop_raw.get("storage_type")),
+                format_sql(laptop_raw.get("webcam_resolution")),
+                format_sql(laptop_raw.get("screen_size")),
+                format_sql(laptop_raw.get("screen_resolution")),
+                format_sql(laptop_raw.get("screen_refresh_rate")),
+                format_sql(laptop_raw.get("screen_brightness")),
+                format_sql(laptop_raw.get("battery_capacity")),
+                format_sql(laptop_raw.get("battery_cells")),
+                format_sql(laptop_raw.get("weight")),
+                format_sql(laptop_raw.get("default_os")),
+                format_sql(laptop_raw.get("warranty")),
+                format_sql(laptop_raw.get("width")),
+                format_sql(laptop_raw.get("depth")),
+                format_sql(laptop_raw.get("height")),
+                format_sql(laptop_raw.get("number_usb_a_ports")),
+                format_sql(laptop_raw.get("number_usb_c_ports")),
+                format_sql(laptop_raw.get("number_hdmi_ports")),
+                format_sql(laptop_raw.get("number_ethernet_ports")),
+                format_sql(laptop_raw.get("number_audio_jacks")),
+                image_paths_sql_string,
+                str(random.randint(5, 50)),
+                str(int(original_price_decimal)),
+                str(int(sale_price_decimal)),
+            )
+            all_values.append(f"({', '.join(value_tuple)})")
 
-        print(f"INSERT laptop queries successfully written to {sql_output_path}")
+        NUM_LAPTOPS = temp_id_counter
+        print(f"Processed {NUM_LAPTOPS} valid laptop records for insertion.")
+
+        # --- Write SQL (keep as is) ---
+        if all_values:
+            chunk_size = 500
+            with open(sql_output_path, "a") as sql_file:
+                sql_file.write("-- Sample Laptop Data --\n")
+                for i in range(0, len(all_values), chunk_size):
+                    chunk = all_values[i : i + chunk_size]
+                    insert_query = insert_query_base + ",\n".join(chunk) + ";\n"
+                    sql_file.write(insert_query)
+            print(f"INSERT laptop queries successfully written to {sql_output_path}")
+        else:
+            print("No valid laptop data found to generate SQL.")
 
     except FileNotFoundError:
-        print(f"Error: JSON file not found at {json_file_path}")
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in {json_file_path}")
+        print(f"Error: JSON directory not found at {json_data_directory}")
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON format: {e}")
     except Exception as e:
-        print(f"Error occurred: {str(e)}")
+        print(f"Error occurred during laptop generation: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
 
 
 def generate_reviews(
@@ -377,6 +429,191 @@ def generate_post_images(
     print(f"Generated {num_posts} post images in '{output_dir}'")
 
 
+def generate_orders(
+    sql_output_path="./backend/commands/insert_sample_data.sql",
+    num_orders=50,
+    max_items_per_order=5,
+    max_quantity_per_item=3,
+):
+    """Generates sample orders and order items SQL using inline formatting."""
+    global NUM_LAPTOPS, LAPTOP_DATA_FOR_ORDERS
+    print(f"\nStarting order generation for {num_orders} orders...")
+    if NUM_LAPTOPS == 0 or not LAPTOP_DATA_FOR_ORDERS:
+        print("Skipping order generation: No valid laptop data.")
+        return
+
+    # --- Generate Fake User Data (keep as before) ---
+    fake_users = []
+    # ... (user generation lists and logic) ...
+    first_names = ["An", "Binh", "Chi", "Duy", "Em", "Phat", "Ga", "Ha", "Khoa", "Lan"]
+    last_names = [
+        "Nguyen",
+        "Tran",
+        "Le",
+        "Pham",
+        "Hoang",
+        "Vu",
+        "Bui",
+        "Doan",
+        "Dang",
+        "Ngo",
+    ]
+    domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com"]
+    countries = ["VN", "US", "SG", "KR", "JP"]
+    statuses = [
+        "pending",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+    ]
+
+    def generate_fake_uid(length=28):
+        return "".join(random.choices(string.ascii_letters + string.digits, k=length))
+
+    for i in range(num_orders):
+        first = random.choice(first_names)
+        last = random.choice(last_names)
+        email = f"{first.lower()}.{last.lower()}{random.randint(1,99)}@{random.choice(domains)}"
+        fake_users.append(
+            {
+                "user_id": generate_fake_uid(),
+                "first_name": first,
+                "last_name": last,
+                "user_name": f"{first} {last}",
+                "user_email": email,
+                "shipping_address": f"{random.randint(1, 100)} {random.choice(['Main St', 'High St', 'Elm St'])}, {random.choice(['Hanoi', 'HCMC', 'Danang'])}",
+                "phone_number": f"+84{random.randint(900000000, 999999999)}",
+                "company": random.choice(
+                    [None, "TechCorp", "Innovate Ltd", "Sample Co"]
+                ),
+                "country": random.choice(countries),
+                "zip_code": str(random.randint(10000, 99999)),
+            }
+        )
+
+    # --- Prepare SQL Statements (keep as before) ---
+    order_inserts = []
+    order_item_inserts = []
+    current_order_id = 0
+    laptop_price_map = {laptop["id"]: laptop for laptop in LAPTOP_DATA_FOR_ORDERS}
+
+    # --- Proactive Fix for Inline Formatting Helper within this function ---
+    def format_sql_local(value):
+        if isinstance(value, str) and value.lower() == "n/a":
+            return "NULL"
+        if value == "n/a" or value == "N/A":
+            return "NULL"
+        if value is None:
+            return "NULL"
+        if isinstance(value, str):
+            # --- Apply same fix as above ---
+            escaped_value = value.replace("'", "''")
+            return f"'{escaped_value}'"
+        if isinstance(value, datetime):
+            return f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
+        if isinstance(value, Decimal):
+            return f"'{value.quantize(Decimal('0.01'))}'"
+        if isinstance(value, (int, float)):
+            return str(value)
+        return "NULL"
+
+    # --- End Proactive Fix ---
+
+    for i in tqdm(range(num_orders), desc="Generating order SQL"):
+        # --- Order and Item Generation Logic (keep as before) ---
+        current_order_id += 1
+        user_data = random.choice(fake_users)
+        num_items = random.randint(1, max_items_per_order)
+        order_total_price = Decimal("0.00")
+        order_status = random.choice(statuses)
+        days_ago = random.randint(1, 365)
+        created_at_dt = datetime.now() - timedelta(days=days_ago)
+        current_order_items = []
+        laptops_in_this_order = set()
+        for _ in range(num_items):
+            available_laptop_ids = list(
+                set(laptop_price_map.keys()) - laptops_in_this_order
+            )
+            if not available_laptop_ids:
+                break
+            laptop_id = random.choice(available_laptop_ids)
+            laptops_in_this_order.add(laptop_id)
+            laptop_info = laptop_price_map.get(laptop_id)
+            if not laptop_info:
+                continue
+            quantity = random.randint(1, max_quantity_per_item)
+            price_at_purchase = laptop_info["generated_sale_price"]
+            order_total_price += price_at_purchase * quantity
+            current_order_items.append((laptop_id, quantity, price_at_purchase))
+
+        # Generate ORDER INSERT using the fixed inline helper
+        order_values = (
+            format_sql_local(user_data["user_id"]),
+            format_sql_local(user_data["first_name"]),
+            format_sql_local(user_data["last_name"]),
+            format_sql_local(user_data["user_name"]),
+            format_sql_local(user_data["user_email"]),
+            format_sql_local(user_data["shipping_address"]),
+            format_sql_local(user_data["phone_number"]),
+            format_sql_local(user_data["company"]),
+            format_sql_local(user_data["country"]),
+            format_sql_local(user_data["zip_code"]),
+            format_sql_local(order_total_price),
+            format_sql_local(order_status),
+            format_sql_local(created_at_dt),
+            format_sql_local(created_at_dt),
+        )
+        order_inserts.append(f"({', '.join(order_values)})")
+
+        # Generate ORDER ITEM INSERTS using the fixed inline helper
+        for item_tuple in current_order_items:
+            item_values = (
+                str(current_order_id),
+                str(item_tuple[0]),
+                str(item_tuple[1]),
+                format_sql_local(item_tuple[2]),  # price_at_purchase
+            )
+            order_item_inserts.append(f"({', '.join(item_values)})")
+
+    # --- Write SQL to File (keep as before) ---
+    # ... (SQL writing logic) ...
+    with open(sql_output_path, "a") as sql_file:
+        sql_file.write("\n-- Sample Order Data --\n")
+        if order_inserts:
+            order_cols = "(user_id, first_name, last_name, user_name, user_email, shipping_address, phone_number, company, country, zip_code, total_price, status, created_at, updated_at)"
+            chunk_size = 100
+            for i in range(0, len(order_inserts), chunk_size):
+                chunk = order_inserts[i : i + chunk_size]
+                sql_file.write(
+                    f"INSERT INTO orders {order_cols} VALUES\n"
+                    + ",\n".join(chunk)
+                    + ";\n"
+                )
+        else:
+            sql_file.write("-- No orders generated --\n")
+        sql_file.write("\n-- Sample Order Item Data --\n")
+        if order_item_inserts:
+            item_cols = "(order_id, product_id, quantity, price_at_purchase)"
+            chunk_size = 500
+            for i in range(0, len(order_item_inserts), chunk_size):
+                chunk = order_item_inserts[i : i + chunk_size]
+                sql_file.write(
+                    f"INSERT INTO order_items {item_cols} VALUES\n"
+                    + ",\n".join(chunk)
+                    + ";\n"
+                )
+        else:
+            sql_file.write("-- No order items generated --\n")
+    print(
+        f"INSERT queries for {num_orders} orders and their items written to {sql_output_path}"
+    )
+    print(
+        "IMPORTANT: Assumed Order IDs start from 1. Ensure sequence alignment if needed."
+    )
+
+
 if __name__ == "__main__":
     clear_old_commands()
     generate_laptop_insert_queries()
@@ -384,5 +621,5 @@ if __name__ == "__main__":
     generate_reviews()
     generate_subscriptions()
     generate_posts()
-    # generate_orders()
     generate_post_images(num_posts=NUM_POSTS)
+    generate_orders(num_orders=20)

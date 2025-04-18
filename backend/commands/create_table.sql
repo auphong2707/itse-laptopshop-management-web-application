@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS orders (
     country VARCHAR(10),             
     zip_code VARCHAR(20),            
 
-    total_price DECIMAL(10, 2) NOT NULL,
+    total_price DECIMAL(18, 2) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL, -- Should reference laptops.id
     quantity INTEGER NOT NULL,
-    price_at_purchase DECIMAL(10, 2) NOT NULL, -- **IMPORTANT: Store the price paid per item**
+    price_at_purchase DECIMAL(18, 2) NOT NULL, -- **IMPORTANT: Store the price paid per item**
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
     -- Optional: Add FOREIGN KEY (product_id) REFERENCES laptops(id) ON DELETE SET NULL (or RESTRICT)
 );
