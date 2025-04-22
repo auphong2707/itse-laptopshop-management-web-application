@@ -55,9 +55,18 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Tag color={status === 'completed' ? 'green' : 'orange'}>{status}</Tag>
-      ),
+      render: (status) => {
+        const statusColors = {
+          pending: 'gold',
+          processing: 'blue',
+          shipped: 'cyan',
+          delivered: 'green',
+          cancelled: 'red',
+          refunded: 'volcano',
+        };
+    
+        return <Tag color={statusColors[status] || 'default'}>{status}</Tag>;
+      },
     },
     {
       title: 'Created At',
