@@ -18,6 +18,7 @@ import {
 import { Divider } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
+import { useUser } from "../utils/UserContext.jsx";
 import WebsiteHeader from "../components/WebsiteHeader.jsx";
 import WebsiteFooter from "../components/WebsiteFooter.jsx";
 import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
@@ -625,12 +626,68 @@ const RefundRequest = () => {
 };
 
 const Orders = () => {
+  const user = useUser();
+  const [ordersData, setOrdersData] = useState({
+    orders: [],
+    total_count: 0,
+    page: 1,
+    limit: 20,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchOrders = async (page = 1, limit = 20) => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const token = await user.accessToken;
+      const response = await axios.get("http://localhost:8000/orders/admin/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page,
+          limit,
+          // Optional: add filters here
+        },
+      });
+      setOrdersData({
+        ...response.data,
+        page,
+        limit,
+      });
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders(ordersData.page, ordersData.limit);
+  }, [user]);
+
+  const handleTableChange = (pagination) => {
+    fetchOrders(pagination.current, pagination.pageSize);
+  };
+
+  if (loading) return <p>Loading orders...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (user?.role !== "admin") return <p>Access denied: Admins only</p>;
+
   return (
     <div style={{ paddingTop: "2rem" }}>
-      <OrderTable />
+      <OrderTable
+        orders={ordersData.orders}
+        page={ordersData.page}
+        limit={ordersData.limit}
+        total_count={ordersData.total_count}
+        onTableChange={handleTableChange}
+      />
     </div>
-  )
-}
+  );
+};
 
 const AdminTabs = () => {
   const navigate = useNavigate();

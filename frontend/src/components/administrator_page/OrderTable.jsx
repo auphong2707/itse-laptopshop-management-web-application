@@ -1,52 +1,16 @@
+import React from 'react';
 import { Table, Card, Tag } from 'antd';
 
-// Sample mock data
-const sampleData = {
-  total_count: 1,
-  page: 0,
-  limit: 10,
-  orders: [
-    {
-      id: 1001,
-      user_id: 'u123',
-      first_name: 'John',
-      last_name: 'Doe',
-      user_name: 'johndoe',
-      user_email: 'john@example.com',
-      total_price: '$250.00',
-      status: 'processing',
-      created_at: '2025-04-22T01:40:38.015Z',
-      updated_at: '2025-04-22T02:00:00.000Z',
-      shipping_address: '123 Main St, New York, NY',
-      phone_number: '123-456-7890',
-      company: 'Example Corp',
-      country: 'USA',
-      zip_code: '10001',
-      items: [
-        {
-          product_id: 501,
-          quantity: 2,
-          price_at_purchase: '$100.00',
-        },
-        {
-          product_id: 502,
-          quantity: 1,
-          price_at_purchase: '$50.00',
-        },
-      ],
-    },
-  ],
-};
-
-const OrderTable = () => {
+const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
   const columns = [
     {
       title: 'Order ID',
       dataIndex: 'id',
       key: 'id',
+      fixed: 'left',
     },
     {
-      title: 'User',
+      title: 'User Name',
       dataIndex: 'user_name',
       key: 'user_name',
       render: (_, record) =>
@@ -56,6 +20,31 @@ const OrderTable = () => {
       title: 'Email',
       dataIndex: 'user_email',
       key: 'user_email',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone_number',
+      key: 'phone_number',
+    },
+    {
+      title: 'Company',
+      dataIndex: 'company',
+      key: 'company',
+    },
+    {
+      title: 'Country',
+      dataIndex: 'country',
+      key: 'country',
+    },
+    {
+      title: 'Zip Code',
+      dataIndex: 'zip_code',
+      key: 'zip_code',
+    },
+    {
+      title: 'Shipping Address',
+      dataIndex: 'shipping_address',
+      key: 'shipping_address',
     },
     {
       title: 'Total Price',
@@ -114,19 +103,21 @@ const OrderTable = () => {
   };
 
   return (
-    <Card title="Order Table">
-      <Table
-        columns={columns}
-        dataSource={sampleData.orders}
-        expandable={{ expandedRowRender }}
-        rowKey="id"
-        pagination={{
-          total: sampleData.total_count,
-          pageSize: sampleData.limit,
-          current: sampleData.page + 1,
-        }}
-      />
-    </Card>
+    <Table
+      columns={columns}
+      dataSource={orders}
+      expandable={{ expandedRowRender }}
+      rowKey="id"
+      scroll={{ x: 'max-content' }}
+      pagination={{
+        total: total_count,
+        pageSize: limit,
+        current: page,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '50', '100'],
+      }}
+      onChange={onTableChange}
+    />
   );
 };
 
