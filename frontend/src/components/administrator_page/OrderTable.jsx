@@ -1,7 +1,45 @@
-import { Table, Tag } from 'antd';
+import { Table, Tag, Button, Popconfirm, message, Select } from 'antd';
+import axios from 'axios';
 import dayjs from 'dayjs';
+import { useUser } from '../../utils/UserContext';
 
-const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
+const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessToken }) => {
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    console.log(`Updating order ${orderId} status to ${newStatus}`);
+    try {
+      await axios.patch(
+        `http://localhost:8000/orders/admin/${orderId}/status`, 
+        {
+          status: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+      message.success(`Order ${orderId} status updated to ${newStatus}`);
+      onTableChange({ current: page, pageSize: limit }); // refresh table
+    } catch (error) {
+      message.error('Failed to update status');
+    }
+  };
+
+  const handleDelete = async (orderId) => {
+    try {
+      await axios.delete(`http://localhost:8000/orders/admin/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      message.success(`Order ${orderId} deleted`);
+      onTableChange({ current: page, pageSize: limit }); // refresh table
+    } catch (error) {
+      message.error('Failed to delete order');
+    }
+  };
+
   const columns = [
     {
       title: 'Order ID',
@@ -80,6 +118,35 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
       key: 'updated_at',
       render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
     },
+    {
+      title: 'Actions',
+      key: 'actions',
+      fixed: 'right',
+      render: (_, record) => (
+        <>
+          <Select
+            defaultValue={record.status}
+            style={{ width: 120, marginRight: 8 }}
+            onChange={(value) => handleStatusChange(record.id, value)}
+          >
+            {['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].map((status) => (
+              <Select.Option key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </Select.Option>
+            ))}
+          </Select>
+          <Popconfirm
+            title="Are you sure to delete this order?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger>Delete</Button>
+          </Popconfirm>
+        </>
+      ),
+    }
+    
   ];
 
   const expandedRowRender = (order) => {

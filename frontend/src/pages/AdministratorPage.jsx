@@ -767,6 +767,7 @@ const Orders = () => {
         limit={ordersData.limit}
         total_count={ordersData.total_count}
         onTableChange={handleTableChange}
+        accessToken={user.accessToken}
       />
     </div>
   );
