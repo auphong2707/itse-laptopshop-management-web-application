@@ -23,6 +23,7 @@ import WebsiteFooter from "../components/WebsiteFooter.jsx";
 import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
+import OrderTable from "../components/administrator_page/OrderTable.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -615,6 +616,22 @@ const StockAlert = () => {
   );
 };
 
+const RefundRequest = () => {
+  return (
+    <div style={{ paddingTop: "2rem" }}>
+      <RefundTable />
+    </div>
+  );
+};
+
+const Orders = () => {
+  return (
+    <div style={{ paddingTop: "2rem" }}>
+      <OrderTable />
+    </div>
+  )
+}
+
 const AdminTabs = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -624,6 +641,7 @@ const AdminTabs = () => {
     if (location.pathname.includes("/admin/detail")) return "1";
     if (location.pathname.includes("/admin/refund")) return "2";
     if (location.pathname.includes("/admin/stock-alerts")) return "3";
+    if (location.pathname.includes("/admin/orders")) return "4";
     return "0";
   };
 
@@ -632,6 +650,7 @@ const AdminTabs = () => {
     if (key === "1") navigate("/admin/detail");
     if (key === "2") navigate("/admin/refund");
     if (key === "3") navigate("/admin/stock-alerts");
+    if (key === "4") navigate("/admin/orders");
   };
 
   return (
@@ -647,15 +666,8 @@ const AdminTabs = () => {
         <Tabs.TabPane key="1" tab="Detail" />
         <Tabs.TabPane key="2" tab="Refund Request" />
         <Tabs.TabPane key="3" tab="Stock Alerts" />
+        <Tabs.TabPane key="4" tab="Orders" />
       </Tabs>
-    </div>
-  );
-};
-
-const RefundRequest = () => {
-  return (
-    <div style={{ paddingTop: "2rem" }}>
-      <RefundTable />
     </div>
   );
 };
@@ -701,4 +713,4 @@ OptionalLabel.propTypes = {
 };
 
 export default AdministratorPage;
-export { Detail, AdminCatalog, RefundRequest, StockAlert };
+export { Detail, AdminCatalog, RefundRequest, StockAlert, Orders };
