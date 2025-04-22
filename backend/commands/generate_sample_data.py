@@ -622,4 +622,4 @@ if __name__ == "__main__":
     generate_subscriptions()
     generate_posts()
     generate_post_images(num_posts=NUM_POSTS)
-    generate_orders(num_orders=20)
+    generate_orders(num_orders=100)
