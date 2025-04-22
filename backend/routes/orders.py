@@ -381,7 +381,9 @@ def cancel_my_order(
 
 # == Admin operation == #
 
-@orders_router.get("/admin/orders")
+@orders_router.get(
+    "/admin/orders",
+    dependencies=[Depends(require_admin_role)])
 def admin_get_all_orders(
     page: int = Query(1, ge=1),
     limit: Optional[int] = Query(20, ge=1, le=100),
