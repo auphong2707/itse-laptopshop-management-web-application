@@ -1,4 +1,3 @@
-from elasticsearch import Elasticsearch
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
@@ -31,9 +30,6 @@ except ImportError:
 except Exception as e:
     print(f"Warning: Firestore client could not be initialized. Error: {e}")
     db_firestore = None
-
-# -- Initialize Elasticsearch Client ---
-es = Elasticsearch("http://elasticsearch:9200")
 
 # --- Create Router ---
 orders_router = APIRouter(prefix="/orders", tags=["orders"])
@@ -381,10 +377,15 @@ def cancel_my_order(
 
 # == Admin operation == #
 
-@orders_router.get("/admin/orders")
+
+@orders_router.get(
+    "/admin/list",
+    response_model=PaginatedOrdersResponse,
+    dependencies=[Depends(require_admin_role)],
+)
 def admin_get_all_orders(
     page: int = Query(1, ge=1),
-    limit: Optional[int] = Query(20, ge=1, le=100),
+    limit: int = Query(20, ge=1, le=100),
     status: Optional[str] = Query(None, description="Filter by order status"),
     user_id_filter: Optional[str] = Query(
         None, alias="userId", description="Filter by User ID (Firebase UID)"
@@ -395,50 +396,37 @@ def admin_get_all_orders(
     end_date: Optional[datetime] = Query(
         None, description="Filter orders created on or before this date (ISO Format)"
     ),
+    db: Session = Depends(get_db),
 ):
-    # build the bool filter exactly like filter_laptops
-    filter_clauses: list[dict] = []
-    if status:
-        filter_clauses.append({"term": {"status.keyword": status}})
-    if user_id_filter:
-        filter_clauses.append({"term": {"user_id.keyword": user_id_filter}})
-    if start_date or end_date:
-        rng: dict = {}
-        if start_date:
-            rng["gte"] = start_date.isoformat()
-        if end_date:
-            rng["lte"] = end_date.isoformat()
-        filter_clauses.append({"range": {"created_at": rng}})
-
-    body: dict = {
-        "query": {"bool": {"filter": filter_clauses or [{"match_all": {}}]}},
-        "sort": [{"created_at": {"order": "desc"}}],
-    }
-    if limit is not None:
-        body.update({"size": limit, "from": (page - 1) * limit})
-
+    """
+    [Admin] Retrieves a paginated list of all orders, with optional filters.
+    Requires admin privileges.
+    """
+    offset = (page - 1) * limit
     try:
-        resp = es.search(index="orders", body=body, track_total_hits=True)
-    except Exception as e:
-        print(f"Elasticsearch error fetching orders: {e}")
-        raise HTTPException(500, "Could not retrieve orders.")
+        query = db.query(Order).options(joinedload(Order.items))
 
-    total = resp["hits"]["total"]["value"]
-    hits = resp["hits"]["hits"]
+        if status:
+            query = query.filter(Order.status == status)
+        if user_id_filter:
+            query = query.filter(Order.user_id == user_id_filter)
+        if start_date:
+            query = query.filter(Order.created_at >= start_date)
+        if end_date:
+            query = query.filter(Order.created_at <= end_date)
 
-    # turn each hit into a dict, injecting the ES document ID
-    orders = []
-    for hit in hits:
-        src = hit["_source"]
-        src["id"] = hit["_id"]
-        orders.append(src)
+        total_count = query.count()
 
-    return {
-        "page": page if limit is not None else None,
-        "limit": limit,
-        "total_count": total,
-        "orders": orders,
-    }
+        orders = (
+            query.order_by(Order.created_at.desc()).offset(offset).limit(limit).all()
+        )
+
+        return PaginatedOrdersResponse(
+            total_count=total_count, page=page, limit=limit, orders=orders
+        )
+    except SQLAlchemyError as e:
+        print(f"Database error fetching all orders for admin: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve orders.")
 
 
 @orders_router.patch(
