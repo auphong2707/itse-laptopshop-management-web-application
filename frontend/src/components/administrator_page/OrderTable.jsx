@@ -1,5 +1,5 @@
-import React from 'react';
-import { Table, Card, Tag } from 'antd';
+import { Table, Tag } from 'antd';
+import dayjs from 'dayjs';
 
 const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
   const columns = [
@@ -72,13 +72,13 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange }) => {
       title: 'Created At',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (val) => new Date(val).toLocaleString(),
+      render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
     },
     {
       title: 'Updated At',
       dataIndex: 'updated_at',
       key: 'updated_at',
-      render: (val) => new Date(val).toLocaleString(),
+      render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
     },
   ];
 
