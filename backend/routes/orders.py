@@ -122,7 +122,7 @@ def create_order_from_cart(
             items_to_create.append({
                 "product_id": product_id,
                 "quantity": requested_quantity,
-                "price_at_purchase_int": sale_price, 
+                "price_at_purchase": sale_price, 
             })
             laptops_to_update[product_id] = requested_quantity
 
