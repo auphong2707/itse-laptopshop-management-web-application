@@ -8,6 +8,7 @@ import { UserProvider } from "./utils/UserContext";
 import AdministratorPage, {
   AdminCatalog,
   Detail,
+  Orders,
   RefundRequest,
   StockAlert,
 } from "./pages/AdministratorPage";
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
         path: "stock-alerts",
         element: <StockAlert />,
       },
+      {
+        path: "orders",
+        element: <Orders />,
+      }
     ],
   },
   {
