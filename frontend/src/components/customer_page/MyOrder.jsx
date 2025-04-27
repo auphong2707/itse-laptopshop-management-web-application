@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Table, Spin, Typography } from "antd";
+import { Table, Spin, Typography, Button } from "antd";
 import axios from "axios";
 import { useUser } from "../../utils/UserContext.jsx";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
@@ -22,7 +23,6 @@ const MyOrder = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch product details using product_id
   const fetchProductDetails = async (productId) => {
     try {
       const response = await axios.get(`http://localhost:8000/laptops/id/${productId}`);
@@ -34,11 +34,10 @@ const MyOrder = () => {
       };
     } catch (err) {
       console.error("Error fetching product details:", err);
-      return { product_name: "Unknown", image: "/default-image.jpg" }; // Default values if fetch fails
+      return { product_name: "Unknown", image: "/default-image.jpg" };
     }
   };
 
-  // Function to fetch orders for the authenticated user
   const fetchOrders = async (page = 1, limit = 20) => {
     if (!user) return;
 
@@ -58,7 +57,6 @@ const MyOrder = () => {
         params,
       });
 
-      // Fetch product details for each item in the orders
       const ordersWithProductInfo = await Promise.all(
         response.data.orders.map(async (order) => {
           const itemsWithDetails = await Promise.all(
@@ -68,7 +66,7 @@ const MyOrder = () => {
                 ...item,
                 product_name: productDetails.product_name,
                 image: productDetails.image,
-                subtotal: item.price_at_purchase * item.quantity, // Calculate subtotal
+                subtotal: item.price_at_purchase * item.quantity,
               };
             })
           );
@@ -93,6 +91,18 @@ const MyOrder = () => {
     }
   };
 
+  const handleRefundRequest = (orderId) => {
+    console.log("Refund requested for order ID:", orderId);
+    // TODO: Implement API call or modal for refund request
+    // Example: message.success(`Refund request for Order ${orderId} submitted`);
+  };
+
+  const handleCancelOrder = (orderId) => {
+    console.log("Cancel requested for order ID:", orderId);
+    // TODO: Call API or show confirmation for canceling order
+    // Example: message.success(`Order ${orderId} has been canceled`);
+  };
+
   useEffect(() => {
     if (user) {
       fetchOrders(ordersData.page, ordersData.limit);
@@ -101,57 +111,104 @@ const MyOrder = () => {
     }
   }, [user]);
 
-  // Columns for displaying the orders in a table
   const columns = [
     {
-      title: "Item",
-      dataIndex: "image",
-      key: "image",
-      render: (image) => (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img
-            src={image}
-            alt="Product"
-            width={80}
-            height={80}
-            style={{ objectFit: "contain", borderRadius: "5px" }}
-          />
-        </div>
-      ),
-      align: "center",
+      title: "Order ID",
+      dataIndex: "id",
+      key: "id",
     },
     {
-      title: "Name",
-      dataIndex: "product_name",
-      key: "product_name",
-      render: (name) => <Text style={{ fontSize: "14px", fontWeight: "bold" }}>{name}</Text>,
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      render: (quantity) => <Text>{quantity}</Text>,
-      align: "center",
-    },
-    {
-      title: "Price",
-      dataIndex: "price_at_purchase",
-      key: "price_at_purchase",
+      title: "Total Price",
+      dataIndex: "total_price",
+      key: "total_price",
       render: (price) => <Text>{formatPrice(price)}</Text>,
       align: "center",
     },
     {
-      title: "Subtotal",
-      dataIndex: "subtotal",
-      key: "subtotal",
-      render: (subtotal) => (
-        <Text>{formatPrice(subtotal)}</Text>
-      ),
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       align: "center",
+    },
+    {
+      title: "Created At",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
+      align: "center",
+    },
+    {
+      title: "",
+      key: "actions",
+      align: "center",
+      render: (_, record) => (
+        <>
+          <Button type="primary" onClick={() => handleRefundRequest(record.id)} style={{ marginRight: 8 }}>
+            Refund
+          </Button>
+          <Button danger onClick={() => handleCancelOrder(record.id)}>
+            Cancel
+          </Button>
+        </>
+      ),
     },
   ];
 
-  // Handle page change in the table
+  const expandedRowRender = (order) => {
+    const itemColumns = [
+      {
+        title: "Image",
+        dataIndex: "image",
+        key: "image",
+        render: (image) => (
+          <img
+            src={image}
+            alt="Product"
+            width={60}
+            height={60}
+            style={{ objectFit: "contain", borderRadius: "5px" }}
+          />
+        ),
+        align: "center",
+      },
+      {
+        title: "Product Name",
+        dataIndex: "product_name",
+        key: "product_name",
+        render: (name) => <div style={{ maxWidth: 550 }}>{name}</div>,
+      },
+      {
+        title: "Quantity",
+        dataIndex: "quantity",
+        key: "quantity",
+        align: "center",
+      },
+      {
+        title: "Price at Purchase",
+        dataIndex: "price_at_purchase",
+        key: "price_at_purchase",
+        render: (price) => <Text>{formatPrice(price)}</Text>,
+        align: "center",
+      },
+      {
+        title: "Total",
+        dataIndex: "subtotal",
+        key: "subtotal",
+        render: (subtotal) => <Text>{formatPrice(subtotal)}</Text>,
+        align: "center",
+      },
+    ];
+
+    return (
+      <Table
+        columns={itemColumns}
+        dataSource={order.items}
+        rowKey={(item) => `${order.id}-${item.product_id}`}
+        pagination={false}
+      />
+    );
+  };
+
   const handleTableChange = (pagination) => {
     fetchOrders(pagination.current, ordersData.limit);
   };
@@ -162,20 +219,22 @@ const MyOrder = () => {
 
       {error && <Text type="danger">{error}</Text>}
 
-      {/* Loading indicator while fetching data */}
       {loading ? (
         <Spin tip="Loading orders..." />
       ) : (
         <Table
           columns={columns}
-          dataSource={ordersData.orders.flatMap((order) => order.items)} // Flatten the items for each order
+          dataSource={ordersData.orders}
+          expandable={{ expandedRowRender }}
+          rowKey="id"
           pagination={{
             current: ordersData.page,
-            pageSize: ordersData.limit,
+            pageSize: 10,
             total: ordersData.total_count,
+            showSizeChanger: false,
           }}
+          scroll={{ x: 'max-content' }}
           onChange={handleTableChange}
-          rowKey="product_id"
         />
       )}
     </div>
