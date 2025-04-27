@@ -105,32 +105,25 @@ def create_order_from_cart(
                 raise HTTPException(
                     status_code=404, detail=f"Product ID {product_id} not found."
                 )
+
             if laptop.quantity < requested_quantity:
                 raise HTTPException(
                     status_code=400,
                     detail=f"Insufficient stock for {laptop.name} (ID: {product_id}).",
                 )
-            try:
-                sale_price = (
-                    Decimal(laptop.sale_price) / Decimal("100")
-                    if isinstance(laptop.sale_price, int)
-                    else Decimal(laptop.sale_price)
-                )
-            except (TypeError, ValueError, InvalidOperation):
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Invalid sale price for product ID {product_id}",
-                )
 
-            item_subtotal = sale_price * Decimal(requested_quantity)
-            order_total_price += item_subtotal
-            items_to_create.append(
-                {
-                    "product_id": product_id,
-                    "quantity": requested_quantity,
-                    "price_at_purchase": sale_price,
-                }
-            )
+            sale_price = laptop.sale_price 
+            if sale_price is None:
+                 raise HTTPException(status_code=500, detail=f"Missing price for product ID {product_id}")
+
+            item_subtotal_int = sale_price * requested_quantity
+            order_total_price_int += item_subtotal_int 
+
+            items_to_create.append({
+                "product_id": product_id,
+                "quantity": requested_quantity,
+                "price_at_purchase_int": sale_price, 
+            })
             laptops_to_update[product_id] = requested_quantity
 
         # --- 3. Database Transaction: Create Order, Items, Update Stock ---

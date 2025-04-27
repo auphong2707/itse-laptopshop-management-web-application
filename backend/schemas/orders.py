@@ -7,7 +7,7 @@ from decimal import Decimal
 class OrderItemBase(BaseModel):
     product_id: int
     quantity: int
-    price_at_purchase: Decimal = Field(..., decimal_places=2)
+    price_at_purchase: int
 
     class Config:
         from_attributes = True
@@ -15,7 +15,7 @@ class OrderItemBase(BaseModel):
 
 class OrderBase(BaseModel):
     user_id: str
-    total_price: Decimal = Field(..., decimal_places=2)
+    total_price: int
     status: str
     created_at: datetime
     updated_at: datetime
