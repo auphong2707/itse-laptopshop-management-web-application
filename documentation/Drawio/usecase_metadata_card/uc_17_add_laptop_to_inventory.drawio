@@ -1,11 +1,11 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.15">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0" version="27.0.3">
   <diagram name="Page-1" id="fKVwwtdCKL8fbl8xTrPb">
-    <mxGraphModel dx="1866" dy="1228" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="703" dy="420" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="5I76yNdcYX2ceO-F8l6g-1" value="" style="shape=table;startSize=0;container=1;collapsible=0;childLayout=tableLayout;fontStyle=0" parent="1" vertex="1">
-          <mxGeometry x="110" y="170" width="670" height="670" as="geometry" />
+          <mxGeometry x="110" y="170" width="670" height="700" as="geometry" />
         </mxCell>
         <mxCell id="5I76yNdcYX2ceO-F8l6g-2" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="5I76yNdcYX2ceO-F8l6g-1" vertex="1">
           <mxGeometry width="670" height="40" as="geometry" />
@@ -329,50 +329,50 @@
             <mxRectangle width="410" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="LJPUDyNstXPkrlik5nQ6-1" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="5I76yNdcYX2ceO-F8l6g-1">
+        <mxCell id="LJPUDyNstXPkrlik5nQ6-1" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="5I76yNdcYX2ceO-F8l6g-1" vertex="1">
           <mxGeometry y="560" width="670" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="LJPUDyNstXPkrlik5nQ6-2" value="Exception Flow" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontStyle=1;rowspan=2;colspan=1;" vertex="1" parent="LJPUDyNstXPkrlik5nQ6-1">
-          <mxGeometry width="110" height="110" as="geometry">
+        <mxCell id="LJPUDyNstXPkrlik5nQ6-2" value="Exception Flow" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontStyle=1;rowspan=2;colspan=1;" parent="LJPUDyNstXPkrlik5nQ6-1" vertex="1">
+          <mxGeometry width="110" height="140" as="geometry">
             <mxRectangle width="110" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="LJPUDyNstXPkrlik5nQ6-3" value="5a" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="LJPUDyNstXPkrlik5nQ6-1">
+        <mxCell id="LJPUDyNstXPkrlik5nQ6-3" value="7a" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="LJPUDyNstXPkrlik5nQ6-1" vertex="1">
           <mxGeometry x="110" width="50" height="70" as="geometry">
             <mxRectangle width="50" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="LJPUDyNstXPkrlik5nQ6-4" value="System" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="LJPUDyNstXPkrlik5nQ6-1">
+        <mxCell id="LJPUDyNstXPkrlik5nQ6-4" value="System" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="LJPUDyNstXPkrlik5nQ6-1" vertex="1">
           <mxGeometry x="160" width="100" height="70" as="geometry">
             <mxRectangle width="100" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="LJPUDyNstXPkrlik5nQ6-5" value="Admin enters one or more fields in the wrong format: Highlight fields and show: &lt;strong data-end=&quot;326&quot; data-start=&quot;299&quot;&gt;&quot;Invalid input format.&quot;&lt;/strong&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="LJPUDyNstXPkrlik5nQ6-1">
+        <mxCell id="LJPUDyNstXPkrlik5nQ6-5" value="&lt;div&gt;Admin enters one or more fields in the wrong format: Highlight fields and show: &lt;strong data-end=&quot;326&quot; data-start=&quot;299&quot;&gt;&quot;Invalid input format.&quot;&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;Use case back to Step 5&lt;/i&gt;&lt;/div&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="LJPUDyNstXPkrlik5nQ6-1" vertex="1">
           <mxGeometry x="260" width="410" height="70" as="geometry">
             <mxRectangle width="410" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="5I76yNdcYX2ceO-F8l6g-52" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="5I76yNdcYX2ceO-F8l6g-1" vertex="1">
-          <mxGeometry y="630" width="670" height="40" as="geometry" />
+          <mxGeometry y="630" width="670" height="70" as="geometry" />
         </mxCell>
         <mxCell id="5I76yNdcYX2ceO-F8l6g-53" value="" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontStyle=1" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1" visible="0">
-          <mxGeometry width="110" height="40" as="geometry">
-            <mxRectangle width="110" height="40" as="alternateBounds" />
+          <mxGeometry width="110" height="70" as="geometry">
+            <mxRectangle width="110" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="5I76yNdcYX2ceO-F8l6g-54" value="7a" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1">
-          <mxGeometry x="110" width="50" height="40" as="geometry">
-            <mxRectangle width="50" height="40" as="alternateBounds" />
+        <mxCell id="5I76yNdcYX2ceO-F8l6g-54" value="7b" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1">
+          <mxGeometry x="110" width="50" height="70" as="geometry">
+            <mxRectangle width="50" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="5I76yNdcYX2ceO-F8l6g-55" value="System" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1">
-          <mxGeometry x="160" width="100" height="40" as="geometry">
-            <mxRectangle width="100" height="40" as="alternateBounds" />
+          <mxGeometry x="160" width="100" height="70" as="geometry">
+            <mxRectangle width="100" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="5I76yNdcYX2ceO-F8l6g-56" value="If saving fails: display an error message" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1">
-          <mxGeometry x="260" width="410" height="40" as="geometry">
-            <mxRectangle width="410" height="40" as="alternateBounds" />
+        <mxCell id="5I76yNdcYX2ceO-F8l6g-56" value="&lt;p style=&quot;white-space: pre-wrap;&quot; dir=&quot;auto&quot;&gt;If there is a system error during adding the laptop to the inventory (e.g., database failure), display an error message: &quot;Unable to add laptop to inventory. Please try again later.&quot;&lt;/p&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="5I76yNdcYX2ceO-F8l6g-52" vertex="1">
+          <mxGeometry x="260" width="410" height="70" as="geometry">
+            <mxRectangle width="410" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
       </root>
