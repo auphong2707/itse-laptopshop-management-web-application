@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.15">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0" version="27.0.3">
   <diagram name="Page-1" id="wkvMPfwWF0B0VFoY-71S">
-    <mxGraphModel dx="1213" dy="798" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="992" dy="593" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -84,7 +84,7 @@
             <mxRectangle width="110" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="bOydSgZBLQBoUM40e2X1-100" value="&lt;div align=&quot;center&quot;&gt;The user access to the dashboard.&lt;/div&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;align=center;spacingLeft=0;spacing=2;spacingRight=0;spacingBottom=0;spacingTop=0;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-98" vertex="1">
+        <mxCell id="bOydSgZBLQBoUM40e2X1-100" value="The admin wants to observe the transactions information" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;align=center;spacingLeft=0;spacing=2;spacingRight=0;spacingBottom=0;spacingTop=0;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-98" vertex="1">
           <mxGeometry x="110" width="600" height="40" as="geometry">
             <mxRectangle width="70" height="40" as="alternateBounds" />
           </mxGeometry>
@@ -107,7 +107,7 @@
             <mxRectangle width="110" height="50" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="bOydSgZBLQBoUM40e2X1-105" value="&lt;ul&gt;&lt;li&gt;User is logged in and has admin privileges&lt;/li&gt;&lt;/ul&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;align=left;spacingLeft=0;spacing=2;spacingRight=0;spacingBottom=0;spacingTop=0;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-103" vertex="1">
+        <mxCell id="bOydSgZBLQBoUM40e2X1-105" value="&lt;ul&gt;&lt;li&gt;Admin is logged in and has admin privileges&lt;/li&gt;&lt;/ul&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;align=left;spacingLeft=0;spacing=2;spacingRight=0;spacingBottom=0;spacingTop=0;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-103" vertex="1">
           <mxGeometry x="110" width="600" height="50" as="geometry">
             <mxRectangle width="70" height="50" as="alternateBounds" />
           </mxGeometry>
@@ -255,7 +255,7 @@
             <mxRectangle width="100" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="bOydSgZBLQBoUM40e2X1-276" value="Navigates to&amp;nbsp;&lt;span data-end=&quot;1239&quot; data-start=&quot;1215&quot;&gt;Admin Dashboard page&lt;/span&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-272" vertex="1">
+        <mxCell id="bOydSgZBLQBoUM40e2X1-276" value="Navigates to&amp;nbsp;&lt;span data-end=&quot;1239&quot; data-start=&quot;1215&quot;&gt;Admin Dashboard page and display all the plots&lt;/span&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;labelBackgroundColor=none;" parent="bOydSgZBLQBoUM40e2X1-272" vertex="1">
           <mxGeometry x="280" width="430" height="40" as="geometry">
             <mxRectangle width="430" height="40" as="alternateBounds" />
           </mxGeometry>
