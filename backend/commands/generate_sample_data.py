@@ -613,6 +613,75 @@ def generate_orders(
         "IMPORTANT: Assumed Order IDs start from 1. Ensure sequence alignment if needed."
     )
 
+def generate_refund_tickets(
+    sql_output_path="./backend/commands/insert_sample_data.sql",
+    num_tickets=30,
+):
+    statuses = ["pending", "rejected"]  # 'approved' handled via resolved_at trigger
+    reasons = [
+        "Sản phẩm bị lỗi phần cứng.",
+        "Không đúng mô tả.",
+        "Không hài lòng với chất lượng.",
+        "Giao nhầm sản phẩm.",
+        "Thay đổi nhu cầu sử dụng.",
+        "Không tương thích với phần mềm cần thiết.",
+        "Giao hàng trễ.",
+        "Sản phẩm đã qua sử dụng.",
+    ]
+
+    possible_order_ids = list(range(1, 101))  # assuming 100 orders
+    used_combinations = set()
+    values = []
+
+    for _ in range(num_tickets):
+        # Ensure unique (email, phone) as per schema constraint
+        while True:
+            email = f"user{random.randint(1, 200)}@example.com"
+            phone = f"+84{random.randint(900000000, 999999999)}"
+            key = (email, phone)
+            if key not in used_combinations:
+                used_combinations.add(key)
+                break
+
+        order_id = random.choice(possible_order_ids)
+        reason = random.choice(reasons)
+        amount = round(random.uniform(500000, 20000000), 2)
+        status = random.choice(statuses)
+        created_at = datetime.utcnow() - timedelta(days=random.randint(1, 100))
+        resolved_at = None
+        if status == "rejected":
+            resolved_at = created_at + timedelta(days=random.randint(1, 7))
+
+        updated_at = resolved_at or (created_at + timedelta(days=random.randint(1, 3)))
+
+        def fmt(val):
+            if val is None:
+                return "NULL"
+            if isinstance(val, datetime):
+                return f"'{val.strftime('%Y-%m-%d %H:%M:%S')}'"
+            if isinstance(val, str):
+                return f"'{val.replace('\'', '\'\'')}'"
+            return str(val)
+
+        values.append(
+            f"({fmt(email)}, {fmt(phone)}, {order_id}, {fmt(reason)}, {amount}, "
+            f"{fmt(status)}, {fmt(created_at)}, {fmt(resolved_at)}, {fmt(updated_at)})"
+        )
+
+    if values:
+        insert_query = (
+            "-- Sample Refund Tickets --\n"
+            "INSERT INTO refund_tickets "
+            "(email, phone_number, order_id, reason, amount, status, created_at, resolved_at, updated_at)\nVALUES\n"
+            + ",\n".join(values)
+            + ";\n"
+        )
+        with open(sql_output_path, "a") as f:
+            f.write("\n" + insert_query)
+        print(f"[✓] Generated and wrote {num_tickets} refund tickets to {sql_output_path}")
+    else:
+        print("No refund tickets generated.")
+
 
 if __name__ == "__main__":
     clear_old_commands()
@@ -623,3 +692,4 @@ if __name__ == "__main__":
     generate_posts()
     generate_post_images(num_posts=NUM_POSTS)
     generate_orders(num_orders=100)
+    generate_refund_tickets(num_tickets=30)
