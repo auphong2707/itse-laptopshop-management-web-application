@@ -1,11 +1,11 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0" version="27.0.2">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0" version="27.0.3">
   <diagram name="Page-1" id="ASFCGlIycIVfyBQZ6pwf">
-    <mxGraphModel dx="843" dy="532" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="843" dy="533" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="yJRBSIRvezlMBspHAgBc-1" value="" style="shape=table;startSize=0;container=1;collapsible=0;childLayout=tableLayout;" parent="1" vertex="1">
-          <mxGeometry x="90" y="160" width="650" height="470.0000000000018" as="geometry" />
+          <mxGeometry x="90" y="160" width="650" height="430.0000000000018" as="geometry" />
         </mxCell>
         <mxCell id="yJRBSIRvezlMBspHAgBc-2" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="yJRBSIRvezlMBspHAgBc-1" vertex="1">
           <mxGeometry width="650" height="40" as="geometry" />
@@ -218,7 +218,7 @@
           <mxGeometry y="380" width="650" height="50" as="geometry" />
         </mxCell>
         <mxCell id="yJRBSIRvezlMBspHAgBc-88" value="Exception Flow" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontStyle=1;rowspan=5;colspan=1;" parent="yJRBSIRvezlMBspHAgBc-87" vertex="1">
-          <mxGeometry width="110" height="90" as="geometry">
+          <mxGeometry width="110" height="50" as="geometry">
             <mxRectangle width="110" height="50" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -235,29 +235,6 @@
         <mxCell id="yJRBSIRvezlMBspHAgBc-91" value="&lt;p style=&quot;white-space: pre-wrap;&quot; dir=&quot;auto&quot;&gt;If the details page fails to load, display: &quot;Unable to load laptop details. Please try again.&quot;&lt;/p&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="yJRBSIRvezlMBspHAgBc-87" vertex="1">
           <mxGeometry x="280" width="370" height="50" as="geometry">
             <mxRectangle width="370" height="50" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yJRBSIRvezlMBspHAgBc-92" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="yJRBSIRvezlMBspHAgBc-1" vertex="1">
-          <mxGeometry y="430" width="650" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="yJRBSIRvezlMBspHAgBc-93" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontStyle=1;" parent="yJRBSIRvezlMBspHAgBc-92" vertex="1" visible="0">
-          <mxGeometry width="110" height="40" as="geometry">
-            <mxRectangle width="110" height="40" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yJRBSIRvezlMBspHAgBc-94" value="2b" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="yJRBSIRvezlMBspHAgBc-92" vertex="1">
-          <mxGeometry x="110" width="70" height="40" as="geometry">
-            <mxRectangle width="70" height="40" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yJRBSIRvezlMBspHAgBc-95" value="User" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="yJRBSIRvezlMBspHAgBc-92" vertex="1">
-          <mxGeometry x="180" width="100" height="40" as="geometry">
-            <mxRectangle width="100" height="40" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yJRBSIRvezlMBspHAgBc-96" value="&lt;p style=&quot;white-space: pre-wrap;&quot; dir=&quot;auto&quot;&gt;User retries or exits.&lt;/p&gt;" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="yJRBSIRvezlMBspHAgBc-92" vertex="1">
-          <mxGeometry x="280" width="370" height="40" as="geometry">
-            <mxRectangle width="370" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
       </root>
