@@ -813,6 +813,79 @@ const AdminTabs = () => {
   );
 };
 
+const RefundRequest = () => {
+  const [emailList, setEmailList] = useState([]);
+  const [refundDataByEmail, setRefundDataByEmail] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAllRefunds = async () => {
+      try {
+        // Bước 1: Lấy tất cả yêu cầu hoàn tiền
+        const response = await axios.get("http://localhost:8000/refund-tickets");
+        const allRefunds = response.data;
+
+        // Bước 2: Lấy danh sách email duy nhất
+        const uniqueEmails = [...new Set(allRefunds.map(item => item.email))];
+        setEmailList(uniqueEmails);
+
+        // Bước 3: Lấy dữ liệu chi tiết theo từng email
+        for (const email of uniqueEmails) {
+          const res = await axios.get("http://localhost:8000/refund-tickets", {
+            params: { email },
+          });
+          setRefundDataByEmail(prev => ({
+            ...prev,
+            [email]: res.data,
+          }));
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu hoàn tiền:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllRefunds();
+  }, []);
+
+  return (
+    <div style={{ paddingTop: "2rem" }}>
+      <h2 style={{ marginBottom: "2rem" }}>Refund Requests</h2>
+      {loading && <p>Loading...</p>}
+
+      {!loading && emailList.length === 0 && (
+        <p>Không có yêu cầu hoàn tiền nào.</p>
+      )}
+
+      {!loading &&
+        emailList.map(email => {
+          const refunds = refundDataByEmail[email] || [];
+
+          // Lấy thông tin chung từ item đầu tiên (nếu có)
+          const requestInfo = refunds.length > 0
+            ? {
+                email: refunds[0].email,
+                name: refunds[0].name,
+                phoneNumber: refunds[0].phoneNumber,
+                reason: refunds[0].reason,
+                status: refunds[0].status,
+                requestId: refunds[0].request_id,
+              }
+            : null;
+
+          return (
+            <RefundTable
+              key={email}
+              refundItems={refunds}
+              requestInfo={requestInfo}
+            />
+          );
+        })}
+    </div>
+  );
+};
+
 const AdministratorPage = () => {
   return (
     <Layout>

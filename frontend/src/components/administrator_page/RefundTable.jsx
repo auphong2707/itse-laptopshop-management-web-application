@@ -3,43 +3,7 @@ import { EyeOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
-const refundRequestInfo = {
-  requestId: "RFD-20250409-001",
-  name: "Nguyen Van A",
-  email: "a.nguyen@example.com",
-  phoneNumber: "0912345678",
-  reason: "Sản phẩm bị lỗi kỹ thuật.",
-  status: "Pending",
-};
-
-const refundedItemsData = [
-  {
-    id: 101,
-    name: "MacBook Pro 14 inch 2023",
-    image: "https://via.placeholder.com/80",
-    refundQuantity: 1,
-    purchaseDate: "2024-12-15",
-    refundDate: "2025-04-05",
-  },
-  {
-    id: 102,
-    name: "Dell XPS 13 OLED",
-    image: "https://via.placeholder.com/80",
-    refundQuantity: 2,
-    purchaseDate: "2025-01-10",
-    refundDate: "2025-04-03",
-  },
-  {
-    id: 103,
-    name: "ASUS ROG Zephyrus G14",
-    image: "https://via.placeholder.com/80",
-    refundQuantity: 1,
-    purchaseDate: "2025-03-01",
-    refundDate: "2025-04-06",
-  },
-];
-
-const RefundTable = () => {
+const RefundTable = ({ refundItems, requestInfo }) => {
   return (
     <div
       style={{
@@ -51,20 +15,22 @@ const RefundTable = () => {
       }}
     >
       {/* Thông tin yêu cầu */}
-      <div style={{ margin: 0, paddingBottom: "20px" }}>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Request ID:</strong> {refundRequestInfo.requestId}
-        </p>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Name:</strong> {refundRequestInfo.name}
-        </p>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Email:</strong> {refundRequestInfo.email}
-        </p>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Phone Number:</strong> {refundRequestInfo.phoneNumber}
-        </p>
-      </div>
+      {requestInfo && (
+        <div style={{ margin: 0, paddingBottom: "20px" }}>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Request ID:</strong> {requestInfo.requestId}
+          </p>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Name:</strong> {requestInfo.name}
+          </p>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Email:</strong> {requestInfo.email}
+          </p>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Phone Number:</strong> {requestInfo.phoneNumber}
+          </p>
+        </div>
+      )}
 
       {/* Bảng sản phẩm */}
       <div
@@ -96,7 +62,7 @@ const RefundTable = () => {
         </div>
 
         {/* Dòng dữ liệu */}
-        {refundedItemsData.map((item) => (
+        {refundItems.map((item) => (
           <div
             key={item.id}
             style={{
@@ -110,7 +76,7 @@ const RefundTable = () => {
           >
             <div style={{ display: "flex", justifyContent: "center" }}>
               <Image
-                src={item.image}
+                src={item.image || "https://via.placeholder.com/80"}
                 width={60}
                 height={60}
                 style={{ objectFit: "contain", borderRadius: "4px" }}
@@ -139,14 +105,16 @@ const RefundTable = () => {
       </div>
 
       {/* Lý do và trạng thái */}
-      <div style={{ marginTop: "20px" }}>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Reason:</strong> {refundRequestInfo.reason}
-        </p>
-        <p style={{ margin: 0, paddingBottom: "5px" }}>
-          <strong>Status:</strong> {refundRequestInfo.status}
-        </p>
-      </div>
+      {requestInfo && (
+        <div style={{ marginTop: "20px" }}>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Reason:</strong> {requestInfo.reason}
+          </p>
+          <p style={{ margin: 0, paddingBottom: "5px" }}>
+            <strong>Status:</strong> {requestInfo.status}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
