@@ -54,8 +54,13 @@ def update_laptop(
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
 
-@laptops_router.get("/search/")
-def search_laptops(query: str = Query(...), limit: int = Query(10)):
+@laptops_router.get("/search")
+def search_laptops(
+    query: str = Query(...), 
+    limit: int = Query(10),
+    page: int = Query(1),
+    sort: str = Query("relevant")
+):
     search_query = {
         "bool": {
             "should": [
@@ -65,9 +70,33 @@ def search_laptops(query: str = Query(...), limit: int = Query(10)):
             "minimum_should_match": 1,
         }
     }
-
-    results = es.search(index="laptops", body={"query": search_query, "size": limit})
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+    
+    sort_options = {
+        "relevant": [],  # Empty list uses Elasticsearch's default relevance scoring
+        "latest": [{"inserted_at": {"order": "desc"}}],
+        "price_asc": [{"sale_price": {"order": "asc"}}],
+        "price_desc": [{"sale_price": {"order": "desc"}}],
+    }
+    
+    sorting = sort_options.get(sort, sort_options["relevant"])
+    
+    query_body = {
+        "query": search_query, 
+        "size": limit,
+        "from": (page - 1) * limit
+    }
+    if sorting:
+        query_body["sort"] = sorting
+        
+    results = es.search(index="laptops", body=query_body, track_total_hits=True)
+    total_count = results["hits"]["total"]["value"]
+    
+    return {
+        "page": page,
+        "limit": limit,
+        "total_count": total_count,
+        "results": [hit["_source"] for hit in results["hits"]["hits"]]
+    }
 
 
 @laptops_router.get("/filter")
