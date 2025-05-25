@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar } from "antd";
+import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar, Input } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FacebookFilled,
   InstagramFilled,
   ShoppingCartOutlined,
-  SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
@@ -14,6 +13,8 @@ import logo from "/vite.svg";
 
 const { Text } = Typography;
 const { Header } = Layout;
+
+const { Search } = Input; 
 
 const headerStyle = {
   borderBottom: "1px solid #f0f0f0",
@@ -133,6 +134,17 @@ const AccountMenu = () => {
 };
 
 const WebsiteHeader = () => {
+  const navigate = useNavigate(); 
+
+  const handleSearch = (value) => {
+    const keyword = value.trim();
+    if (!keyword) return;
+
+    navigate(
+      `/search?query=${encodeURIComponent(keyword)}`
+    );
+  };
+
   return (
     <Header style={headerStyle}>
       {/* Top Bar */}
@@ -225,17 +237,19 @@ const WebsiteHeader = () => {
           </Flex>
         </Flex>
 
-        <Flex align="center" gap="35px">
-          <Flex align="center" gap="middle">
-            <SearchOutlined style={{ fontSize: "18px", color: "black" }} />
-            <Link to="/shopping-cart">
-              <ShoppingCartOutlined
-                style={{ fontSize: "21px", color: "black" }}
-              />
-            </Link>
-          </Flex>
-
-          {/* Account Menu */}
+        <Flex align="center" gap="middle">
+          <Search
+            placeholder="Search laptops…"
+            allowClear
+            size="medium"
+            style={{ width: 280 }}
+            onSearch={handleSearch}
+          />
+          <Link to="/shopping-cart">
+            <ShoppingCartOutlined
+            style={{ fontSize: "21px", color: "black" }}
+            />
+          </Link>
           <AccountMenu />
         </Flex>
       </Flex>
