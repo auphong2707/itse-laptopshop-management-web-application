@@ -54,7 +54,8 @@ def update_laptop(
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
 
-STOP_WORDS = ["laptop"]
+STOP_WORDS = {"laptop", "laptops"}
+
 @laptops_router.get("/search")
 def search_laptops(
     query: str = Query(...),
@@ -62,30 +63,47 @@ def search_laptops(
     page: int = Query(1),
     sort: str = Query("relevant")
 ):
-    # Tách term và lược bỏ stop-words
     terms = query.lower().split()
     filtered_terms = [t for t in terms if t not in STOP_WORDS]
-    filtered_query = " ".join(filtered_terms) or query   # fallback nếu xóa hết
+    filtered_query = " ".join(filtered_terms) or query
 
-    # Xây bool query
     search_query = {
         "bool": {
             "should": [
-                # Boost cao cho khớp toàn cụm
-                {"match_phrase": {"name": {"query": query, "boost": 5}}},
-                {"match_phrase": {"serial_number": {"query": query, "boost": 5}}},
+                # 1) Khớp liên tục (boost cao)
+                {"match_phrase": {"name": {"query": query, "boost": 6}}},
+                {"match_phrase": {"serial_number": {"query": query, "boost": 6}}},
 
-                # Cross-fields cho phần meaningful
+                # 2) Khớp rải rác trong name (tất cả token phải có)
+                {
+                    "match": {
+                        "name": {
+                            "query": filtered_query,
+                            "operator": "and",
+                            "boost": 4
+                        }
+                    }
+                },
+
+                # 3) Cross-fields trên nhiều cột (bao gồm name & serial_number)
                 {
                     "multi_match": {
                         "query": filtered_query,
-                        "fields": ["brand^3", "sub_brand^3", "cpu^2", "vga^2"],
+                        "fields": [
+                            "brand^3",
+                            "sub_brand^3",
+                            "name^2",
+                            "serial_number^3",
+                            "cpu^1",
+                            "vga^1"
+                        ],
                         "type": "cross_fields",
                         "operator": "and" if len(filtered_terms) > 1 else "or"
                     }
                 }
             ],
-            # Bắt buộc phải match ít nhất 1 term có nghĩa trong name
+            "minimum_should_match": 1,
+            # Vẫn ép phải match ≥1 term có nghĩa trong name
             "must": {
                 "bool": {
                     "should": [
@@ -93,12 +111,10 @@ def search_laptops(
                     ],
                     "minimum_should_match": 1
                 }
-            },
-            "minimum_should_match": 1
+            }
         }
     }
 
-    # Sắp xếp
     sort_options = {
         "relevant": [],
         "latest":  [{"inserted_at": {"order": "desc"}}],
@@ -107,7 +123,6 @@ def search_laptops(
     }
     sorting = sort_options.get(sort, [])
 
-    # Gửi truy vấn ES
     query_body = {
         "query": search_query,
         "size": limit,
@@ -117,7 +132,6 @@ def search_laptops(
         query_body["sort"] = sorting
 
     results = es.search(index="laptops", body=query_body, track_total_hits=True)
-
     return {
         "page": page,
         "limit": limit,
