@@ -660,7 +660,8 @@ def generate_refund_tickets(
             if isinstance(val, datetime):
                 return f"'{val.strftime('%Y-%m-%d %H:%M:%S')}'"
             if isinstance(val, str):
-                return f"'{val.replace('\'', '\'\'')}'"
+                escaped = val.replace("'", "''")
+                return f"'{escaped}'"
             return str(val)
 
         values.append(
