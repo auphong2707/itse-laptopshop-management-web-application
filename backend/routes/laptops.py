@@ -61,13 +61,38 @@ def search_laptops(
     page: int = Query(1),
     sort: str = Query("relevant")
 ):
+    # Split the query into terms
+    terms = query.lower().split()
+    
+    # More sophisticated search query that handles common terms
     search_query = {
         "bool": {
             "should": [
-                {"match": {"name": query}},
-                {"match": {"serial_number": query}},
+                # Exact match on the whole query with high boost
+                {"match_phrase": {"name": {"query": query, "boost": 5}}},
+                {"match_phrase": {"serial_number": {"query": query, "boost": 5}}},
+                
+                # Multi-match for specific terms excluding common words
+                {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["brand^3", "sub_brand^3", "cpu^2", "vga^2"],
+                        "type": "cross_fields",
+                        "operator": "and"
+                    }
+                }
             ],
             "minimum_should_match": 1,
+            # Filter out documents where only common terms like "laptop" match
+            "must": {
+                "bool": {
+                    "should": [
+                        {"match": {"name": {"query": term, "minimum_should_match": "1"} }}
+                        for term in terms if term.lower() not in ["laptop", "laptops"]
+                    ],
+                    "minimum_should_match": 1
+                }
+            }
         }
     }
     
