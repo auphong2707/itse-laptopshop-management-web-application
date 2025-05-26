@@ -54,73 +54,75 @@ def update_laptop(
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
 
+STOP_WORDS = ["laptop"]
 @laptops_router.get("/search")
 def search_laptops(
-    query: str = Query(...), 
+    query: str = Query(...),
     limit: int = Query(10),
     page: int = Query(1),
     sort: str = Query("relevant")
 ):
-    # Split the query into terms
+    # Tách term và lược bỏ stop-words
     terms = query.lower().split()
-    
-    # More sophisticated search query that handles common terms
+    filtered_terms = [t for t in terms if t not in STOP_WORDS]
+    filtered_query = " ".join(filtered_terms) or query   # fallback nếu xóa hết
+
+    # Xây bool query
     search_query = {
         "bool": {
             "should": [
-                # Exact match on the whole query with high boost
+                # Boost cao cho khớp toàn cụm
                 {"match_phrase": {"name": {"query": query, "boost": 5}}},
                 {"match_phrase": {"serial_number": {"query": query, "boost": 5}}},
-                
-                # Multi-match for specific terms excluding common words
+
+                # Cross-fields cho phần meaningful
                 {
                     "multi_match": {
-                        "query": query,
+                        "query": filtered_query,
                         "fields": ["brand^3", "sub_brand^3", "cpu^2", "vga^2"],
                         "type": "cross_fields",
-                        "operator": "and"
+                        "operator": "and" if len(filtered_terms) > 1 else "or"
                     }
                 }
             ],
-            "minimum_should_match": 1,
-            # Filter out documents where only common terms like "laptop" match
+            # Bắt buộc phải match ít nhất 1 term có nghĩa trong name
             "must": {
                 "bool": {
                     "should": [
-                        {"match": {"name": {"query": term, "minimum_should_match": "1"} }}
-                        for term in terms if term.lower() not in ["laptop", "laptops"]
+                        {"match": {"name": term}} for term in filtered_terms
                     ],
                     "minimum_should_match": 1
                 }
-            }
+            },
+            "minimum_should_match": 1
         }
     }
-    
+
+    # Sắp xếp
     sort_options = {
-        "relevant": [],  # Empty list uses Elasticsearch's default relevance scoring
-        "latest": [{"inserted_at": {"order": "desc"}}],
-        "price_asc": [{"sale_price": {"order": "asc"}}],
+        "relevant": [],
+        "latest":  [{"inserted_at": {"order": "desc"}}],
+        "price_asc":  [{"sale_price": {"order": "asc"}}],
         "price_desc": [{"sale_price": {"order": "desc"}}],
     }
-    
-    sorting = sort_options.get(sort, sort_options["relevant"])
-    
+    sorting = sort_options.get(sort, [])
+
+    # Gửi truy vấn ES
     query_body = {
-        "query": search_query, 
+        "query": search_query,
         "size": limit,
-        "from": (page - 1) * limit
+        "from": (page - 1) * limit,
     }
     if sorting:
         query_body["sort"] = sorting
-        
+
     results = es.search(index="laptops", body=query_body, track_total_hits=True)
-    total_count = results["hits"]["total"]["value"]
-    
+
     return {
         "page": page,
         "limit": limit,
-        "total_count": total_count,
-        "results": [hit["_source"] for hit in results["hits"]["hits"]]
+        "total_count": results["hits"]["total"]["value"],
+        "results": [hit["_source"] for hit in results["hits"]["hits"]],
     }
 
 
