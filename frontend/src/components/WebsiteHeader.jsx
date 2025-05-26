@@ -64,7 +64,7 @@ const AccountMenu = () => {
         <>
           <Menu.Item key="account" style={{ fontWeight: "bold" }}>
             {user.role === "customer" ? (
-              <Link to="/customer">My Account</Link>
+              <Link to="/customer/accountInformation">Account Information</Link>
             ) : (
               "My Account"
             )}
@@ -80,11 +80,14 @@ const AccountMenu = () => {
             </Menu.Item>
           ) : (
             <>
-              <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>
-                My Wish List (0)
+              <Menu.Item key="orders" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/orders">My Orders</Link>
               </Menu.Item>
-              <Menu.Item key="compare" style={{ fontWeight: "bold" }}>
-                Compare (0)
+              <Menu.Item key="productReviews" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/productReviews">Product Reviews</Link>
+              </Menu.Item>
+              <Menu.Item key="newsletterSubscriptions" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/newsletterSubscriptions">Newsletter Subscriptions</Link>
               </Menu.Item>
             </>
           )}

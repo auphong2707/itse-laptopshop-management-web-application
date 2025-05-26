@@ -42,7 +42,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/customer",
+    path: "/customer/:section?",
     element: (
       <>
         <ScrollRestoration />

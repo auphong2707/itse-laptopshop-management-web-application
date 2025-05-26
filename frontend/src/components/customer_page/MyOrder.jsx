@@ -214,9 +214,7 @@ const MyOrder = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h3>My Orders</h3>
-
+    <div style={{ paddingTop: "15px" }}>
       {error && <Text type="danger">{error}</Text>}
 
       {loading ? (
