@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { QRPay, BanksObject } from 'vietnam-qr-pay';
+import QRCode from "react-qr-code";
 import {
   Row,
   Col,
@@ -7,6 +9,7 @@ import {
   Layout,
   Breadcrumb,
   Divider,
+  Modal,
 } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -17,9 +20,9 @@ import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
 import ShoppingItemsTable from "../components/shopping_cart_page/ShoppingItemsTable";
 
-const PaypalButton = styled(Button)`
-  background-color: #ffcc00;
-  color: #000;
+const PayOnlineButton = styled(Button)`
+  background-color: #ff3b30;
+  color: #fff;
   font-weight: bold;
   font-size: 16px;
   height: 50px;
@@ -28,8 +31,8 @@ const PaypalButton = styled(Button)`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #e6b800;
-    color: #000;
+    background-color: #0053b3;
+    color: #fff;
     cursor: pointer;
   }
 `;
@@ -47,9 +50,28 @@ const contentStyle = {
   padding: "2rem",
 };
 
+
 const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  const [qrModalVisible, setQrModalVisible] = useState(false);
+  const [qrUrl, setQrUrl] = useState("");
+
+  const finalPrice = 50000 + 1.15 * totalPrice;
+
+  const handlePay = () => {
+    const momoPay = QRPay.initVietQR({
+      bankBin: BanksObject.tpbank.bin,
+      bankNumber: "07537430201",
+      amount: finalPrice.toString(),
+    });
+    
+    const content = momoPay.build();
+    console.log("MoMo QR Content:", content);
+    setQrUrl(content);
+    setQrModalVisible(true);
+  };
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -178,31 +200,12 @@ const ShoppingCartPage = () => {
               <Title level={3} style={{ marginTop: "12px" }}>
                 Order Total:{" "}
                 <span style={{ float: "right" }}>
-                  {formatPrice(50000 + 1.15 * totalPrice)}
+                  {formatPrice(finalPrice)}
                 </span>
               </Title>
               <Button
                 type="primary"
                 block
-                size="large" // Tùy chọn: "large", "middle", "small"
-                style={{
-                  marginTop: "10px",
-                  fontWeight: "bold",
-                  fontSize: "16px", // Tăng cỡ chữ
-                  height: "50px", // Chiều cao nút
-                  borderRadius: "9999px", // Bo tròn mạnh
-                }}
-              >
-                Proceed to Checkout
-              </Button>
-
-              <PaypalButton block size="large" style={{ marginTop: "8px" }}>
-                Check out with PayPal
-              </PaypalButton>
-
-              <Button
-                block
-                disabled
                 size="large"
                 style={{
                   marginTop: "10px",
@@ -212,8 +215,32 @@ const ShoppingCartPage = () => {
                   borderRadius: "9999px",
                 }}
               >
-                Check Out with Multiple Addresses
+                Pay on Delivery
               </Button>
+
+              <PayOnlineButton block size="large" style={{ marginTop: "10px" }} onClick={handlePay}
+              >
+                Pay with E-Banking
+              </PayOnlineButton>
+
+              <Modal
+                title="Scan to Pay"
+                open={qrModalVisible}
+                onCancel={() => setQrModalVisible(false)}
+                footer={null}
+                centered
+              >
+                {qrUrl ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <QRCode value={qrUrl} size={220} />
+                    <p style={{ marginTop: '10px' }}>Use any app to scan and pay</p>
+                  </div>
+                ) : (
+                  <p>Generating QR code...</p>
+                )}
+              </Modal>
+
+
             </div>
           </Col>
         </Row>
