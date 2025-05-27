@@ -172,11 +172,11 @@ Specs.propTypes = {
 const transformData = (data) => {
   return {
     ...data,
-    name: data["name"].toUpperCase(),
-    brand: data["brand"].toUpperCase(),
+    name: data["name"] ? data["name"].toUpperCase() : "N/A",
+    brand: data["brand"] ? data["brand"].toUpperCase() : "N/A",
     cpu: data["cpu"] ? data["cpu"].toUpperCase() : "N/A",
-    ram_type: data["ram_type"].toUpperCase(),
-    storage_type: data["storage_type"].toUpperCase(),
+    ram_type: data["ram_type"] ? data["ram_type"].toUpperCase() : "N/A",
+    storage_type: data["storage_type"] ? data["storage_type"].toUpperCase() : "N/A",
     vga: data["vga"] ? data["vga"].toUpperCase() : "N/A",
     default_os: data["default_os"]
       ? data["default_os"]
@@ -205,8 +205,7 @@ const ProductPage = () => {
       .then((data) => transformData(data))
       .then((data) => setProductData(data));
   }, [id]);
-
-  console.log(productData);
+  
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const handleSubmitReview = async () => {
