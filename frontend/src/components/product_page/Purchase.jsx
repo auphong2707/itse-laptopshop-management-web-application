@@ -107,7 +107,7 @@ const Purchase = ({ price, laptopId }) => {
       style={{
         position: "absolute",
         top: "100px",
-        right: "-15px",
+        right: "20px",
         display: "flex",
         justifyContent: "flex-end",
         alignItems: "center",
