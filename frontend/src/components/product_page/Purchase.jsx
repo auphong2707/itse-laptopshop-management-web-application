@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { Button, InputNumber, Typography, Flex, notification } from "antd";
+import { Button, InputNumber, Typography, Flex, notification, Modal } from "antd";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -22,14 +22,23 @@ const Purchase = ({ price, laptopId }) => {
   };
 
   const handleAddToCart = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      Modal.confirm({
+        title: "Login Required",
+        content: "You must be logged in to add items to the cart.",
+        okText: "Go to Login",
+        cancelText: "Cancel",
+        onOk() {
+          window.location.href = "/customer/login";
+        },
+      });
+      return;
+    }
+
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
       const token = await user.getIdToken();
 
       const response = await axios.post(
@@ -65,9 +74,9 @@ const Purchase = ({ price, laptopId }) => {
           width: "600px",
         },
       });
-      setQuantity(1);
 
-    } catch (err) {
+      setQuantity(1);
+    } catch (error) {
       notification.error({
         message: (
           <Text style={{ fontSize: 24, fontWeight: "bold" }}>
@@ -76,11 +85,11 @@ const Purchase = ({ price, laptopId }) => {
         ),
         description: (
           <Text style={{ fontSize: 20 }}>
-            Failed to add product to cart!
+            Unable to add laptop to cart. Please try again later.
           </Text>
         ),
         duration: 3,
-        placement: "topRight",
+        placement: "top",
         style: {
           fontSize: "16px",
           padding: "16px",
@@ -89,6 +98,7 @@ const Purchase = ({ price, laptopId }) => {
       });
     }
   };
+
 
   const formattedPrice = formatPrice(price, quantity);
 
