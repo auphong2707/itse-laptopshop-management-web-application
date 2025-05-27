@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar, Input } from "antd";
+import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar, Input, Modal } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FacebookFilled,
@@ -7,7 +7,11 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+
+import { useUser } from "../utils/UserContext";
+
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+
 
 import logo from "/vite.svg";
 
@@ -137,6 +141,7 @@ const AccountMenu = () => {
 };
 
 const WebsiteHeader = () => {
+  const user = useUser();
   const navigate = useNavigate(); 
 
   const handleSearch = (value) => {
@@ -248,11 +253,29 @@ const WebsiteHeader = () => {
             style={{ width: 280 }}
             onSearch={handleSearch}
           />
-          <Link to="/shopping-cart">
+          {user?.role !== "admin" && (
             <ShoppingCartOutlined
-            style={{ fontSize: "21px", color: "black" }}
+              style={{ fontSize: "21px", color: "black", cursor: "pointer" }}
+              onClick={() => {
+                if (user?.role === "customer") {
+                  navigate("/shopping-cart");
+                } else {
+                  Modal.confirm({
+                    title: "Login Required",
+                    content: "You must be logged in to access the shopping cart.",
+                    okText: "Go to Login",
+                    cancelText: "Cancel",
+                    onOk() {
+                      navigate("/customer/login");
+                    },
+                    onCancel() {
+                      // Do nothing — just close the modal
+                    },
+                  });
+                }
+              }}
             />
-          </Link>
+          )}
           <AccountMenu />
         </Flex>
       </Flex>
