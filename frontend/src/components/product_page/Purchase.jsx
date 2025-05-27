@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { Button, InputNumber, Typography, Flex } from "antd";
+import { Button, InputNumber, Typography, Flex, notification, Modal } from "antd";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -22,16 +22,24 @@ const Purchase = ({ price, laptopId }) => {
   };
 
   const handleAddToCart = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      Modal.confirm({
+        title: "Login Required",
+        content: "You must be logged in to add items to the cart.",
+        okText: "Go to Login",
+        cancelText: "Cancel",
+        onOk() {
+          window.location.href = "/customer/login";
+        },
+      });
+      return;
+    }
+
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
       const token = await user.getIdToken();
-      console.log("Token:", token);
 
       const response = await axios.post(
         "http://localhost:8000/cart/add",
@@ -47,11 +55,50 @@ const Purchase = ({ price, laptopId }) => {
         },
       );
 
-      console.log("Added to cart:", response.data);
-    } catch (err) {
-      console.error("Error adding to cart:", err);
+      notification.success({
+        message: (
+          <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+            Success
+          </Text>
+        ),
+        description: (
+          <Text style={{ fontSize: 20 }}>
+            Product added to cart successfully!
+          </Text>
+        ),
+        duration: 3,
+        placement: "top",
+        style: {
+          fontSize: "16px",
+          padding: "16px",
+          width: "600px",
+        },
+      });
+
+      setQuantity(1);
+    } catch (error) {
+      notification.error({
+        message: (
+          <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+            Error
+          </Text>
+        ),
+        description: (
+          <Text style={{ fontSize: 20 }}>
+            Unable to add laptop to cart. Please try again later.
+          </Text>
+        ),
+        duration: 3,
+        placement: "top",
+        style: {
+          fontSize: "16px",
+          padding: "16px",
+          width: "600px",
+        },
+      });
     }
   };
+
 
   const formattedPrice = formatPrice(price, quantity);
 
