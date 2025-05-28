@@ -177,7 +177,6 @@ CREATE TABLE IF NOT EXISTS refund_tickets (
     phone_number TEXT NOT NULL,  -- User's phone number
     order_id INTEGER NOT NULL,  -- Associated order ID
     reason TEXT NOT NULL,  -- Reason for the refund
-    amount DECIMAL(10, 2) CHECK (amount > 0),  -- Refund amount must be positive
     status VARCHAR(50) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',  -- Only valid statuses
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the refund was created
     resolved_at TIMESTAMP,  -- Timestamp when the refund was resolved (if applicable)
