@@ -248,7 +248,7 @@ const MyOrder = () => {
           rowKey="id"
           pagination={{
             current: ordersData.page,
-            pageSize: 10,
+            pageSize: 20,
             total: ordersData.total_count,
             showSizeChanger: false,
           }}
