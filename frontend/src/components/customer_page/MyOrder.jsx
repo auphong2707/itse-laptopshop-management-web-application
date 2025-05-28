@@ -132,7 +132,7 @@ const MyOrder = () => {
         const statusColors = {
           pending: 'gold',
           processing: 'blue',
-          shipped: 'cyan',
+          shipping: 'cyan',
           delivered: 'green',
           cancelled: 'red',
           refunded: 'volcano',

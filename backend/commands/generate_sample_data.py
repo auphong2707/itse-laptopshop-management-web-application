@@ -463,7 +463,7 @@ def generate_orders(
     statuses = [
         "pending",
         "processing",
-        "shipped",
+        "shipping",
         "delivered",
         "cancelled",
         "refunded",
