@@ -36,7 +36,6 @@ class RefundTicketUpdate(BaseModel):
 
 class RefundTicketResponse(RefundTicketCreate):
     id: int
-    updated_at: datetime  # We will include an updated_at field in the response
 
     class Config:
         orm_mode = True  # Tell Pydantic to treat the model as a dict

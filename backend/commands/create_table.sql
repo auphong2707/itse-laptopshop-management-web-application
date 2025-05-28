@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS refund_tickets (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the refund was created
     resolved_at TIMESTAMP,  -- Timestamp when the refund was resolved (if applicable)
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,  -- Foreign key to orders
-    CONSTRAINT unique_user_email_phone UNIQUE(email, phone_number)  -- Ensure unique combination of email and phone
+    CONSTRAINT unique_user_email_phone UNIQUE(email, phone_number, order_id)  -- Ensure unique combination of email and phone
 );
 
 -- Create a function that updates the refund status to 'approved' when resolved_at is set
