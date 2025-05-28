@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Spin, Typography, Button } from "antd";
+import { Table, Spin, Typography, Button, Tag } from "antd";
 import axios from "axios";
 import { useUser } from "../../utils/UserContext.jsx";
 import dayjs from "dayjs";
@@ -125,10 +125,22 @@ const MyOrder = () => {
       align: "center",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        const statusColors = {
+          pending: 'gold',
+          processing: 'blue',
+          shipped: 'cyan',
+          delivered: 'green',
+          cancelled: 'red',
+          refunded: 'volcano',
+        };
+    
+        return <Tag color={statusColors[status] || 'default'}>{status}</Tag>;
+      },
+      align: "center"
     },
     {
       title: "Created At",
@@ -214,9 +226,7 @@ const MyOrder = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h3>My Orders</h3>
-
+    <div style={{ paddingTop: "20px" }}>
       {error && <Text type="danger">{error}</Text>}
 
       {loading ? (
