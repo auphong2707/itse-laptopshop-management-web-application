@@ -470,7 +470,8 @@ def generate_orders(
     ]
 
     def generate_fake_uid(length=28):
-        return "".join(random.choices(string.ascii_letters + string.digits, k=length))
+        real_uid = "UXXB26VXsZdin2QRTDvQtKW8HiI2"
+        return random.choice([real_uid, "".join(random.choices(string.ascii_letters + string.digits, k=length))])
 
     for i in range(num_orders):
         first = random.choice(first_names)
