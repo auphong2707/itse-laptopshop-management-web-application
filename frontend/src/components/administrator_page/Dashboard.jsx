@@ -3,7 +3,7 @@ import { Card, Col, Row, Statistic } from "antd";
 import { Pie, Line } from "@ant-design/plots";
 import axios from "axios";
 
-const Dashboard = ({totalRevenue}) => {
+const Dashboard = ({totalRevenue, orderCount}) => {
   // Dữ liệu giả cho Pie
   const salesByStatusData = [
     { type: "Shipped", value: 65 },
@@ -33,8 +33,17 @@ const Dashboard = ({totalRevenue}) => {
     colorField: "type",
     radius: 1,
     innerRadius: 0.6,
-    label: { type: "spider", labelHeight: 28 },
-    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    label: {
+      type: "outer", // ← instead of "spider"
+      content: '{name} ({percentage})',
+      style: {
+        fontWeight: 500,
+      },
+    },
+    interactions: [
+      { type: "element-selected" },
+      { type: "element-active" }
+    ],
   };
 
   return (
@@ -55,7 +64,7 @@ const Dashboard = ({totalRevenue}) => {
             <div style={{ marginTop: "2rem" }} />
             <Statistic
               title={<span style={{ fontSize: "18px", fontWeight: "bold" }}>Number of Orders</span>}
-              value={321} // Có thể thay bằng orders.length nếu muốn
+              value={orderCount} 
               valueStyle={{ fontSize: "32px", fontWeight: "bold" }}
             />
           </Card>
@@ -63,7 +72,7 @@ const Dashboard = ({totalRevenue}) => {
 
         <Col xs={24} lg={8}>
           <Card title="Sales by Status" style={{ height: "100%" }}>
-            <Pie {...pieConfig} height={250} />
+            <Pie {...pieConfig} style={{height:250}} />
           </Card>
         </Col>
       </Row>

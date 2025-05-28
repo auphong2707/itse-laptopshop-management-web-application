@@ -888,7 +888,6 @@ const DashboardTab = () => {
   
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
-  
   const fetchOrders = async () => {
     try {
       const token = await user.accessToken;
@@ -903,6 +902,7 @@ const DashboardTab = () => {
         },
       });
 
+      console.log("Full order data:", res.data);
       const orders = res.data.orders || res.data;
       const total = orders.reduce((sum, order) => sum + (order.total_price || 0), 0);
       setTotalRevenue(total);
@@ -926,7 +926,7 @@ const DashboardTab = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <Dashboard totalRevenue={totalRevenue} />
+      <Dashboard totalRevenue={totalRevenue} orderCount={orderCount}/>
     </div>
   );
 }
