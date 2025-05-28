@@ -31,6 +31,7 @@ import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 import OrderTable from "../components/administrator_page/OrderTable.jsx";
+import Dashboard from "../components/administrator_page/Dashboard.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -119,7 +120,7 @@ const transformFormData = (values) => {
   };
 };
 
-const Detail = () => {
+const DetailTab = () => {
   const [form] = Form.useForm();
   const { id } = useParams();
   const [_, setProductData] = useState({});
@@ -562,7 +563,7 @@ const transformStockData = (data) => {
   }));
 };
 
-const StockAlert = () => {
+const StockAlertTab = () => {
   const [stockData, setStockData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -623,7 +624,7 @@ const StockAlert = () => {
   );
 };
 
-const RefundRequest = () => {
+const RefundRequestTab = () => {
   const [emailList, setEmailList] = useState([]);
   const [refundDataByEmail, setRefundDataByEmail] = useState({});
   const [loading, setLoading] = useState(true);
@@ -696,7 +697,7 @@ const RefundRequest = () => {
   );
 };
 
-const Orders = () => {
+const OrdersTab = () => {
   const user = useUser();
   const [form] = Form.useForm();
 
@@ -843,21 +844,24 @@ const AdminTabs = () => {
   const location = useLocation();
 
   const getActiveKey = () => {
-    if (location.pathname.includes("/admin/catalog")) return "0";
-    if (location.pathname.includes("/admin/detail")) return "1";
-    if (location.pathname.includes("/admin/refund")) return "2";
-    if (location.pathname.includes("/admin/stock-alerts")) return "3";
-    if (location.pathname.includes("/admin/orders")) return "4";
+    if (location.pathname.includes("/admin/dashboard")) return "0";
+    if (location.pathname.includes("/admin/catalog")) return "1";
+    if (location.pathname.includes("/admin/detail")) return "2";
+    if (location.pathname.includes("/admin/refund")) return "3";
+    if (location.pathname.includes("/admin/stock-alerts")) return "4";
+    if (location.pathname.includes("/admin/orders")) return "5";
     return "0";
   };
 
   const handleTabChange = (key) => {
-    if (key === "0") navigate("/admin/catalog/all");
-    if (key === "1") navigate("/admin/detail");
-    if (key === "2") navigate("/admin/refund");
-    if (key === "3") navigate("/admin/stock-alerts");
-    if (key === "4") navigate("/admin/orders");
+    if (key === "0") navigate("/admin/dashboard");
+    if (key === "1") navigate("/admin/catalog/all");
+    if (key === "2") navigate("/admin/detail");
+    if (key === "3") navigate("/admin/refund");
+    if (key === "4") navigate("/admin/stock-alerts");
+    if (key === "5") navigate("/admin/orders");
   };
+
 
   return (
     <div>
@@ -868,15 +872,64 @@ const AdminTabs = () => {
         tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
         style={{ width: "100%" }}
       >
-        <Tabs.TabPane key="0" tab="All Products" />
-        <Tabs.TabPane key="1" tab="Detail" />
-        <Tabs.TabPane key="2" tab="Refund Request" />
-        <Tabs.TabPane key="3" tab="Stock Alerts" />
-        <Tabs.TabPane key="4" tab="Orders" />
+        <Tabs.TabPane key="0" tab="Dashboard" />
+        <Tabs.TabPane key="1" tab="All Products" />
+        <Tabs.TabPane key="2" tab="DetailTab" />
+        <Tabs.TabPane key="3" tab="Refund Request" />
+        <Tabs.TabPane key="4" tab="Stock Alerts" />
+        <Tabs.TabPane key="5" tab="OrdersTab" />
       </Tabs>
     </div>
   );
 };
+
+const DashboardTab = () => {
+  const user = useUser();
+  
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  
+  const fetchOrders = async () => {
+    try {
+      const token = await user.accessToken;
+      if (!token) {
+        console.warn("Token is missing.");
+        return;
+      }
+
+     const res = await axios.get("http://localhost:8000/orders/admin/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const orders = res.data.orders || res.data;
+      const total = orders.reduce((sum, order) => sum + (order.total_price || 0), 0);
+      setTotalRevenue(total);
+      setOrderCount(orders.length);
+    } catch (error) {
+      console.error("Không thể lấy dữ liệu đơn hàng:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      fetchOrders();
+    }
+  })
+
+  if (!user || user.role !== "admin") {
+    return <p>Access denied: Admins only</p>;
+  }
+  
+  console.log(totalRevenue, orderCount);
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <Dashboard totalRevenue={totalRevenue} />
+    </div>
+  );
+}
 
 const AdministratorPage = () => {
   return (
@@ -919,4 +972,4 @@ OptionalLabel.propTypes = {
 };
 
 export default AdministratorPage;
-export { Detail, AdminCatalog, RefundRequest, StockAlert, Orders };
+export { DetailTab, AdminCatalog, RefundRequestTab, StockAlertTab, OrdersTab, DashboardTab };
