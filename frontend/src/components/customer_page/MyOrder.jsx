@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Spin, Typography, Button, Tag } from "antd";
+import { Table, Spin, Typography, Button, Tag, Modal, notification } from "antd";
 import axios from "axios";
 import { useUser } from "../../utils/UserContext.jsx";
 import dayjs from "dayjs";
@@ -91,10 +91,97 @@ const MyOrder = () => {
     }
   };
 
+  const postTicket = async ({ orderId, reason }) => {
+    const token = await user.accessToken;
+    console.log(user);
+    const refundData = {
+      email: user.email,
+      phone_number: user.phoneNumber,
+      order_id: orderId,
+      reason: reason,
+      status: "pending"
+    };
+
+    console.log("Submitting refund request:", refundData);
+
+    try {
+      await axios.post("http://localhost:8000/refund_tickets/", refundData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      notification.success({
+        message: 'Refund Request Submitted',
+        description: `Your refund request for order ${orderId} has been submitted successfully.`,
+      });
+    } catch (error) {
+      console.error("Error creating refund ticket:", error);
+      notification.error({
+        message: 'Refund Request Failed',
+        description: error.response.data.detail || 'Failed to submit refund request.',
+      });
+      return Promise.reject();
+    }
+  };
+
   const handleRefundRequest = (orderId) => {
     console.log("Refund requested for order ID:", orderId);
-    // TODO: Implement API call or modal for refund request
-    // Example: message.success(`Refund request for Order ${orderId} submitted`);
+    
+    Modal.confirm({
+      title: 'Request Refund',
+      width: 700,
+      height: 400,
+      centered: true,
+      content: (
+        <div>
+          <p>Please enter the reason for your refund request:</p>
+          <textarea
+            id="refundReason"
+            placeholder="Enter reason for refund..."
+            style={{
+              width: '95%',
+              minHeight: '100px',
+              padding: '8px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '4px',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+      ),
+      okText: 'Submit',
+      cancelText: 'Cancel',
+      onOk() {
+        const reason = document.getElementById('refundReason').value.trim();
+        if (!reason) {
+          Modal.error({
+            title: 'Error',
+            content: 'Please enter a reason for the refund request.',
+          });
+          return Promise.reject();
+        }
+
+        return new Promise((resolve, reject) => {
+          Modal.confirm({
+            title: 'Confirm Refund Request',
+            content: `Are you sure you want to request a refund for order ${orderId}?`,
+            okText: 'Yes',
+            cancelText: 'No',
+            width: 500,
+            onOk() {
+              postTicket({ orderId, reason })
+                .then(() => resolve())
+                .catch(() => reject());
+            },
+            onCancel() {
+              reject();
+            },
+          });
+        });
+      },
+    });
   };
 
   const handleCancelOrder = (orderId) => {
