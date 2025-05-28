@@ -150,15 +150,24 @@ const MyOrder = () => {
       align: "center",
     },
     {
-      title: "",
+      title: "Action",
       key: "actions",
       align: "center",
       render: (_, record) => (
         <>
-          <Button type="primary" onClick={() => handleRefundRequest(record.id)} style={{ marginRight: 8 }}>
+          <Button 
+            type="primary" 
+            onClick={() => handleRefundRequest(record.id)} 
+            style={{ marginRight: 8 }}
+            disabled={record.status !== 'delivered'}
+          >
             Refund
           </Button>
-          <Button danger onClick={() => handleCancelOrder(record.id)}>
+          <Button 
+            danger 
+            onClick={() => handleCancelOrder(record.id)}
+            disabled={record.status !== 'pending' && record.status !== 'processing'}
+          >
             Cancel
           </Button>
         </>
