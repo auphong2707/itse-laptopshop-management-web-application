@@ -8,7 +8,6 @@ class RefundTicketCreate(BaseModel):
     phone_number: str
     order_id: int
     reason: str
-    amount: float = Field(..., gt=0)  # Refund amount must be positive
     status: str = "pending"  # Default to pending, can be 'approved' or 'rejected'
     created_at: datetime = Field(
         default_factory=datetime.utcnow
@@ -26,7 +25,6 @@ class RefundTicketUpdate(BaseModel):
     phone_number: Optional[str] = None
     order_id: Optional[int] = None
     reason: Optional[str] = None
-    amount: Optional[float] = Field(None, gt=0)
     status: Optional[str] = (
         None  # You can update the status (pending, approved, rejected)
     )
@@ -38,7 +36,6 @@ class RefundTicketUpdate(BaseModel):
 
 class RefundTicketResponse(RefundTicketCreate):
     id: int
-    updated_at: datetime  # We will include an updated_at field in the response
 
     class Config:
         orm_mode = True  # Tell Pydantic to treat the model as a dict

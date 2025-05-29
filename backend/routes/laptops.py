@@ -54,20 +54,90 @@ def update_laptop(
     return {"message": "Laptop updated successfully", "laptop": laptop}
 
 
-@laptops_router.get("/search/")
-def search_laptops(query: str = Query(...), limit: int = Query(10)):
+STOP_WORDS = {"laptop", "laptops"}
+
+@laptops_router.get("/search")
+def search_laptops(
+    query: str = Query(...),
+    limit: int = Query(10),
+    page: int = Query(1),
+    sort: str = Query("relevant")
+):
+    terms = query.lower().split()
+    filtered_terms = [t for t in terms if t not in STOP_WORDS]
+    filtered_query = " ".join(filtered_terms) or query
+
     search_query = {
         "bool": {
             "should": [
-                {"match": {"name": query}},
-                {"match": {"serial_number": query}},
+                # 1) Khớp liên tục (boost cao)
+                {"match_phrase": {"name": {"query": query, "boost": 6}}},
+                {"match_phrase": {"serial_number": {"query": query, "boost": 6}}},
+
+                # 2) Khớp rải rác trong name (tất cả token phải có)
+                {
+                    "match": {
+                        "name": {
+                            "query": filtered_query,
+                            "operator": "and",
+                            "boost": 4
+                        }
+                    }
+                },
+
+                # 3) Cross-fields trên nhiều cột (bao gồm name & serial_number)
+                {
+                    "multi_match": {
+                        "query": filtered_query,
+                        "fields": [
+                            "brand^3",
+                            "sub_brand^3",
+                            "name^2",
+                            "serial_number^3",
+                            "cpu^1",
+                            "vga^1"
+                        ],
+                        "type": "cross_fields",
+                        "operator": "and" if len(filtered_terms) > 1 else "or"
+                    }
+                }
             ],
             "minimum_should_match": 1,
+            # Vẫn ép phải match ≥1 term có nghĩa trong name
+            "must": {
+                "bool": {
+                    "should": [
+                        {"match": {"name": term}} for term in filtered_terms
+                    ],
+                    "minimum_should_match": 1
+                }
+            }
         }
     }
 
-    results = es.search(index="laptops", body={"query": search_query, "size": limit})
-    return {"results": [hit["_source"] for hit in results["hits"]["hits"]]}
+    sort_options = {
+        "relevant": [],
+        "latest":  [{"inserted_at": {"order": "desc"}}],
+        "price_asc":  [{"sale_price": {"order": "asc"}}],
+        "price_desc": [{"sale_price": {"order": "desc"}}],
+    }
+    sorting = sort_options.get(sort, [])
+
+    query_body = {
+        "query": search_query,
+        "size": limit,
+        "from": (page - 1) * limit,
+    }
+    if sorting:
+        query_body["sort"] = sorting
+
+    results = es.search(index="laptops", body=query_body, track_total_hits=True)
+    return {
+        "page": page,
+        "limit": limit,
+        "total_count": results["hits"]["total"]["value"],
+        "results": [hit["_source"] for hit in results["hits"]["hits"]],
+    }
 
 
 @laptops_router.get("/filter")

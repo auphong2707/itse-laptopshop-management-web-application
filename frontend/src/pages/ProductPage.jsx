@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Layout, Typography, Breadcrumb, Table, Image, Rate } from "antd";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Layout, Typography, Breadcrumb, Table, Image, Rate, Modal, notification } from "antd";
 import PropTypes from "prop-types";
 
 import WebsiteHeader from "../components/WebsiteHeader";
@@ -9,6 +9,7 @@ import ProductImage from "../components/product_page/ProductImage";
 import ProductTabs from "../components/product_page/ProductTabs";
 import Purchase from "../components/product_page/Purchase";
 import SupportSection from "../components/product_page/SupportSection";
+import { useUser } from '../utils/UserContext';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -171,11 +172,11 @@ Specs.propTypes = {
 const transformData = (data) => {
   return {
     ...data,
-    name: data["name"].toUpperCase(),
-    brand: data["brand"].toUpperCase(),
+    name: data["name"] ? data["name"].toUpperCase() : "N/A",
+    brand: data["brand"] ? data["brand"].toUpperCase() : "N/A",
     cpu: data["cpu"] ? data["cpu"].toUpperCase() : "N/A",
-    ram_type: data["ram_type"].toUpperCase(),
-    storage_type: data["storage_type"].toUpperCase(),
+    ram_type: data["ram_type"] ? data["ram_type"].toUpperCase() : "N/A",
+    storage_type: data["storage_type"] ? data["storage_type"].toUpperCase() : "N/A",
     vga: data["vga"] ? data["vga"].toUpperCase() : "N/A",
     default_os: data["default_os"]
       ? data["default_os"]
@@ -193,6 +194,9 @@ const transformData = (data) => {
 };
 
 const ProductPage = () => {
+  const navigate = useNavigate();
+
+  const user = useUser();
   const { id } = useParams();
   const [productData, setProductData] = useState({});
   useEffect(() => {
@@ -201,13 +205,50 @@ const ProductPage = () => {
       .then((data) => transformData(data))
       .then((data) => setProductData(data));
   }, [id]);
-
-  console.log(productData);
+  
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
-  const [reviewName, setReviewName] = useState("");
-  const [reviewEmail, setReviewEmail] = useState("");
   const handleSubmitReview = async () => {
+    if (!user) {
+      Modal.confirm({
+        title: "Login Required",
+        content: "You must be logged in to access the shopping cart.",
+        okText: "Go to Login",
+        cancelText: "Cancel",
+        onOk() {
+          navigate("/customer/login");
+        },
+        onCancel() {},
+      });
+      return;
+    }
+
+    if (rating === 0 || reviewText.trim() === "") {
+      notification.error({
+        message: (
+          <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+            Error
+          </Text>
+        ),
+        description: (
+          <Text style={{ fontSize: 20 }}>
+            Please provide a rating and write a review before submitting.
+          </Text>
+        ),
+        duration: 3,
+        placement: "topRight",
+        style: {
+          fontSize: "16px",
+          padding: "16px",
+          width: "600px",
+        },
+      });
+      return;
+    }
+
+    const reviewName = await user.displayName;
+    const reviewEmail = await user.email;
+
     const review = {
       user_name: reviewName,
       email: reviewEmail,
@@ -226,18 +267,49 @@ const ProductPage = () => {
       });
 
       if (res.ok) {
-        alert("Review submitted successfully!");
+        notification.success({
+          message: (
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+              Success
+            </Text>
+          ),
+          description: (
+            <Text style={{ fontSize: 20 }}>
+              Review submitted successfully!
+            </Text>
+          ),
+          duration: 3,
+          placement: "top",
+          style: {
+            fontSize: "16px",
+            padding: "16px",
+            width: "600px",
+          },
+        });
         // Reset form
         setRating(0);
         setReviewText("");
-        setReviewName("");
-        setReviewEmail("");
       } else {
         const errorData = await res.json();
-        alert(
-          "Failed to submit review: " +
-            (errorData.detail || JSON.stringify(errorData)),
-        );
+          notification.error({
+          message: (
+            <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+              Error
+            </Text>
+          ),
+          description: (
+            <Text style={{ fontSize: 20 }}>
+              {errorData.detail || "Unable to submit review. Please try again later."}
+            </Text>
+          ),
+          duration: 3,
+          placement: "topRight",
+          style: {
+            fontSize: "16px",
+            padding: "16px",
+            width: "600px",
+          },
+        });
       }
     } catch (err) {
       console.error("Error submitting review:", err);
@@ -358,36 +430,6 @@ const ProductPage = () => {
             fontFamily: "sans-serif",
           }}
         />
-
-        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={reviewName}
-            onChange={(e) => setReviewName(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "0.75rem",
-              border: "1px solid #000",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            value={reviewEmail}
-            onChange={(e) => setReviewEmail(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "0.75rem",
-              border: "1px solid #000",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
-        </div>
 
         <button
           onClick={handleSubmitReview}

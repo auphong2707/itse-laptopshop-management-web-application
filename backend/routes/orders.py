@@ -436,7 +436,7 @@ def admin_update_order_status(
     allowed_statuses = [
         "pending",
         "processing",
-        "shipped",
+        "shipping",
         "delivered",
         "cancelled",
         "refunded",

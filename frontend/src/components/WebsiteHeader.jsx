@@ -1,19 +1,24 @@
 import { useState, useEffect } from "react";
-import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar } from "antd";
+import { Flex, Typography, Layout, Space, Menu, Dropdown, Avatar, Input, Modal } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FacebookFilled,
   InstagramFilled,
   ShoppingCartOutlined,
-  SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+
+import { useUser } from "../utils/UserContext";
+
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+
 
 import logo from "/vite.svg";
 
 const { Text } = Typography;
 const { Header } = Layout;
+
+const { Search } = Input; 
 
 const headerStyle = {
   borderBottom: "1px solid #f0f0f0",
@@ -63,7 +68,7 @@ const AccountMenu = () => {
         <>
           <Menu.Item key="account" style={{ fontWeight: "bold" }}>
             {user.role === "customer" ? (
-              <Link to="/customer">My Account</Link>
+              <Link to="/customer/accountInformation">Account Information</Link>
             ) : (
               "My Account"
             )}
@@ -79,11 +84,14 @@ const AccountMenu = () => {
             </Menu.Item>
           ) : (
             <>
-              <Menu.Item key="wishlist" style={{ fontWeight: "bold" }}>
-                My Wish List (0)
+              <Menu.Item key="orders" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/orders">My Orders</Link>
               </Menu.Item>
-              <Menu.Item key="compare" style={{ fontWeight: "bold" }}>
-                Compare (0)
+              <Menu.Item key="productReviews" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/productReviews">Product Reviews</Link>
+              </Menu.Item>
+              <Menu.Item key="newsletterSubscriptions" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/newsletterSubscriptions">Newsletter Subscriptions</Link>
               </Menu.Item>
             </>
           )}
@@ -133,6 +141,18 @@ const AccountMenu = () => {
 };
 
 const WebsiteHeader = () => {
+  const user = useUser();
+  const navigate = useNavigate(); 
+
+  const handleSearch = (value) => {
+    const keyword = value.trim();
+    if (!keyword) return;
+
+    navigate(
+      `/search?query=${encodeURIComponent(keyword)}`
+    );
+  };
+
   return (
     <Header style={headerStyle}>
       {/* Top Bar */}
@@ -225,17 +245,37 @@ const WebsiteHeader = () => {
           </Flex>
         </Flex>
 
-        <Flex align="center" gap="35px">
-          <Flex align="center" gap="middle">
-            <SearchOutlined style={{ fontSize: "18px", color: "black" }} />
-            <Link to="/shopping-cart">
-              <ShoppingCartOutlined
-                style={{ fontSize: "21px", color: "black" }}
-              />
-            </Link>
-          </Flex>
-
-          {/* Account Menu */}
+        <Flex align="center" gap="middle">
+          <Search
+            placeholder="Search laptops…"
+            allowClear
+            size="medium"
+            style={{ width: 280 }}
+            onSearch={handleSearch}
+          />
+          {user?.role !== "admin" && (
+            <ShoppingCartOutlined
+              style={{ fontSize: "21px", color: "black", cursor: "pointer" }}
+              onClick={() => {
+                if (user?.role === "customer") {
+                  navigate("/shopping-cart");
+                } else {
+                  Modal.confirm({
+                    title: "Login Required",
+                    content: "You must be logged in to access the shopping cart.",
+                    okText: "Go to Login",
+                    cancelText: "Cancel",
+                    onOk() {
+                      navigate("/customer/login");
+                    },
+                    onCancel() {
+                      // Do nothing — just close the modal
+                    },
+                  });
+                }
+              }}
+            />
+          )}
           <AccountMenu />
         </Flex>
       </Flex>

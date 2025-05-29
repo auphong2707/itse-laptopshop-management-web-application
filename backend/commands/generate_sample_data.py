@@ -463,14 +463,15 @@ def generate_orders(
     statuses = [
         "pending",
         "processing",
-        "shipped",
+        "shipping",
         "delivered",
         "cancelled",
         "refunded",
     ]
 
     def generate_fake_uid(length=28):
-        return "".join(random.choices(string.ascii_letters + string.digits, k=length))
+        real_uid = "UXXB26VXsZdin2QRTDvQtKW8HiI2"
+        return random.choice([real_uid, "".join(random.choices(string.ascii_letters + string.digits, k=length))])
 
     for i in range(num_orders):
         first = random.choice(first_names)
@@ -645,7 +646,6 @@ def generate_refund_tickets(
 
         order_id = random.choice(possible_order_ids)
         reason = random.choice(reasons)
-        amount = round(random.uniform(500000, 20000000), 2)
         status = random.choice(statuses)
         created_at = datetime.utcnow() - timedelta(days=random.randint(1, 100))
         resolved_at = None
@@ -665,7 +665,7 @@ def generate_refund_tickets(
             return str(val)
 
         values.append(
-            f"({fmt(email)}, {fmt(phone)}, {order_id}, {fmt(reason)}, {amount}, "
+            f"({fmt(email)}, {fmt(phone)}, {order_id}, {fmt(reason)}, "
             f"{fmt(status)}, {fmt(created_at)}, {fmt(resolved_at)}, {fmt(updated_at)})"
         )
 
@@ -673,7 +673,7 @@ def generate_refund_tickets(
         insert_query = (
             "-- Sample Refund Tickets --\n"
             "INSERT INTO refund_tickets "
-            "(email, phone_number, order_id, reason, amount, status, created_at, resolved_at, updated_at)\nVALUES\n"
+            "(email, phone_number, order_id, reason, status, created_at, resolved_at, updated_at)\nVALUES\n"
             + ",\n".join(values)
             + ";\n"
         )

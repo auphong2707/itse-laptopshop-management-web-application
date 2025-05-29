@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Typography, Image, InputNumber, Button } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
@@ -315,7 +316,7 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
           type="primary"
           style={{ borderRadius: "9999px", fontWeight: "bold" }}
         >
-          Continue Shopping
+          <Link to="/">Continue Shopping</Link>
         </Button>
       </div>
     </div>
