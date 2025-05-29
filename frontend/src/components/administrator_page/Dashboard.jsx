@@ -3,32 +3,38 @@ import { Card, Col, Row, Statistic } from "antd";
 import { Pie, Line } from "@ant-design/plots";
 import axios from "axios";
 
-const Dashboard = ({totalRevenue, orderCount}) => {
-  // Dữ liệu giả cho Pie
-  const salesByStatusData = [
-    { type: "Shipped", value: 65 },
-    { type: "Pending", value: 25 },
-    { type: "Cancelled", value: 10 },
-  ];
+const Dashboard = ({totalRevenue, orderCount, salesByStatus, salesOverTime, ordersOverTime}) => {
 
-  const lineData = Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    value: Math.floor(Math.random() * 5000 + 5000),
-  }));
+  const salesLineConfig = {
+  data: salesOverTime,
+  xField: "date",
+  yField: "revenue",
+  height: 220,
+  smooth: true,
+  lineStyle: { stroke: "#52c41a" },
+  tooltip: { showMarkers: true },
+};
 
-  const lineConfig = {
-    data: lineData,
-    xField: "day",
-    yField: "value",
-    height: 220,
-    smooth: true,
-    lineStyle: { stroke: "#1677ff" },
-    tooltip: { showMarkers: false },
-  };
+const orderLineConfig = {
+  data: ordersOverTime,
+  xField: "date",
+  yField: "count",
+  height: 220,
+  smooth: true,
+  lineStyle: { stroke: "#fa541c" }, // Use a different color from revenue
+  tooltip: {
+    formatter: (datum) => ({
+      name: "Orders",
+      value: `${datum.count} orders`,
+    }),
+  },
+};
+
+
 
   const pieConfig = {
     appendPadding: 10,
-    data: salesByStatusData,
+    data: salesByStatus,
     angleField: "value",
     colorField: "type",
     radius: 1,
@@ -80,7 +86,7 @@ const Dashboard = ({totalRevenue, orderCount}) => {
       <Row style={{ marginTop: "2rem" }}>
         <Col span={24}>
           <Card title="Sales Over Time">
-            <Line {...lineConfig} />
+            <Line {...salesLineConfig} />
           </Card>
         </Col>
       </Row>
@@ -88,7 +94,7 @@ const Dashboard = ({totalRevenue, orderCount}) => {
       <Row style={{ marginTop: "2rem" }}>
         <Col span={24}>
           <Card title="Order Over Time">
-            <Line {...lineConfig} />
+            <Line {...orderLineConfig} />
           </Card>
         </Col>
       </Row>

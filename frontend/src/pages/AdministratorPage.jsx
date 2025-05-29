@@ -885,32 +885,79 @@ const AdminTabs = () => {
 
 const DashboardTab = () => {
   const user = useUser();
-  
+  const [salesByStatus, setSalesByStatus] = useState([]);
+  const [salesOverTime, setSalesOverTime] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
+  const [ordersOverTime, setOrdersOverTime] = useState([]);
+  
   const fetchOrders = async () => {
-    try {
-      const token = await user.accessToken;
-      if (!token) {
-        console.warn("Token is missing.");
-        return;
-      }
+  try {
+    const token = await user.accessToken;
+    if (!token) return;
 
-     const res = await axios.get("http://localhost:8000/orders/admin/list", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const res = await axios.get("http://localhost:8000/orders/admin/list", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      console.log("Full order data:", res.data);
-      const orders = res.data.orders || res.data;
-      const total = orders.reduce((sum, order) => sum + (order.total_price || 0), 0);
-      setTotalRevenue(total);
-      setOrderCount(orders.length);
-    } catch (error) {
-      console.error("Không thể lấy dữ liệu đơn hàng:", error);
+    const orders = res.data.orders || res.data;
+
+    // 1. Total revenue
+    const total = orders.reduce(
+      (sum, order) => sum + (order.total_price || 0),
+      0
+    );
+    setTotalRevenue(total);
+    setOrderCount(orders.length);
+
+    // 2. Sales by status (pie chart)
+    const statusCount = {};
+    for (const order of orders) {
+      const status = order.status || "unknown";
+      statusCount[status] = (statusCount[status] || 0) + 1;
     }
-  };
+    const pieData = Object.entries(statusCount).map(([type, value]) => ({
+      type,
+      value,
+    }));
+    setSalesByStatus(pieData);
+
+    // 3. Sales over time (line chart)
+    const revenueByDate = {};
+    for (const order of orders) {
+      const date = new Date(order.created_at).toISOString().split("T")[0]; // 'YYYY-MM-DD'
+      revenueByDate[date] = (revenueByDate[date] || 0) + (order.total_price || 0);
+    }
+
+    const sortedDates = Object.keys(revenueByDate).sort();
+    const lineData = sortedDates.map(date => ({
+      date,
+      revenue: revenueByDate[date],
+    }));
+    setSalesOverTime(lineData);
+
+    // 4. Order count over time (grouped by date)
+    const orderCountByDate = {};
+    for (const order of orders) {
+      const date = new Date(order.created_at).toISOString().split("T")[0];
+      orderCountByDate[date] = (orderCountByDate[date] || 0) + 1;
+    }
+
+    const sortedOrderDates = Object.keys(orderCountByDate).sort();
+    const orderLineData = sortedOrderDates.map((date) => ({
+      date,
+      count: orderCountByDate[date],
+    }));
+    setOrdersOverTime(orderLineData);
+
+    
+
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+  }
+};
+
+
 
   useEffect(() => {
     if (user?.role === "admin") {
@@ -926,7 +973,13 @@ const DashboardTab = () => {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <Dashboard totalRevenue={totalRevenue} orderCount={orderCount}/>
+      <Dashboard 
+          totalRevenue={totalRevenue} 
+          orderCount={orderCount}
+          salesByStatus={salesByStatus}
+          salesOverTime={salesOverTime}
+          ordersOverTime={ordersOverTime}
+          />
     </div>
   );
 }
