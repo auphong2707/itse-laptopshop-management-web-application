@@ -13,7 +13,6 @@ import {
   Layout,
   Typography,
   Breadcrumb,
-  Tabs,
   DatePicker,
   Card,
   Select,
@@ -27,10 +26,11 @@ const { RangePicker } = DatePicker;
 import { useUser } from "../utils/UserContext.jsx";
 import WebsiteHeader from "../components/WebsiteHeader.jsx";
 import WebsiteFooter from "../components/WebsiteFooter.jsx";
-import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
+import Inventory from "../components/administrator_page/Inventory.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 import OrderTable from "../components/administrator_page/OrderTable.jsx";
+import Dashboard from "../components/administrator_page/Dashboard.jsx";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -119,7 +119,7 @@ const transformFormData = (values) => {
   };
 };
 
-const Detail = () => {
+const DetailTab = () => {
   const [form] = Form.useForm();
   const { id } = useParams();
   const [_, setProductData] = useState({});
@@ -562,7 +562,7 @@ const transformStockData = (data) => {
   }));
 };
 
-const StockAlert = () => {
+const StockAlertTab = () => {
   const [stockData, setStockData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -623,7 +623,7 @@ const StockAlert = () => {
   );
 };
 
-const RefundRequest = () => {
+const RefundRequestTab = () => {
   const [emailList, setEmailList] = useState([]);
   const [refundDataByEmail, setRefundDataByEmail] = useState({});
   const [loading, setLoading] = useState(true);
@@ -696,7 +696,7 @@ const RefundRequest = () => {
   );
 };
 
-const Orders = () => {
+const OrdersTab = () => {
   const user = useUser();
   const [form] = Form.useForm();
 
@@ -838,47 +838,110 @@ const Orders = () => {
   );
 };
 
-const AdminTabs = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+const DashboardTab = () => {
+  const user = useUser();
+  const [salesByStatus, setSalesByStatus] = useState([]);
+  const [salesOverTime, setSalesOverTime] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [ordersOverTime, setOrdersOverTime] = useState([]);
+  
+  const fetchOrders = async () => {
+  try {
+    const token = await user.accessToken;
+    if (!token) return;
 
-  const getActiveKey = () => {
-    if (location.pathname.includes("/admin/catalog")) return "0";
-    if (location.pathname.includes("/admin/detail")) return "1";
-    if (location.pathname.includes("/admin/refund")) return "2";
-    if (location.pathname.includes("/admin/stock-alerts")) return "3";
-    if (location.pathname.includes("/admin/orders")) return "4";
-    return "0";
-  };
+    const res = await axios.get("http://localhost:8000/orders/admin/list", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const handleTabChange = (key) => {
-    if (key === "0") navigate("/admin/catalog/all");
-    if (key === "1") navigate("/admin/detail");
-    if (key === "2") navigate("/admin/refund");
-    if (key === "3") navigate("/admin/stock-alerts");
-    if (key === "4") navigate("/admin/orders");
-  };
+    const orders = res.data.orders || res.data;
 
-  return (
-    <div>
-      <Tabs
-        activeKey={getActiveKey()}
-        onChange={handleTabChange}
-        tabBarGutter={80}
-        tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
-        style={{ width: "100%" }}
-      >
-        <Tabs.TabPane key="0" tab="All Products" />
-        <Tabs.TabPane key="1" tab="Detail" />
-        <Tabs.TabPane key="2" tab="Refund Request" />
-        <Tabs.TabPane key="3" tab="Stock Alerts" />
-        <Tabs.TabPane key="4" tab="Orders" />
-      </Tabs>
-    </div>
-  );
+    // 1. Total revenue
+    const total = orders.reduce(
+      (sum, order) => sum + (order.total_price || 0),
+      0
+    );
+    setTotalRevenue(total);
+    setOrderCount(orders.length);
+
+    // 2. Sales by status (pie chart)
+    const statusCount = {};
+    for (const order of orders) {
+      const status = order.status || "unknown";
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    }
+    const pieData = Object.entries(statusCount).map(([type, value]) => ({
+      type,
+      value,
+    }));
+    setSalesByStatus(pieData);
+
+    // 3. Sales over time (line chart)
+    const revenueByDate = {};
+    for (const order of orders) {
+      const date = new Date(order.created_at).toISOString().split("T")[0]; // 'YYYY-MM-DD'
+      revenueByDate[date] = (revenueByDate[date] || 0) + (order.total_price || 0);
+    }
+
+    const sortedDates = Object.keys(revenueByDate).sort();
+    const lineData = sortedDates.map(date => ({
+      date,
+      revenue: revenueByDate[date],
+    }));
+    setSalesOverTime(lineData);
+
+    // 4. Order count over time (grouped by date)
+    const orderCountByDate = {};
+    for (const order of orders) {
+      const date = new Date(order.created_at).toISOString().split("T")[0];
+      orderCountByDate[date] = (orderCountByDate[date] || 0) + 1;
+    }
+
+    const sortedOrderDates = Object.keys(orderCountByDate).sort();
+    const orderLineData = sortedOrderDates.map((date) => ({
+      date,
+      count: orderCountByDate[date],
+    }));
+    setOrdersOverTime(orderLineData);
+
+    
+
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+  }
 };
 
+
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      fetchOrders();
+    }
+  })
+
+  if (!user || user.role !== "admin") {
+    return <p>Access denied: Admins only</p>;
+  }
+  
+  console.log(totalRevenue, orderCount);
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <Dashboard 
+          totalRevenue={totalRevenue} 
+          orderCount={orderCount}
+          salesByStatus={salesByStatus}
+          salesOverTime={salesOverTime}
+          ordersOverTime={ordersOverTime}
+          />
+    </div>
+  );
+}
+
 const AdministratorPage = () => {
+  const location = useLocation();
+
   return (
     <Layout>
       <WebsiteHeader />
@@ -888,18 +951,46 @@ const AdministratorPage = () => {
           separator=">"
           style={{ marginBottom: "1rem", fontSize: "14px" }}
         >
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
+          <Breadcrumb.Item>Admin</Breadcrumb.Item>
+          {(() => {
+            
+            const pathSegments = location.pathname.split('/').filter(segment => segment);
+            
+            // Map path segments to display names
+            const pathToDisplayName = {
+              'inventory': 'Inventory',
+              'detail': 'Product Detail',
+              'refund': 'Refund Requests',
+              'stock': 'Stock Alerts',
+              'orders': 'Orders',
+              'dashboard': 'Dashboard'
+            };
+            
+            // Get the current page from the path (last segment)
+            if (pathSegments.length > 0) {
+              const currentPage = pathSegments[1];
+              
+              if (currentPage === 'detail') {
+                if (pathSegments.length > 2) {
+                  // If it's a detail page, use the third segment as the identifier
+                  const detailId = pathSegments[2];
+                  return <Breadcrumb.Item>Product Detail: {detailId}</Breadcrumb.Item>;
+                }
+                else {
+                  return <Breadcrumb.Item>Add Product</Breadcrumb.Item>;
+                }
+              }
+              else {
+                const displayName = pathToDisplayName[currentPage] || 
+                currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+                return <Breadcrumb.Item>{displayName}</Breadcrumb.Item>;
+              }
+            }
+            
+            return <Breadcrumb.Item>Dashboard</Breadcrumb.Item>;
+          })()}
         </Breadcrumb>
 
-        <Title level={2} style={{ fontWeight: "bold" }}>
-          Administrator Page
-        </Title>
-
-        {/* Tabs for Navigation */}
-        <AdminTabs />
-
-        {/* Outlet for Rendering Child Components */}
         <Outlet />
       </Content>
 
@@ -919,4 +1010,4 @@ OptionalLabel.propTypes = {
 };
 
 export default AdministratorPage;
-export { Detail, AdminCatalog, RefundRequest, StockAlert, Orders };
+export { DetailTab, Inventory, RefundRequestTab, StockAlertTab, OrdersTab, DashboardTab };

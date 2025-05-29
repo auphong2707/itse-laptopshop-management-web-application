@@ -66,24 +66,33 @@ const AccountMenu = () => {
     <Menu onClick={handleMenuClick} style={{ minWidth: "165px" }}>
       {user ? (
         <>
-          <Menu.Item key="account" style={{ fontWeight: "bold" }}>
-            {user.role === "customer" ? (
-              <Link to="/customer/accountInformation">Account Information</Link>
-            ) : (
-              "My Account"
-            )}
-          </Menu.Item>
-
           {user.role === "admin" ? (
-            <Menu.Item
-              key="dashboard"
-              style={{ fontWeight: "bold" }}
-              onClick={() => navigate("/admin/dashboard")}
-            >
-              Dashboard
+            <>
+            <Menu.Item key="dashboard" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/dashboard">Dashboard</Link>
             </Menu.Item>
+            <Menu.Item key="inventory" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/inventory/all">Inventory</Link>
+            </Menu.Item>
+            <Menu.Item key="addProduct" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/detail">Add Product</Link>
+            </Menu.Item>
+
+            <Menu.Item key="refund" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/refund">Refund Requests</Link>
+            </Menu.Item>
+            <Menu.Item key="stockAlerts" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/stock-alerts">Stock Alerts</Link>
+            </Menu.Item>
+            <Menu.Item key="orders" style={{ fontWeight: "bold" }}>
+              <Link to="/admin/orders">Orders</Link>
+            </Menu.Item>
+            </>
           ) : (
             <>
+              <Menu.Item key="account" style={{ fontWeight: "bold" }}>
+                <Link to="/customer/accountInformation">Account Information</Link>
+              </Menu.Item>
               <Menu.Item key="orders" style={{ fontWeight: "bold" }}>
                 <Link to="/customer/orders">My Orders</Link>
               </Menu.Item>
