@@ -13,7 +13,6 @@ import {
   Layout,
   Typography,
   Breadcrumb,
-  Tabs,
   DatePicker,
   Card,
   Select,
@@ -27,7 +26,7 @@ const { RangePicker } = DatePicker;
 import { useUser } from "../utils/UserContext.jsx";
 import WebsiteHeader from "../components/WebsiteHeader.jsx";
 import WebsiteFooter from "../components/WebsiteFooter.jsx";
-import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
+import Inventory from "../components/administrator_page/Inventory.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 import OrderTable from "../components/administrator_page/OrderTable.jsx";
@@ -839,50 +838,6 @@ const OrdersTab = () => {
   );
 };
 
-const AdminTabs = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const getActiveKey = () => {
-    if (location.pathname.includes("/admin/dashboard")) return "0";
-    if (location.pathname.includes("/admin/catalog")) return "1";
-    if (location.pathname.includes("/admin/detail")) return "2";
-    if (location.pathname.includes("/admin/refund")) return "3";
-    if (location.pathname.includes("/admin/stock-alerts")) return "4";
-    if (location.pathname.includes("/admin/orders")) return "5";
-    return "0";
-  };
-
-  const handleTabChange = (key) => {
-    if (key === "0") navigate("/admin/dashboard");
-    if (key === "1") navigate("/admin/catalog/all");
-    if (key === "2") navigate("/admin/detail");
-    if (key === "3") navigate("/admin/refund");
-    if (key === "4") navigate("/admin/stock-alerts");
-    if (key === "5") navigate("/admin/orders");
-  };
-
-
-  return (
-    <div>
-      <Tabs
-        activeKey={getActiveKey()}
-        onChange={handleTabChange}
-        tabBarGutter={80}
-        tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
-        style={{ width: "100%" }}
-      >
-        <Tabs.TabPane key="0" tab="Dashboard" />
-        <Tabs.TabPane key="1" tab="All Products" />
-        <Tabs.TabPane key="2" tab="DetailTab" />
-        <Tabs.TabPane key="3" tab="Refund Request" />
-        <Tabs.TabPane key="4" tab="Stock Alerts" />
-        <Tabs.TabPane key="5" tab="OrdersTab" />
-      </Tabs>
-    </div>
-  );
-};
-
 const DashboardTab = () => {
   const user = useUser();
   const [salesByStatus, setSalesByStatus] = useState([]);
@@ -985,6 +940,8 @@ const DashboardTab = () => {
 }
 
 const AdministratorPage = () => {
+  const location = useLocation();
+
   return (
     <Layout>
       <WebsiteHeader />
@@ -994,18 +951,46 @@ const AdministratorPage = () => {
           separator=">"
           style={{ marginBottom: "1rem", fontSize: "14px" }}
         >
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
+          <Breadcrumb.Item>Admin</Breadcrumb.Item>
+          {(() => {
+            
+            const pathSegments = location.pathname.split('/').filter(segment => segment);
+            
+            // Map path segments to display names
+            const pathToDisplayName = {
+              'inventory': 'Inventory',
+              'detail': 'Product Detail',
+              'refund': 'Refund Requests',
+              'stock': 'Stock Alerts',
+              'orders': 'Orders',
+              'dashboard': 'Dashboard'
+            };
+            
+            // Get the current page from the path (last segment)
+            if (pathSegments.length > 0) {
+              const currentPage = pathSegments[1];
+              
+              if (currentPage === 'detail') {
+                if (pathSegments.length > 2) {
+                  // If it's a detail page, use the third segment as the identifier
+                  const detailId = pathSegments[2];
+                  return <Breadcrumb.Item>Product Detail: {detailId}</Breadcrumb.Item>;
+                }
+                else {
+                  return <Breadcrumb.Item>Add Product</Breadcrumb.Item>;
+                }
+              }
+              else {
+                const displayName = pathToDisplayName[currentPage] || 
+                currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+                return <Breadcrumb.Item>{displayName}</Breadcrumb.Item>;
+              }
+            }
+            
+            return <Breadcrumb.Item>Dashboard</Breadcrumb.Item>;
+          })()}
         </Breadcrumb>
 
-        <Title level={2} style={{ fontWeight: "bold" }}>
-          Administrator Page
-        </Title>
-
-        {/* Tabs for Navigation */}
-        <AdminTabs />
-
-        {/* Outlet for Rendering Child Components */}
         <Outlet />
       </Content>
 
@@ -1025,4 +1010,4 @@ OptionalLabel.propTypes = {
 };
 
 export default AdministratorPage;
-export { DetailTab, AdminCatalog, RefundRequestTab, StockAlertTab, OrdersTab, DashboardTab };
+export { DetailTab, Inventory, RefundRequestTab, StockAlertTab, OrdersTab, DashboardTab };

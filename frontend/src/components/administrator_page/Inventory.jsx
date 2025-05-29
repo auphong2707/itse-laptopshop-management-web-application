@@ -23,25 +23,25 @@ const brands = [
   {
     name: "asus",
     logo: "/brand-logo/asus-logo.png",
-    link: "/admin/catalog/asus",
+    link: "/admin/inventory/asus",
   },
   {
     name: "lenovo",
     logo: "/brand-logo/lenovo-logo.png",
-    link: "/admin/catalog/lenovo",
+    link: "/admin/inventory/lenovo",
   },
   {
     name: "acer",
     logo: "/brand-logo/acer-logo.png",
-    link: "/admin/catalog/acer",
+    link: "/admin/inventory/acer",
   },
   {
     name: "dell",
     logo: "/brand-logo/dell-logo.png",
-    link: "/admin/catalog/dell",
+    link: "/admin/inventory/dell",
   },
-  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/admin/catalog/hp" },
-  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/admin/catalog/msi" },
+  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/admin/inventory/hp" },
+  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/admin/inventory/msi" },
 ];
 
 const subBrands = {
@@ -187,7 +187,7 @@ const convertToQueryString = (
   return query ? `${query}` : "";
 };
 
-const AdminCatalog = () => {
+const Inventory = () => {
   const { brand } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -437,4 +437,4 @@ const AdminCatalog = () => {
   );
 };
 
-export default AdminCatalog;
+export default Inventory;

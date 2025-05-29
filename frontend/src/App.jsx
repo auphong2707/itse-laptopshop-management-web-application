@@ -7,7 +7,7 @@ import {
 
 import { UserProvider } from "./utils/UserContext";
 import AdministratorPage, {
-  AdminCatalog,
+  Inventory,
   DetailTab,
   OrdersTab,
   RefundRequestTab,
@@ -75,8 +75,8 @@ const router = createBrowserRouter([
         element: <DashboardTab />,
       },
       {
-        path: "catalog/:brand",
-        element: <AdminCatalog />,
+        path: "inventory/:brand",
+        element: <Inventory />,
       },
       {
         path: "detail",
