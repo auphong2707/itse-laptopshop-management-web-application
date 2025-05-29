@@ -3,34 +3,31 @@ import { Card, Col, Row, Statistic } from "antd";
 import { Pie, Line } from "@ant-design/plots";
 import axios from "axios";
 
-const Dashboard = ({totalRevenue, orderCount, salesByStatus, salesOverTime, ordersOverTime}) => {
-
+const Dashboard = ({ totalRevenue, orderCount, salesByStatus, salesOverTime, ordersOverTime }) => {
   const salesLineConfig = {
-  data: salesOverTime,
-  xField: "date",
-  yField: "revenue",
-  height: 220,
-  smooth: true,
-  lineStyle: { stroke: "#52c41a" },
-  tooltip: { showMarkers: true },
-};
+    data: salesOverTime,
+    xField: "date",
+    yField: "revenue",
+    height: 200,
+    smooth: true,
+    lineStyle: { stroke: "#1677ff", lineWidth: 2 },
+    tooltip: { showMarkers: true },
+  };
 
-const orderLineConfig = {
-  data: ordersOverTime,
-  xField: "date",
-  yField: "count",
-  height: 220,
-  smooth: true,
-  lineStyle: { stroke: "#fa541c" }, // Use a different color from revenue
-  tooltip: {
-    formatter: (datum) => ({
-      name: "Orders",
-      value: `${datum.count} orders`,
-    }),
-  },
-};
-
-
+  const orderLineConfig = {
+    data: ordersOverTime,
+    xField: "date",
+    yField: "count",
+    height: 200,
+    smooth: true,
+    lineStyle: { stroke: "#1677ff", lineWidth: 2 },
+    tooltip: {
+      formatter: (datum) => ({
+        name: "Orders",
+        value: `${datum.count} orders`,
+      }),
+    },
+  };
 
   const pieConfig = {
     appendPadding: 10,
@@ -40,66 +37,121 @@ const orderLineConfig = {
     radius: 1,
     innerRadius: 0.6,
     label: {
-      type: "outer", // ← instead of "spider"
-      content: '{name} ({percentage})',
+      type: "inner",
+      content: "{percentage}",
       style: {
-        fontWeight: 500,
+        fontWeight: 600,
+        fill: "#fff",
       },
     },
-    interactions: [
-      { type: "element-selected" },
-      { type: "element-active" }
-    ],
+    interactions: [{ type: "element-selected" }, { type: "element-active" }],
+    legend: { position: "bottom" },
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2 style={{ fontWeight: "bold", fontSize: "24px", marginBottom: "2rem" }}>
-        Sales Performance Overview
-      </h2>
+    <div
+      style={{
+        padding: "3rem",
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "#f5f5f5",
+        minHeight: "100vh",
+      }}
+    >
+      <Card
+        style={{
+          width: "100%",
+          maxWidth: "1000px",
+          background: "#fff",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          padding: "2rem",
+        }}
+      >
+        <h2 style={{ fontSize: "50px", fontWeight: "700",marginTop: "0", marginBottom: "2rem", textAlign: "center" }}>
+          Sales Performance Overview
+        </h2>
 
-      <Row gutter={24}>
-        <Col xs={24} lg={8}>
-          <Card>
-            <Statistic
-              title={<span style={{ fontSize: "18px", fontWeight: "bold" }}>Total Revenue</span>}
-              value={totalRevenue}
-              prefix="₫"
-              valueStyle={{ color: "#1677ff", fontSize: "32px", fontWeight: "bold" }}
-            />
-            <div style={{ marginTop: "2rem" }} />
-            <Statistic
-              title={<span style={{ fontSize: "18px", fontWeight: "bold" }}>Number of Orders</span>}
-              value={orderCount} 
-              valueStyle={{ fontSize: "32px", fontWeight: "bold" }}
-            />
-          </Card>
-        </Col>
+        <Row gutter={[24, 24]} justify="center">
+          <Col xs={24} md={12}>
+            <Card
+              style={{
+                height: 600,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              bordered={false}
+            >
+              <Statistic
+                title={
+                  <span style={{ fontSize: "18px", fontWeight: "bold", color: "#000000" }}>
+                    Total Revenue This Month
+                  </span>
+                }
+                value={totalRevenue}
+                prefix="₫"
+                valueStyle={{
+                  color: "#1677ff",
+                  fontSize: "36px",
+                  fontWeight: "bold",
+                }}
+              />
+              <div style={{ height: "1.5rem" }} />
+              <Statistic
+                title={
+                  <span style={{ fontSize: "18px", fontWeight: "bold", color: "#000000" }}>
+                    Number of Orders
+                  </span>
+                }
+                value={orderCount}
+                valueStyle={{
+                  color: "#1677ff",
+                  fontSize: "36px",
+                  fontWeight: "bold",
+                }}
+              />
+            </Card>
+          </Col>
 
-        <Col xs={24} lg={8}>
-          <Card title="Sales by Status" style={{ height: "100%" }}>
-            <Pie {...pieConfig} style={{height:250}} />
-          </Card>
-        </Col>
-      </Row>
+          <Col xs={24} md={12}>
+            <Card title={
+                  <span style={{ fontSize: "18px", fontWeight: "bold", color: "#000000" }}>
+                    Sales by Status
+                  </span>
+                } bordered={false} style={{ height: 600 }}>
+              <Pie {...pieConfig} style={{ height: 220 }} />
+            </Card>
+          </Col>
+        </Row>
 
-      <Row style={{ marginTop: "2rem" }}>
-        <Col span={24}>
-          <Card title="Sales Over Time">
-            <Line {...salesLineConfig} />
-          </Card>
-        </Col>
-      </Row>
+        <Row gutter={[24, 24]} style={{ marginTop: "2rem" }}>
+          <Col span={24}>
+            <Card title={
+                  <span style={{ fontSize: "18px", fontWeight: "bold", color: "#000000" }}>
+                    Sales Over Time
+                  </span>
+                } bordered={false}>
+              <Line {...salesLineConfig} />
+            </Card>
+          </Col>
 
-      <Row style={{ marginTop: "2rem" }}>
-        <Col span={24}>
-          <Card title="Order Over Time">
-            <Line {...orderLineConfig} />
-          </Card>
-        </Col>
-      </Row>
+          <Col span={24}>
+            <Card title={
+                  <span style={{ fontSize: "18px", fontWeight: "bold", color: "#000000" }}>
+                    Order Over Time
+                  </span>
+                } bordered={false}>
+              <Line {...orderLineConfig} />
+            </Card>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
 
 export default Dashboard;
+
+
