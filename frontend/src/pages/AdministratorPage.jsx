@@ -851,7 +851,7 @@ const DashboardTab = () => {
     const token = await user.accessToken;
     if (!token) return;
 
-    const res = await axios.get("http://localhost:8000/orders/admin/list", {
+    const res = await axios.get("http://localhost:8000/orders/admin/list/all", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
