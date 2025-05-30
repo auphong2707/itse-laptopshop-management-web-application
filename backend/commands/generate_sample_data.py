@@ -66,9 +66,9 @@ def get_laptop_usage_type(sub_brand):
     elif sub_brand in ["thinkpad", "thinkbook", "latitude", "elitebook", "probook", "modern"]:
         return "business"
     elif sub_brand in ["precision", "zbook", "creator", "workstation"]:
-        return "workstations"
+        return "workstation"
     elif sub_brand in ["zenbook", "vivobook", "swift", "xps", "spectre", "envy", "yoga", "prestigate"]:
-        return "ultrabooks"
+        return "ultrabook"
     else:
         return "general"
 
