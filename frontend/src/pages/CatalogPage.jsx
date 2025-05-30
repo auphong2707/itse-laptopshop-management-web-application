@@ -205,7 +205,6 @@ const CatalogPage = () => {
   const updateImmediateParams = (params) => {
     const newParams = new URLSearchParams(searchParams);
     Object.keys(params).forEach((key) => {
-      console.log(`Updating param: ${key} with value: ${params[key]}`);
       newParams.set(key, params[key]);
     });
     setSearchParams(newParams);
