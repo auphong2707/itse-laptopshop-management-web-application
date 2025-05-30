@@ -13,7 +13,7 @@ const Dashboard = ({ totalRevenue, orderCount, salesByStatus, salesOverTime, ord
     lineStyle: { stroke: "#1677ff", lineWidth: 2 },
     tooltip: { showMarkers: true },
   };
-
+  
   const orderLineConfig = {
     data: ordersOverTime,
     xField: "date",
