@@ -266,7 +266,7 @@ const FilterSection = ({
         {/* Type Filter */}
         <CheckboxFilter
           title="Usage Type"
-          category="usage_type"
+          category="usageType"
           options={[
             { name: "Gaming" },
             { name: "Business" },
