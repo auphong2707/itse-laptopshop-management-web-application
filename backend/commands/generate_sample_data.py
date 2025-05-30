@@ -60,7 +60,7 @@ def get_sub_brand(brand, name):
 
     return "n/a"
 
-def get_laptop_type(sub_brand):
+def get_laptop_usage_type(sub_brand):
     if sub_brand in ["rog", "tuf", "legion", "loq", "predator", "nitro", "alienware", "g series", "omen", "victus", "katana", "stealth"]:
         return "gaming"
     elif sub_brand in ["thinkpad", "thinkbook", "latitude", "elitebook", "probook", "modern"]:
@@ -91,7 +91,7 @@ def generate_laptop_insert_queries(
     NUM_LAPTOPS = 0
     LAPTOP_DATA_FOR_ORDERS = []
 
-    insert_query_base = """INSERT INTO laptops (brand, sub_brand, name, type, cpu, vga, ram_amount, ram_type, storage_amount,
+    insert_query_base = """INSERT INTO laptops (brand, sub_brand, name, usage_type, cpu, vga, ram_amount, ram_type, storage_amount,
         storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness,
         battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height,
         number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
@@ -165,13 +165,13 @@ def generate_laptop_insert_queries(
 
             # Prepare values tuple using inline formatting
             sub_brand = get_sub_brand(laptop_raw.get("brand"), laptop_raw.get("name"))
-            laptop_type = get_laptop_type(sub_brand)
+            laptop_usage_type = get_laptop_usage_type(sub_brand)
 
             value_tuple = (
                 format_sql(laptop_raw.get("brand")),
                 format_sql(sub_brand),
                 format_sql(laptop_raw.get("name")),
-                format_sql(laptop_type),
+                format_sql(laptop_usage_type),
                 format_sql(laptop_raw.get("cpu")),
                 format_sql(laptop_raw.get("vga")),
                 format_sql(laptop_raw.get("ram_amount")),
