@@ -112,18 +112,22 @@ def create_order_from_cart(
                     detail=f"Insufficient stock for {laptop.name} (ID: {product_id}).",
                 )
 
-            sale_price = laptop.sale_price 
+            sale_price = laptop.sale_price
             if sale_price is None:
-                 raise HTTPException(status_code=500, detail=f"Missing price for product ID {product_id}")
+                raise HTTPException(
+                    status_code=500, detail=f"Missing price for product ID {product_id}"
+                )
 
             item_subtotal_int = sale_price * requested_quantity
-            order_total_price += item_subtotal_int 
+            order_total_price += item_subtotal_int
 
-            items_to_create.append({
-                "product_id": product_id,
-                "quantity": requested_quantity,
-                "price_at_purchase": sale_price, 
-            })
+            items_to_create.append(
+                {
+                    "product_id": product_id,
+                    "quantity": requested_quantity,
+                    "price_at_purchase": sale_price,
+                }
+            )
             laptops_to_update[product_id] = requested_quantity
 
         # --- 3. Database Transaction: Create Order, Items, Update Stock ---
@@ -158,7 +162,7 @@ def create_order_from_cart(
                 order_item = OrderItem(
                     product_id=item_data["product_id"],
                     quantity=item_data["quantity"],
-                    price_at_purchase=item_data["price_at_purchase"]
+                    price_at_purchase=item_data["price_at_purchase"],
                 )
                 # Associate item with order - SQLAlchemy handles FK assignment
                 order_item.order = new_order
@@ -371,13 +375,21 @@ def cancel_my_order(
 
 @orders_router.get(
     "/admin/list",
-    response_model=PaginatedOrdersResponse,
+    # Response model will now be dynamic
+    # response_model=Union[PaginatedOrdersResponse, List[OrderResponse]], # More complex for auto-docs
     dependencies=[Depends(require_admin_role)],
 )
 def admin_get_all_orders(
-    page: int = Query(1, ge=1),
-    limit: int = Query(20, ge=1, le=100),
-    status: Optional[str] = Query(None, description="Filter by order status"),
+    page: int = Query(1, ge=1, description="Page number (ignored if get_all=true)"),
+    limit: int = Query(
+        20, ge=1, le=100, description="Items per page (ignored if get_all=true)"
+    ),
+    get_all: bool = Query(
+        False, description="Set to true to retrieve all orders without pagination"
+    ),  # NEW parameter
+    status_filter: Optional[str] = Query(
+        None, alias="status", description="Filter by order status"
+    ),  # Renamed for clarity
     user_id_filter: Optional[str] = Query(
         None, alias="userId", description="Filter by User ID (Firebase UID)"
     ),
@@ -390,15 +402,90 @@ def admin_get_all_orders(
     db: Session = Depends(get_db),
 ):
     """
-    [Admin] Retrieves a paginated list of all orders, with optional filters.
+    [Admin] Retrieves a list of all orders, with optional filters.
+    Supports pagination by default, or can retrieve all orders if 'get_all=true'.
     Requires admin privileges.
     """
-    offset = (page - 1) * limit
     try:
-        query = db.query(Order).options(joinedload(Order.items))
+        query = db.query(Order).options(joinedload(Order.items))  # Eager load items
 
-        if status:
-            query = query.filter(Order.status == status)
+        # Apply filters (renamed 'status' to 'status_filter' to avoid conflict with status module)
+        if status_filter:
+            query = query.filter(Order.status == status_filter)
+        if user_id_filter:
+            query = query.filter(Order.user_id == user_id_filter)
+        if start_date:
+            query = query.filter(Order.created_at >= start_date)
+        if end_date:
+            # For 'end_date' to be inclusive of the whole day, you might need to adjust it
+            # e.g., end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
+            query = query.filter(Order.created_at <= end_date)
+
+        # Order the results
+        query = query.order_by(Order.created_at.desc())
+
+        if get_all:
+            # Retrieve all matching orders
+            orders = query.all()
+            # For the response, if you want to distinguish, you might return just the list
+            # or wrap it in a consistent structure. Let's return just the list for now.
+            # FastAPI will serialize the list of Order ORM objects using OrderResponse.
+            # The auto-generated docs might need manual adjustment for the response_model.
+            return orders  # Returns List[OrderResponse] effectively
+        else:
+            # Apply pagination
+            offset = (page - 1) * limit
+            total_count = query.count()  # Count after filtering but before pagination
+            orders = query.offset(offset).limit(limit).all()
+
+            return PaginatedOrdersResponse(
+                total_count=total_count, page=page, limit=limit, orders=orders
+            )
+
+    except SQLAlchemyError as e:
+        print(f"Database error fetching all orders for admin: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not retrieve orders.",
+        )
+    except Exception as e:  # Catch any other unexpected errors
+        print(f"Unexpected error in admin_get_all_orders: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred.",
+        )
+
+
+@orders_router.get(
+    "/admin/list/all",
+    response_model=List[OrderResponse],
+    dependencies=[Depends(require_admin_role)],
+)
+def admin_get_all_orders_unpaginated(
+    status_filter: Optional[str] = Query(
+        None, alias="status", description="Filter by order status"
+    ),
+    user_id_filter: Optional[str] = Query(
+        None, alias="userId", description="Filter by User ID (Firebase UID)"
+    ),
+    start_date: Optional[datetime] = Query(
+        None, description="Filter orders created on or after this date (ISO Format)"
+    ),
+    end_date: Optional[datetime] = Query(
+        None, description="Filter orders created on or before this date (ISO Format)"
+    ),
+    db: Session = Depends(get_db),
+):
+    """
+    [Admin] Retrieves ALL orders, with optional filters, without pagination.
+    Requires admin privileges.
+    """
+    try:
+        query = db.query(Order).options(joinedload(Order.items))  # Eager load items
+
+        # Apply filters
+        if status_filter:
+            query = query.filter(Order.status == status_filter)
         if user_id_filter:
             query = query.filter(Order.user_id == user_id_filter)
         if start_date:
@@ -406,18 +493,22 @@ def admin_get_all_orders(
         if end_date:
             query = query.filter(Order.created_at <= end_date)
 
-        total_count = query.count()
+        # Order the results but NO offset or limit
+        orders = query.order_by(Order.created_at.desc()).all()
 
-        orders = (
-            query.order_by(Order.created_at.desc()).offset(offset).limit(limit).all()
-        )
-
-        return PaginatedOrdersResponse(
-            total_count=total_count, page=page, limit=limit, orders=orders
-        )
+        return orders  # Returns List[OrderResponse]
     except SQLAlchemyError as e:
-        print(f"Database error fetching all orders for admin: {e}")
-        raise HTTPException(status_code=500, detail="Could not retrieve orders.")
+        print(f"Database error fetching all orders for admin (unpaginated): {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not retrieve orders.",
+        )
+    except Exception as e:
+        print(f"Unexpected error in admin_get_all_orders_unpaginated: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred.",
+        )
 
 
 @orders_router.patch(
