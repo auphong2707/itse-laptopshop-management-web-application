@@ -263,6 +263,23 @@ const FilterSection = ({
 
         <Divider style={{ marginBottom: 0, marginTop: 3 }} />
 
+        {/* Type Filter */}
+        <CheckboxFilter
+          title="Usage Type"
+          category="usage_type"
+          options={[
+            { name: "Gaming" },
+            { name: "Business" },
+            { name: "Ultrabook" },
+            { name: "Workstation" },
+            { name: "General"}
+          ]}
+          handleCheckboxChange={(value) =>
+            updatePendingFilters({ type: value })
+          }
+        />
+        <Divider style={{ marginBottom: 0, marginTop: 3 }} />
+
         {/* Sub-brand Filter */}
         <CheckboxFilter
           title="Sub-brand"
