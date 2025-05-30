@@ -51,10 +51,10 @@ const Dashboard = ({ totalRevenue, orderCount, salesByStatus, salesOverTime, ord
   return (
     <div
       style={{
-        padding: "3rem",
+      
         display: "flex",
         justifyContent: "center",
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#ffffff",
         minHeight: "100vh",
       }}
     >
