@@ -851,7 +851,7 @@ const DashboardTab = () => {
     const token = await user.accessToken;
     if (!token) return;
 
-    const res = await axios.get("http://localhost:8000/orders/admin/list", {
+    const res = await axios.get("http://localhost:8000/orders/admin/list/all", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -878,32 +878,41 @@ const DashboardTab = () => {
     setSalesByStatus(pieData);
 
     // 3. Sales over time (line chart)
-    const revenueByDate = {};
+    const revenueByMonth = {};
     for (const order of orders) {
-      const date = new Date(order.created_at).toISOString().split("T")[0]; // 'YYYY-MM-DD'
-      revenueByDate[date] = (revenueByDate[date] || 0) + (order.total_price || 0);
+      const dateObj = new Date(order.created_at);
+      const yearMonth = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // e.g. '2024-05'
+
+      revenueByMonth[yearMonth] = (revenueByMonth[yearMonth] || 0) + (order.total_price || 0);
     }
 
-    const sortedDates = Object.keys(revenueByDate).sort();
-    const lineData = sortedDates.map(date => ({
-      date,
-      revenue: revenueByDate[date],
+    const sortedMonths = Object.keys(revenueByMonth).sort();
+
+    const salesOverTime = sortedMonths.map(month => ({
+      date: month,       // X-axis will now show '2024-05'
+      revenue: revenueByMonth[month],
     }));
-    setSalesOverTime(lineData);
+    setSalesOverTime(salesOverTime);
+
+
+    
 
     // 4. Order count over time (grouped by date)
-    const orderCountByDate = {};
+    const orderCountByMonth = {};
     for (const order of orders) {
-      const date = new Date(order.created_at).toISOString().split("T")[0];
-      orderCountByDate[date] = (orderCountByDate[date] || 0) + 1;
+      const dateObj = new Date(order.created_at);
+      const yearMonth = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // e.g. '2024-05'
+
+      orderCountByMonth[yearMonth] = (orderCountByMonth[yearMonth] || 0) + 1;
     }
 
-    const sortedOrderDates = Object.keys(orderCountByDate).sort();
-    const orderLineData = sortedOrderDates.map((date) => ({
-      date,
-      count: orderCountByDate[date],
+
+    const ordersOverTime = sortedMonths.map(month => ({
+      date: month,
+      count: orderCountByMonth[month],
     }));
-    setOrdersOverTime(orderLineData);
+    setOrdersOverTime(ordersOverTime);
+
 
     
 
@@ -918,7 +927,7 @@ const DashboardTab = () => {
     if (user?.role === "admin") {
       fetchOrders();
     }
-  })
+  }, [user]);
 
   if (!user || user.role !== "admin") {
     return <p>Access denied: Admins only</p>;
