@@ -273,7 +273,7 @@ const CatalogPage = () => {
       priceRange: [3000000, 180000000],
       weightRange: [0.5, 5],
       selectedFilters: {
-        usage_type: [],
+        usageType: [],
         subBrand: [],
         cpu: [],
         vga: [],
