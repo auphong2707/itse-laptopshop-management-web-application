@@ -33,33 +33,6 @@ import OrderTable from "../components/administrator_page/OrderTable.jsx";
 import Dashboard from "../components/administrator_page/Dashboard.jsx";
 
 const { Content } = Layout;
-const { Title } = Typography;
-
-const sectionTitleStyle = {
-  fontSize: "20px",
-  fontWeight: "bold",
-  marginTop: "2rem",
-};
-
-const CustomDivider = ({ label }) => (
-  <>
-    <h3 style={sectionTitleStyle}>{label}</h3>
-    <div style={{ width: "50%" }}>
-      <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-    </div>
-  </>
-);
-
-const RequiredLabel = ({ label }) => (
-  <span style={{ fontWeight: "bold" }}>
-    {label}
-    <span style={{ color: "red", marginLeft: 4 }}>*</span>
-  </span>
-);
-
-const OptionalLabel = ({ label }) => (
-  <span style={{ fontWeight: "bold" }}>{label}</span>
-);
 
 const transformFormData = (values) => {
   return {
@@ -120,6 +93,25 @@ const transformFormData = (values) => {
 };
 
 const DetailTab = () => {
+  const sectionTitleStyle = {
+    fontSize: "20px",
+    fontWeight: "bold",
+    marginTop: "2rem",
+  };
+
+  const CustomDivider = ({ label }) => (
+    <>
+      <h3 style={sectionTitleStyle}>{label}</h3>
+      <div style={{ width: "100%" }}>
+        <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
+      </div>
+    </>
+  );
+
+  CustomDivider.propTypes = {
+    label: PropTypes.string.isRequired,
+  };
+
   const [form] = Form.useForm();
   const { id } = useParams();
   const [_, setProductData] = useState({});
@@ -197,356 +189,424 @@ const DetailTab = () => {
     }
   };
 
-  const inputStyle = { width: "40%" };
-
   return (
     <div style={{ padding: "0rem 0" }}>
       <Form
         layout="horizontal"
         form={form}
         labelCol={{ span: 4 }}
-        wrapperCol={{ span: 20 }}
         labelAlign="left"
         colon={false}
       >
-        {/* Flex Container chính */}
-        <div style={{ display: "flex", gap: "2rem" }}>
-          {/* Phần bên trái: Form fields */}
-          <div style={{ flex: 2 }}>
-            {/* General Information */}
-            <CustomDivider label="General Information" />
-            <Form.Item label={<RequiredLabel label="Brand" />} name="brand">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Name" />} name="name">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Operating System" />}
-              name="default_os"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Warranty" />}
-              name="warranty"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        {/* General Information */}
+        <CustomDivider label="General Information" />
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Brand</span>} name="brand"
+          rules={[{ required: true, message: "Brand is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Performance */}
-            <CustomDivider label="Performance" />
-            <Form.Item label={<RequiredLabel label="CPU" />} name="cpu">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<OptionalLabel label="GPU" />} name="vga">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="RAM Amount" />}
-              name="ram_amount"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="RAM Type" />}
-              name="ram_type"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Storage Amount" />}
-              name="storage_amount"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Storage Type" />}
-              name="storage_type"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Sub Brand</span>} name="sub_brand"
+          rules={[{ required: false, message: "Sub Brand is optional" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Display */}
-            <CustomDivider label="Display" />
-            <Form.Item
-              label={<RequiredLabel label="Size" />}
-              name="screen_size"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Resolution" />}
-              name="screen_resolution"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Refresh Rate" />}
-              name="screen_refresh_rate"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Brightness" />}
-              name="screen_brightness"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Name</span>} name="name"
+          rules={[{ required: true, message: "Name is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Battery and Power */}
-            <CustomDivider label="Battery and Power" />
-            <Form.Item
-              label={<RequiredLabel label="Battery Capacity" />}
-              name="battery_capacity"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Battery Cells" />}
-              name="battery_cells"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Description</span>} name="description"
+          rules={[{ required: false }]}>
+          <Input.TextArea rows={10} />
+        </Form.Item>
 
-            {/* Physical Dimensions and Weight */}
-            <CustomDivider label="Physical Dimensions and Weight" />
-            <Form.Item label={<RequiredLabel label="Width" />} name="width">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Depth" />} name="depth">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Height" />} name="height">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Weight" />} name="weight">
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Usage Type</span>}
+          name="usage_type"
+          rules={[{ required: true, message: "Usage Type is required" }]}
+        >
+          <Select>
+            <Select.Option value="gaming">Gaming</Select.Option>
+            <Select.Option value="business">Business</Select.Option>
+            <Select.Option value="workstation">Workstation</Select.Option>
+            <Select.Option value="ultrabook">Ultrabook</Select.Option>
+            <Select.Option value="general">General</Select.Option>
+          </Select>
+        </Form.Item>
 
-            {/* Connectivity and Ports */}
-            <CustomDivider label="Connectivity and Ports" />
-            <Form.Item
-              label={<RequiredLabel label="USB-A Ports" />}
-              name="number_usb_a_ports"
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="USB-C Ports" />}
-              name="number_usb_c_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Operating System</span>}
+          rules={[{ required: true, message: "Operating System is required" }]}
+          name="default_os"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Warranty</span>}
+          rules={[{ required: true, message: "Warranty is required" }]}
+          name="warranty"
+        >
+          <InputNumber />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="HDMI Ports" />}
-              name="number_hdmi_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Performance */}
+        <CustomDivider label="Performance" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>CPU</span>}
+          name="cpu"
+          rules={[{ required: true, message: "CPU is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>GPU</span>}
+          name="vga"
+          rules={[{ required: false }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>RAM Amount</span>}
+          rules={[{ required: true, message: "RAM Amount is required" }]}
+          name="ram_amount"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>RAM Type</span>}
+          rules={[{ required: true, message: "RAM Type is required" }]}
+          name="ram_type"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Storage Amount</span>}
+          rules={[{ required: true, message: "Storage Amount is required" }]}
+          name="storage_amount"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Storage Type</span>}
+          rules={[{ required: true, message: "Storage Type is required" }]}
+          name="storage_type"
+        >
+          <Input />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="Ethernet Ports" />}
-              name="number_ethernet_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Display */}
+        <CustomDivider label="Display" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Size</span>}
+          rules={[{ required: true, message: "Screen Size is required" }]}
+          name="screen_size"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Resolution</span>}
+          rules={[{ required: true, message: "Screen Resolution is required" }]}
+          name="screen_resolution"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Refresh Rate</span>}
+          rules={[{ required: true, message: "Screen Refresh Rate is required" }]}
+          name="screen_refresh_rate"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Brightness</span>}
+          rules={[{ required: true, message: "Screen Brightness is required" }]}
+          name="screen_brightness"
+        >
+          <InputNumber />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="Audio Jacks" />}
-              name="number_audio_jacks"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Battery and Power */}
+        <CustomDivider label="Battery and Power" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Battery Capacity</span>}
+          rules={[{ required: true, message: "Battery Capacity is required" }]}
+          name="battery_capacity"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Battery Cells</span>}
+          rules={[{ required: true, message: "Battery Cells is required" }]}
+          name="battery_cells"
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Other features */}
-            <CustomDivider label="Other features" />
-            <Form.Item
-              label={<OptionalLabel label="Webcam" />}
-              name="webcam_resolution"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        {/* Physical Dimensions and Weight */}
+        <CustomDivider label="Physical Dimensions and Weight" />
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Width</span>} name="width"
+          rules={[{ required: true, message: "Width is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Depth</span>} name="depth"
+          rules={[{ required: true, message: "Depth is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Height</span>} name="height"
+          rules={[{ required: true, message: "Height is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Weight</span>} name="weight"
+          rules={[{ required: true, message: "Weight is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Price */}
-            <CustomDivider label="Retail information" />
-            <Form.Item
-              label={<RequiredLabel label="Quantity" />}
-              name="quantity"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Original Price" />}
-              name="original_price"
-            >
-              <InputNumber suffix="đ" style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<OptionalLabel label="Sales Price" />}
-              name="sale_price"
-            >
-              <InputNumber suffix="đ" style={inputStyle} />
-            </Form.Item>
-
-            {/* Submit button */}
-            <Form.Item wrapperCol={{ offset: 4 }}>
-              <Button type="primary" onClick={() => handleSubmit(form)}>
-                {id ? "Update Laptop" : "Add Laptop"}
-              </Button>
-            </Form.Item>
-          </div>
-
-          <div
+        {/* Connectivity and Ports */}
+        <CustomDivider label="Connectivity and Ports" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>USB-A Ports</span>}
+          rules={[{ required: true, message: "USB-A Ports is required" }]}
+          name="number_usb_a_ports"
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
             style={{
-              position: "absolute",
-              right: "215px",
-              top: "325px",
-              flex: 1,
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
             }}
-          >
-            <Form.Item name="pictures">
-              <Swiper
-                modules={[Navigation]}
-                navigation
-                spaceBetween={40}
-                slidesPerView={1}
-                style={{ width: "650px", height: "400px", padding: "1rem" }}
-              >
-                {pictures.map((picture, index) => (
-                  <SwiperSlide
-                    key={index}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      position: "relative",
-                    }}
-                  >
-                    <img
-                      src={picture}
-                      alt={`Picture ${index + 1}`}
-                      style={{ width: "600px", height: "400px" }}
-                    />
-                    <button
-                      onClick={() => handleDeletePicture(index)}
-                      style={{
-                        position: "absolute",
-                        top: "-12px",
-                        right: "10px",
-                        background: "#b0b0b0",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        color: "red",
-                        borderRadius: "50%",
-                        width: "22px",
-                        height: "24px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "background 0.3s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.target.style.background = "#8a8a8a")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.target.style.background = "#b0b0b0")
-                      }
-                    >
-                      <CloseOutlined />
-                    </button>
-                  </SwiperSlide>
-                ))}
-                {/* Add Picture Button */}
+          />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>USB-C Ports</span>}
+          name="number_usb_c_ports"
+          rules= {[{ required: true, message: "USB-C Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>HDMI Ports</span>}
+          name="number_hdmi_ports"
+          rules={[{ required: true, message: "HDMI Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Ethernet Ports</span>}
+          name="number_ethernet_ports"
+          rules={[{ required: true, message: "Ethernet Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Audio Jacks</span>}
+          name="number_audio_jacks"
+          rules={[{ required: true, message: "Audio Jacks is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        {/* Other features */}
+        <CustomDivider label="Other features" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Webcam Resolution</span>}
+          rules={[{ required: false, message: "Webcam Resolution is optional" }]}
+          name="webcam_resolution"
+        >
+          <Input />
+        </Form.Item>
+
+        {/* Price */}
+        <CustomDivider label="Retail information" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Quantity</span>}
+          rules={[{ required: true, message: "Quantity is required" }]}
+          name="quantity"
+        >
+          <InputNumber defaultValue={0} />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Original Price</span>}
+          rules={[{ required: true, message: "Original Price is required" }]}
+          name="original_price"
+        >
+          <InputNumber suffix="đ" />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Sale Price</span>}
+          rules={[{ required: true, message: "Sale Price is required" }]}
+          name="sale_price"
+        >
+          <InputNumber suffix="đ" />
+        </Form.Item>
+
+        {/* Images */}
+        <CustomDivider label="Images" />
+        <Form.Item name="pictures" style={{ width: "100%", border: "2px dashed #aaa", borderRadius: "8px", padding: "2rem" }}>
+          <div className="fjahasfkhkask" style={{  }}>
+            <Swiper
+              modules={[Navigation]}
+              navigation
+              spaceBetween={40}
+              slidesPerView={1}
+              style={{ width: "100%", height: "400px", padding: "1rem" }}
+            >
+              {pictures.map((picture, index) => (
                 <SwiperSlide
+                  key={index}
                   style={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    position: "relative",
                   }}
                 >
-                  <label
+                  <img
+                    src={picture}
+                    alt={`Picture ${index + 1}`}
+                    style={{ width: "600px", height: "400px" }}
+                  />
+                  <button
+                    onClick={() => handleDeletePicture(index)}
                     style={{
+                      position: "absolute",
+                      top: "-12px",
+                      right: "10px",
+                      background: "#b0b0b0",
+                      border: "none",
                       cursor: "pointer",
-                      padding: "20px",
-                      border: "2px dashed #aaa",
-                      borderRadius: "8px",
+                      fontSize: "14px",
+                      color: "red",
+                      borderRadius: "50%",
+                      width: "22px",
+                      height: "24px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background 0.3s ease",
                     }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.background = "#8a8a8a")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.background = "#b0b0b0")
+                    }
                   >
-                    Add picture
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleAddPicture}
-                    />
-                  </label>
+                    <CloseOutlined />
+                  </button>
                 </SwiperSlide>
-              </Swiper>
-            </Form.Item>
+              ))}
+              {/* Add Picture Button */}
+              <SwiperSlide
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <label
+                  style={{
+                    cursor: "pointer",
+                    padding: "20px",
+                    border: "2px dashed #aaa",
+                    borderRadius: "8px",
+                  }}
+                >
+                  Add picture
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleAddPicture}
+                  />
+                </label>
+              </SwiperSlide>
+            </Swiper>
           </div>
-        </div>
+        </Form.Item>
+
+        <br></br>
+        <br></br>
+
+        {/* Submit button */}
+        <Form.Item style={{ display: "flex", justifyContent: "center" }}>
+          <Button type="primary" onClick={() => handleSubmit(form)} style={{ width: "500px", height: "50px" }}>
+            <span style={{ fontWeight: "bold", fontSize: "16px" }}>
+              {id ? "Update Laptop" : "Add Laptop"}
+            </span>
+          </Button>
+        </Form.Item>
       </Form>
     </div>
   );
@@ -1006,16 +1066,6 @@ const AdministratorPage = () => {
       <WebsiteFooter />
     </Layout>
   );
-};
-
-CustomDivider.propTypes = {
-  label: PropTypes.string.isRequired,
-};
-RequiredLabel.propTypes = {
-  label: PropTypes.string.isRequired,
-};
-OptionalLabel.propTypes = {
-  label: PropTypes.string.isRequired,
 };
 
 export default AdministratorPage;
