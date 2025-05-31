@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Typography, Image, InputNumber, Button } from "antd";
+import { Modal, Typography, Image, InputNumber, Button } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
@@ -117,7 +117,7 @@ const Items = ({ product, index, onSubtotalChange, onRemove }) => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-          onClick={() => onRemove(product.id)}
+          onClick={() => onRemove(product)}
         />
       </div>
     </div>
@@ -192,51 +192,83 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
     setSubTotals(newSubTotals);
   };
 
-  const handleRemoveItem = async (laptopId) => {
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
+  const handleRemoveItem = (product) => {
+    Modal.confirm({
+      title: `Do you want to delete the product "${product.name}" from the cart?`,
+      okText: "Confirm",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (!user) throw new Error("User not authenticated");
 
-      const token = await user.getIdToken();
+          const token = await user.getIdToken();
 
-      await axios.delete(`http://localhost:8000/cart/remove/${laptopId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+          await axios.delete(`http://localhost:8000/cart/remove/${product.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-      // Remove from UI
-      const updatedItems = cartItems.filter((item) => item.id !== laptopId);
-      setCartItems(updatedItems);
-      setSubTotals(updatedItems.map((item) => item.sale_price * item.quantity));
-    } catch (err) {
-      console.error("Error removing item from cart:", err);
-    }
+          // Remove from UI
+          const updatedItems = cartItems.filter((item) => item.id !== product.id);
+          setCartItems(updatedItems);
+          setSubTotals(updatedItems.map((item) => item.sale_price * item.quantity));
+
+          // Show success message
+          Modal.success({
+            title: "Product deleted successfully",
+            okText: "OK",
+          });
+        } catch (err) {
+          console.error("Error removing item from cart:", err);
+        }
+      },
+    });
   };
 
-  const handleClearCart = async () => {
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
 
-      const token = await user.getIdToken();
 
-      await axios.delete("http://localhost:8000/cart/clear", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      // Clear UI state
-      setCartItems([]);
-      setSubTotals([]);
-      setTotalPrice(0);
-    } catch (err) {
-      console.error("Error clearing cart:", err);
-    }
+  const handleClearCart = () => {
+    Modal.confirm({
+      title: "Are you sure you want to clear the entire cart?",
+      okText: "Confirm",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          if (!user) throw new Error("User not authenticated");
+
+          const token = await user.getIdToken();
+
+          await axios.delete("http://localhost:8000/cart/clear", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          // Clear UI state
+          setCartItems([]);
+          setSubTotals([]);
+          setTotalPrice(0);
+
+          // Show success modal
+          Modal.success({
+            title: "Shopping cart has been cleared.",
+            okText: "OK",
+          });
+        } catch (err) {
+          console.error("Error clearing cart:", err);
+        }
+      },
+    });
   };
+
+
+
 
   useEffect(() => {
     const sum = subTotals.reduce((acc, val) => acc + val, 0);
