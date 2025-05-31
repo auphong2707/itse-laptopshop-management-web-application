@@ -29,6 +29,8 @@ class Laptop(Base):
     brand = Column(String, nullable=False)
     sub_brand = Column(String)
     name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    usage_type = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
     vga = Column(String)
     ram_amount = Column(Integer, nullable=False)
