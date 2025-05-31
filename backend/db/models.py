@@ -156,8 +156,7 @@ class OrderItem(Base):
 # Enum for Refund Status
 class RefundStatus(enum.Enum):
     pending = "Pending"
-    approved = "Approved"
-    rejected = "Rejected"
+    resolved = "Resolved"
 
 
 class RefundTicket(Base):
@@ -186,7 +185,7 @@ class RefundTicket(Base):
     # Adding all constraints and indexes in one __table_args__
     __table_args__ = (
         CheckConstraint(
-            "status IN ('Pending', 'Approved', 'Rejected')",
+            "status IN ('Pending', 'Resolved')",
             name="check_status_valid_values",
         ),  # Ensure valid status values
         Index(

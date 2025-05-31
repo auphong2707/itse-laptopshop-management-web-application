@@ -618,7 +618,7 @@ def generate_refund_tickets(
     sql_output_path="./backend/commands/insert_sample_data.sql",
     num_tickets=30,
 ):
-    statuses = ["pending", "rejected"]  # 'approved' handled via resolved_at trigger
+    statuses = ["pending", "resolved"]
     reasons = [
         "Sản phẩm bị lỗi phần cứng.",
         "Không đúng mô tả.",
