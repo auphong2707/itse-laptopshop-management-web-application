@@ -105,7 +105,7 @@ const MyOrder = () => {
     console.log("Submitting refund request:", refundData);
 
     try {
-      await axios.post("http://localhost:8000/refund_tickets/", refundData, {
+      await axios.post("http://localhost:8000/refund-tickets/", refundData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
