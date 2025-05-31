@@ -217,20 +217,17 @@ const WebsiteHeader = () => {
           </Link>
 
           <Flex align="center" gap="middle">
-            <Typography.Link strong style={{ color: "black" }}>
+            <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Gaming">
               Gaming Laptops
             </Typography.Link>
-            <Typography.Link strong style={{ color: "black" }}>
+            <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Business">
               Business Laptops
             </Typography.Link>
-            <Typography.Link strong style={{ color: "black" }}>
+            <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Workstation">
               Workstations
             </Typography.Link>
-            <Typography.Link strong style={{ color: "black" }}>
+            <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Ultrabook">
               Ultrabooks
-            </Typography.Link>
-            <Typography.Link strong style={{ color: "black" }}>
-              Accessories
             </Typography.Link>
             <Typography.Link
               strong

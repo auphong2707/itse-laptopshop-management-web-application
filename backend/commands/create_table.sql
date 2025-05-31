@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS laptops (
     brand TEXT,
     sub_brand TEXT,
     name TEXT,
+    description TEXT,
+    usage_type TEXT,
     cpu TEXT,
     vga TEXT,
     ram_amount INTEGER,

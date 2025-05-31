@@ -113,6 +113,14 @@ const convertToQueryString = (
   if (sortBy === "price-high") query += "&sort=price_desc";
   if (sortBy === "sale") query += "&sort=sale";
 
+  // Usage Type
+  if (filters.selectedFilters.usageType.length > 0) {
+    filters.selectedFilters.usageType.forEach((usageType) => {
+      usageType = usageType.toLowerCase().replace(" ", "+");
+      query += `&usage_type=${usageType}`;
+    });
+  }
+
   // Sub-brand
   if (filters.selectedFilters.subBrand.length > 0) {
     filters.selectedFilters.subBrand.forEach((subBrand) => {
@@ -216,6 +224,7 @@ const Inventory = () => {
       ],
       selectedFilters: {
         subBrand: searchParams.getAll("subBrand"),
+        usageType: searchParams.getAll("usageType"),
         cpu: searchParams.getAll("cpu"),
         vga: searchParams.getAll("vga"),
         ramAmount: searchParams.getAll("ramAmount"),
@@ -267,6 +276,7 @@ const Inventory = () => {
       priceRange: [3000000, 180000000],
       weightRange: [0.5, 5],
       selectedFilters: {
+        usageType: [],
         subBrand: [],
         cpu: [],
         vga: [],
@@ -304,6 +314,7 @@ const Inventory = () => {
   // Additional state
   const [collapseState, setCollapseState] = useState({
     priceRange: 1,
+    usageType: 1,
     subBrand: 1,
     cpu: 1,
     vga: 1,

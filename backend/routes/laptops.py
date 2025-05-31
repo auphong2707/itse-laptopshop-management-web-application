@@ -153,6 +153,7 @@ def filter_laptops(
     screen_size: list[int] = Query([]),
     weight_min: float = Query(None),
     weight_max: float = Query(None),
+    usage_type: list[str] = Query([]),
     limit: int = Query(None),
     page: int = Query(1),
     sort: str = Query("latest"),
@@ -188,6 +189,9 @@ def filter_laptops(
                 if isinstance(v, str)
             ]
         )
+    # Add filter for usage_type parameter
+    if usage_type:
+        filter_query["bool"]["filter"].append({"terms": {"usage_type.keyword": usage_type}})
     if screen_size:
         filter_query["bool"]["filter"].append(
             {
