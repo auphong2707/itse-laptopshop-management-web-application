@@ -58,7 +58,7 @@ const ShoppingCartPage = () => {
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [qrUrl, setQrUrl] = useState("");
 
-  const finalPrice = 50000 + 1.15 * totalPrice;
+  const finalPrice = Math.round(50000 + 1.15 * totalPrice);
 
   const handlePay = () => {
     const momoPay = QRPay.initVietQR({
