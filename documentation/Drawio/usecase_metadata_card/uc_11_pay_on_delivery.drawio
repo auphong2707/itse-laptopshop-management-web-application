@@ -84,7 +84,7 @@
             <mxRectangle width="120" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="97rLu-nz3RBSKDyjoL6Z-19" value="Customer selects &lt;strong data-end=&quot;1981&quot; data-start=&quot;1955&quot;&gt;Cash on Delivery (COD)&lt;/strong&gt; and confirms." style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;" parent="97rLu-nz3RBSKDyjoL6Z-17" vertex="1">
+        <mxCell id="97rLu-nz3RBSKDyjoL6Z-19" value="Customer wants to pay on Delivery." style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;rowspan=1;colspan=3;" parent="97rLu-nz3RBSKDyjoL6Z-17" vertex="1">
           <mxGeometry x="120" width="580" height="40" as="geometry">
             <mxRectangle width="54" height="40" as="alternateBounds" />
           </mxGeometry>
