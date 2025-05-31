@@ -71,8 +71,152 @@ def get_laptop_usage_type(sub_brand):
         return "ultrabook"
     else:
         return "general"
+    
+def get_laptop_description(laptop):
+    """Generate a descriptive marketing text for a laptop based on its features."""
+    # Extract key specifications
+    brand = laptop.get("brand", "").capitalize() if laptop.get("brand") else ""
+    name = laptop.get("name", "")
+    usage_type = get_laptop_usage_type(get_sub_brand(brand, name))
+    cpu = laptop.get("cpu", "")
+    vga = laptop.get("vga", "")
+    ram_amount = str(laptop.get("ram_amount", ""))
+    ram_type = laptop.get("ram_type", "")
+    storage_amount = str(laptop.get("storage_amount", ""))
+    storage_type = laptop.get("storage_type", "")
+    screen_size = str(laptop.get("screen_size", ""))
+    screen_resolution = laptop.get("screen_resolution", "")
+    screen_refresh_rate = str(laptop.get("screen_refresh_rate", ""))
+    weight = str(laptop.get("weight", ""))
 
-
+    # Initialize description parts
+    intro = ""
+    performance = ""
+    display = ""
+    design = ""
+    conclusion = ""
+    
+    # Create intro based on usage type
+    if usage_type == "gaming":
+        intro_templates = [
+            f"Nâng tầm trải nghiệm gaming của bạn với {brand} {name}.",
+            f"Khám phá sức mạnh gaming đỉnh cao với {brand} {name}.",
+            f"Laptop gaming {brand} {name} - Chinh phục mọi tựa game đầy thách thức."
+        ]
+        intro = random.choice(intro_templates)
+    elif usage_type == "business":
+        intro_templates = [
+            f"Đồng hành cùng doanh nhân thành đạt với {brand} {name}.",
+            f"{brand} {name} - Giải pháp tối ưu cho công việc chuyên nghiệp.",
+            f"Nâng cao hiệu suất công việc với laptop doanh nhân {brand} {name}."
+        ]
+        intro = random.choice(intro_templates)
+    elif usage_type == "ultrabook":
+        intro_templates = [
+            f"Mỏng nhẹ, sang trọng và mạnh mẽ - {brand} {name} là lựa chọn hoàn hảo.",
+            f"{brand} {name} - Ultrabook cao cấp cho người dùng năng động.",
+            f"Trải nghiệm sự hoàn hảo trong một thiết kế mỏng nhẹ với {brand} {name}."
+        ]
+        intro = random.choice(intro_templates)
+    elif usage_type == "workstation":
+        intro_templates = [
+            f"{brand} {name} - Sức mạnh vượt trội cho công việc sáng tạo chuyên nghiệp.",
+            f"Chinh phục mọi dự án đồ họa phức tạp với {brand} {name}.",
+            f"Workstation {brand} {name} - Đối tác đáng tin cậy của nhà sáng tạo nội dung."
+        ]
+        intro = random.choice(intro_templates)
+    else:
+        intro_templates = [
+            f"{brand} {name} - Laptop đa năng cho mọi nhu cầu sử dụng.",
+            f"Trải nghiệm công nghệ tiên tiến với {brand} {name}.",
+            f"{brand} {name} - Sự lựa chọn hoàn hảo cho công việc và giải trí."
+        ]
+        intro = random.choice(intro_templates)
+    
+    # Create performance description
+    if cpu and vga:
+        performance_templates = [
+            f"Được trang bị {cpu} và card đồ họa {vga}, kết hợp với {ram_amount} {ram_type} RAM và {storage_amount} {storage_type}, mang đến hiệu năng mạnh mẽ cho mọi tác vụ.",
+            f"Sức mạnh đến từ bộ vi xử lý {cpu}, GPU {vga}, {ram_amount} RAM và {storage_amount} {storage_type}, đảm bảo mọi hoạt động diễn ra mượt mà.",
+            f"Hiệu năng vượt trội với {cpu}, {vga}, {ram_amount} RAM và ổ cứng {storage_amount} {storage_type} cho khả năng xử lý đa nhiệm tuyệt vời."
+        ]
+        performance = random.choice(performance_templates)
+    elif cpu:
+        performance_templates = [
+            f"Với bộ vi xử lý {cpu} cùng {ram_amount} RAM và {storage_amount} {storage_type}, máy đáp ứng tốt mọi nhu cầu sử dụng hàng ngày.",
+            f"Hiệu năng ổn định đến từ {cpu}, {ram_amount} RAM và {storage_amount} {storage_type}, đủ sức cho các tác vụ thường ngày.",
+            f"Trang bị {cpu}, {ram_amount} RAM và {storage_amount} {storage_type} cho trải nghiệm mượt mà trong công việc hàng ngày."
+        ]
+        performance = random.choice(performance_templates)
+    
+    # Create display description
+    if screen_size and screen_resolution:
+        display_templates = [
+            f"Màn hình {screen_size} với độ phân giải {screen_resolution}{' và tần số quét ' + screen_refresh_rate if screen_refresh_rate else ''} mang đến trải nghiệm hình ảnh sắc nét và sống động.",
+            f"Trải nghiệm hình ảnh tuyệt đẹp trên màn hình {screen_size} độ phân giải {screen_resolution}{', tần số quét ' + screen_refresh_rate if screen_refresh_rate else ''}.",
+            f"Đắm chìm trong không gian hình ảnh rộng lớn với màn hình {screen_size}, độ phân giải {screen_resolution}{' và tần số ' + screen_refresh_rate if screen_refresh_rate else ''}."
+        ]
+        display = random.choice(display_templates)
+    
+    # Create design description
+    if weight:
+        try:
+            weight_value = float(weight.replace("kg", "").strip())
+            if weight_value < 2:
+                design_templates = [
+                    f"Thiết kế mỏng nhẹ chỉ {weight}, dễ dàng mang theo bên mình mọi lúc mọi nơi.",
+                    f"Với trọng lượng chỉ {weight}, đây là người bạn đồng hành lý tưởng cho người thường xuyên di chuyển.",
+                    f"Trọng lượng chỉ {weight} giúp bạn dễ dàng mang theo laptop đi bất cứ đâu."
+                ]
+            else:
+                design_templates = [
+                    f"Thiết kế bền bỉ với trọng lượng {weight}, cân bằng giữa hiệu năng và tính di động.",
+                    f"Máy có trọng lượng {weight}, được thiết kế chắc chắn để đáp ứng nhu cầu sử dụng hàng ngày.",
+                    f"Với trọng lượng {weight}, máy vẫn đảm bảo sự cân bằng giữa sức mạnh và khả năng di chuyển."
+                ]
+            design = random.choice(design_templates)
+        except:
+            pass
+    
+    # Create conclusion
+    if usage_type == "gaming":
+        conclusion_templates = [
+            "Là lựa chọn hoàn hảo cho game thủ đam mê chinh phục mọi tựa game.",
+            "Đáp ứng mọi nhu cầu gaming từ cơ bản đến chuyên nghiệp.",
+            "Mang đến trải nghiệm chơi game mượt mà, không giật lag ở mức cấu hình cao."
+        ]
+    elif usage_type == "business":
+        conclusion_templates = [
+            "Là trợ thủ đắc lực cho doanh nhân trong mọi cuộc họp và dự án quan trọng.",
+            "Đáp ứng hoàn hảo nhu cầu làm việc chuyên nghiệp với độ bền cao.",
+            "Tối ưu hóa hiệu suất công việc với độ bảo mật và ổn định vượt trội."
+        ]
+    elif usage_type == "ultrabook":
+        conclusion_templates = [
+            "Là sự lựa chọn hoàn hảo cho người dùng yêu thích sự gọn nhẹ và thời trang.",
+            "Kết hợp hoàn hảo giữa hiệu năng và tính di động cho người dùng năng động.",
+            "Đáp ứng đầy đủ nhu cầu công việc và giải trí trong một thiết kế sang trọng."
+        ]
+    elif usage_type == "workstation":
+        conclusion_templates = [
+            "Là công cụ không thể thiếu cho các nhà sáng tạo nội dung chuyên nghiệp.",
+            "Đáp ứng xuất sắc nhu cầu xử lý đồ họa, render video và các tác vụ nặng.",
+            "Mang đến sức mạnh xử lý vượt trội cho các dự án đòi hỏi hiệu năng cao."
+        ]
+    else:
+        conclusion_templates = [
+            "Là lựa chọn đáng cân nhắc cho người dùng tìm kiếm sự cân bằng giữa hiệu năng và giá thành.",
+            "Đáp ứng tốt nhu cầu học tập, làm việc và giải trí hàng ngày.",
+            "Mang đến trải nghiệm sử dụng toàn diện với mức giá hợp lý."
+        ]
+    conclusion = random.choice(conclusion_templates)
+    
+    # Combine all parts
+    description_parts = [part for part in [intro, performance, display, design, conclusion] if part]
+    description = " ".join(description_parts)
+    
+    return description
+    
 def clear_old_commands():
     with open("./backend/commands/insert_sample_data.sql", "w") as sql_file:
         sql_file.write("")
@@ -91,7 +235,7 @@ def generate_laptop_insert_queries(
     NUM_LAPTOPS = 0
     LAPTOP_DATA_FOR_ORDERS = []
 
-    insert_query_base = """INSERT INTO laptops (brand, sub_brand, name, usage_type, cpu, vga, ram_amount, ram_type, storage_amount,
+    insert_query_base = """INSERT INTO laptops (brand, sub_brand, name, description, usage_type, cpu, vga, ram_amount, ram_type, storage_amount,
         storage_type, webcam_resolution, screen_size, screen_resolution, screen_refresh_rate, screen_brightness,
         battery_capacity, battery_cells, weight, default_os, warranty, width, depth, height,
         number_usb_a_ports, number_usb_c_ports, number_hdmi_ports, number_ethernet_ports, number_audio_jacks, product_image_mini, quantity, original_price, sale_price) VALUES """
@@ -166,11 +310,13 @@ def generate_laptop_insert_queries(
             # Prepare values tuple using inline formatting
             sub_brand = get_sub_brand(laptop_raw.get("brand"), laptop_raw.get("name"))
             laptop_usage_type = get_laptop_usage_type(sub_brand)
+            description = get_laptop_description(laptop_raw)
 
             value_tuple = (
                 format_sql(laptop_raw.get("brand")),
                 format_sql(sub_brand),
                 format_sql(laptop_raw.get("name")),
+                format_sql(description),
                 format_sql(laptop_usage_type),
                 format_sql(laptop_raw.get("cpu")),
                 format_sql(laptop_raw.get("vga")),
