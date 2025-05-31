@@ -23,25 +23,25 @@ const brands = [
   {
     name: "asus",
     logo: "/brand-logo/asus-logo.png",
-    link: "/admin/catalog/asus",
+    link: "/admin/inventory/asus",
   },
   {
     name: "lenovo",
     logo: "/brand-logo/lenovo-logo.png",
-    link: "/admin/catalog/lenovo",
+    link: "/admin/inventory/lenovo",
   },
   {
     name: "acer",
     logo: "/brand-logo/acer-logo.png",
-    link: "/admin/catalog/acer",
+    link: "/admin/inventory/acer",
   },
   {
     name: "dell",
     logo: "/brand-logo/dell-logo.png",
-    link: "/admin/catalog/dell",
+    link: "/admin/inventory/dell",
   },
-  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/admin/catalog/hp" },
-  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/admin/catalog/msi" },
+  { name: "hp", logo: "/brand-logo/hp-logo.png", link: "/admin/inventory/hp" },
+  { name: "msi", logo: "/brand-logo/msi-logo.png", link: "/admin/inventory/msi" },
 ];
 
 const subBrands = {
@@ -112,6 +112,14 @@ const convertToQueryString = (
   if (sortBy === "price-low") query += "&sort=price_asc";
   if (sortBy === "price-high") query += "&sort=price_desc";
   if (sortBy === "sale") query += "&sort=sale";
+
+  // Usage Type
+  if (filters.selectedFilters.usageType.length > 0) {
+    filters.selectedFilters.usageType.forEach((usageType) => {
+      usageType = usageType.toLowerCase().replace(" ", "+");
+      query += `&usage_type=${usageType}`;
+    });
+  }
 
   // Sub-brand
   if (filters.selectedFilters.subBrand.length > 0) {
@@ -187,7 +195,7 @@ const convertToQueryString = (
   return query ? `${query}` : "";
 };
 
-const AdminCatalog = () => {
+const Inventory = () => {
   const { brand } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -216,6 +224,7 @@ const AdminCatalog = () => {
       ],
       selectedFilters: {
         subBrand: searchParams.getAll("subBrand"),
+        usageType: searchParams.getAll("usageType"),
         cpu: searchParams.getAll("cpu"),
         vga: searchParams.getAll("vga"),
         ramAmount: searchParams.getAll("ramAmount"),
@@ -267,6 +276,7 @@ const AdminCatalog = () => {
       priceRange: [3000000, 180000000],
       weightRange: [0.5, 5],
       selectedFilters: {
+        usageType: [],
         subBrand: [],
         cpu: [],
         vga: [],
@@ -304,6 +314,7 @@ const AdminCatalog = () => {
   // Additional state
   const [collapseState, setCollapseState] = useState({
     priceRange: 1,
+    usageType: 1,
     subBrand: 1,
     cpu: 1,
     vga: 1,
@@ -437,4 +448,4 @@ const AdminCatalog = () => {
   );
 };
 
-export default AdminCatalog;
+export default Inventory;

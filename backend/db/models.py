@@ -29,6 +29,8 @@ class Laptop(Base):
     brand = Column(String, nullable=False)
     sub_brand = Column(String)
     name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    usage_type = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
     vga = Column(String)
     ram_amount = Column(Integer, nullable=False)
@@ -170,7 +172,6 @@ class RefundTicket(Base):
         Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
     )  # Associated order ID
     reason = Column(String, nullable=False)  # Reason for the refund
-    amount = Column(Float, nullable=False)  # Refund amount
     status = Column(
         Enum(RefundStatus), nullable=False, default=RefundStatus.pending
     )  # Use Enum for status
@@ -186,9 +187,6 @@ class RefundTicket(Base):
 
     # Adding all constraints and indexes in one __table_args__
     __table_args__ = (
-        CheckConstraint(
-            "amount > 0", name="check_amount_positive"
-        ),  # Ensure the amount is positive
         CheckConstraint(
             "status IN ('Pending', 'Approved', 'Rejected')",
             name="check_status_valid_values",

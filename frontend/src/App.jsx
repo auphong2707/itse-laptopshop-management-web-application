@@ -7,11 +7,12 @@ import {
 
 import { UserProvider } from "./utils/UserContext";
 import AdministratorPage, {
-  AdminCatalog,
-  Detail,
-  Orders,
-  RefundRequest,
-  StockAlert,
+  Inventory,
+  DetailTab,
+  OrdersTab,
+  RefundRequestTab,
+  StockAlertTab,
+  DashboardTab
 } from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
@@ -70,28 +71,32 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "catalog/:brand",
-        element: <AdminCatalog />,
+        path: "dashboard",
+        element: <DashboardTab />,
+      },
+      {
+        path: "inventory/:brand",
+        element: <Inventory />,
       },
       {
         path: "detail",
-        element: <Detail />,
+        element: <DetailTab />,
       },
       {
         path: "detail/:id",
-        element: <Detail />,
+        element: <DetailTab />,
       },
       {
         path: "refund",
-        element: <RefundRequest />,
+        element: <RefundRequestTab />,
       },
       {
         path: "stock-alerts",
-        element: <StockAlert />,
+        element: <StockAlertTab />,
       },
       {
         path: "orders",
-        element: <Orders />,
+        element: <OrdersTab />,
       }
     ],
   },

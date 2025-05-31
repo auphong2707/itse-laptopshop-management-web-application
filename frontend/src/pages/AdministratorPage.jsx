@@ -13,7 +13,6 @@ import {
   Layout,
   Typography,
   Breadcrumb,
-  Tabs,
   DatePicker,
   Card,
   Select,
@@ -27,39 +26,13 @@ const { RangePicker } = DatePicker;
 import { useUser } from "../utils/UserContext.jsx";
 import WebsiteHeader from "../components/WebsiteHeader.jsx";
 import WebsiteFooter from "../components/WebsiteFooter.jsx";
-import AdminCatalog from "../components/administrator_page/AdminCatalog.jsx";
+import Inventory from "../components/administrator_page/Inventory.jsx";
 import RefundTable from "../components/administrator_page/RefundTable.jsx";
 import StockAlertTable from "../components/administrator_page/StockAlertTable.jsx";
 import OrderTable from "../components/administrator_page/OrderTable.jsx";
+import Dashboard from "../components/administrator_page/Dashboard.jsx";
 
 const { Content } = Layout;
-const { Title } = Typography;
-
-const sectionTitleStyle = {
-  fontSize: "20px",
-  fontWeight: "bold",
-  marginTop: "2rem",
-};
-
-const CustomDivider = ({ label }) => (
-  <>
-    <h3 style={sectionTitleStyle}>{label}</h3>
-    <div style={{ width: "50%" }}>
-      <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-    </div>
-  </>
-);
-
-const RequiredLabel = ({ label }) => (
-  <span style={{ fontWeight: "bold" }}>
-    {label}
-    <span style={{ color: "red", marginLeft: 4 }}>*</span>
-  </span>
-);
-
-const OptionalLabel = ({ label }) => (
-  <span style={{ fontWeight: "bold" }}>{label}</span>
-);
 
 const transformFormData = (values) => {
   return {
@@ -119,7 +92,26 @@ const transformFormData = (values) => {
   };
 };
 
-const Detail = () => {
+const DetailTab = () => {
+  const sectionTitleStyle = {
+    fontSize: "20px",
+    fontWeight: "bold",
+    marginTop: "2rem",
+  };
+
+  const CustomDivider = ({ label }) => (
+    <>
+      <h3 style={sectionTitleStyle}>{label}</h3>
+      <div style={{ width: "100%" }}>
+        <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
+      </div>
+    </>
+  );
+
+  CustomDivider.propTypes = {
+    label: PropTypes.string.isRequired,
+  };
+
   const [form] = Form.useForm();
   const { id } = useParams();
   const [_, setProductData] = useState({});
@@ -197,356 +189,424 @@ const Detail = () => {
     }
   };
 
-  const inputStyle = { width: "40%" };
-
   return (
     <div style={{ padding: "0rem 0" }}>
       <Form
         layout="horizontal"
         form={form}
         labelCol={{ span: 4 }}
-        wrapperCol={{ span: 20 }}
         labelAlign="left"
         colon={false}
       >
-        {/* Flex Container chính */}
-        <div style={{ display: "flex", gap: "2rem" }}>
-          {/* Phần bên trái: Form fields */}
-          <div style={{ flex: 2 }}>
-            {/* General Information */}
-            <CustomDivider label="General Information" />
-            <Form.Item label={<RequiredLabel label="Brand" />} name="brand">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Name" />} name="name">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Operating System" />}
-              name="default_os"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Warranty" />}
-              name="warranty"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        {/* General Information */}
+        <CustomDivider label="General Information" />
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Brand</span>} name="brand"
+          rules={[{ required: true, message: "Brand is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Performance */}
-            <CustomDivider label="Performance" />
-            <Form.Item label={<RequiredLabel label="CPU" />} name="cpu">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<OptionalLabel label="GPU" />} name="vga">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="RAM Amount" />}
-              name="ram_amount"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="RAM Type" />}
-              name="ram_type"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Storage Amount" />}
-              name="storage_amount"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Storage Type" />}
-              name="storage_type"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Sub Brand</span>} name="sub_brand"
+          rules={[{ required: false, message: "Sub Brand is optional" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Display */}
-            <CustomDivider label="Display" />
-            <Form.Item
-              label={<RequiredLabel label="Size" />}
-              name="screen_size"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Resolution" />}
-              name="screen_resolution"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Refresh Rate" />}
-              name="screen_refresh_rate"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Brightness" />}
-              name="screen_brightness"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Name</span>} name="name"
+          rules={[{ required: true, message: "Name is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Battery and Power */}
-            <CustomDivider label="Battery and Power" />
-            <Form.Item
-              label={<RequiredLabel label="Battery Capacity" />}
-              name="battery_capacity"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Battery Cells" />}
-              name="battery_cells"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Description</span>} name="description"
+          rules={[{ required: false }]}>
+          <Input.TextArea rows={10} />
+        </Form.Item>
 
-            {/* Physical Dimensions and Weight */}
-            <CustomDivider label="Physical Dimensions and Weight" />
-            <Form.Item label={<RequiredLabel label="Width" />} name="width">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Depth" />} name="depth">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Height" />} name="height">
-              <Input style={inputStyle} />
-            </Form.Item>
-            <Form.Item label={<RequiredLabel label="Weight" />} name="weight">
-              <Input style={inputStyle} />
-            </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Usage Type</span>}
+          name="usage_type"
+          rules={[{ required: true, message: "Usage Type is required" }]}
+        >
+          <Select>
+            <Select.Option value="gaming">Gaming</Select.Option>
+            <Select.Option value="business">Business</Select.Option>
+            <Select.Option value="workstation">Workstation</Select.Option>
+            <Select.Option value="ultrabook">Ultrabook</Select.Option>
+            <Select.Option value="general">General</Select.Option>
+          </Select>
+        </Form.Item>
 
-            {/* Connectivity and Ports */}
-            <CustomDivider label="Connectivity and Ports" />
-            <Form.Item
-              label={<RequiredLabel label="USB-A Ports" />}
-              name="number_usb_a_ports"
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="USB-C Ports" />}
-              name="number_usb_c_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Operating System</span>}
+          rules={[{ required: true, message: "Operating System is required" }]}
+          name="default_os"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Warranty</span>}
+          rules={[{ required: true, message: "Warranty is required" }]}
+          name="warranty"
+        >
+          <InputNumber />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="HDMI Ports" />}
-              name="number_hdmi_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Performance */}
+        <CustomDivider label="Performance" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>CPU</span>}
+          name="cpu"
+          rules={[{ required: true, message: "CPU is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>GPU</span>}
+          name="vga"
+          rules={[{ required: false }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>RAM Amount</span>}
+          rules={[{ required: true, message: "RAM Amount is required" }]}
+          name="ram_amount"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>RAM Type</span>}
+          rules={[{ required: true, message: "RAM Type is required" }]}
+          name="ram_type"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Storage Amount</span>}
+          rules={[{ required: true, message: "Storage Amount is required" }]}
+          name="storage_amount"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Storage Type</span>}
+          rules={[{ required: true, message: "Storage Type is required" }]}
+          name="storage_type"
+        >
+          <Input />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="Ethernet Ports" />}
-              name="number_ethernet_ports"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Display */}
+        <CustomDivider label="Display" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Size</span>}
+          rules={[{ required: true, message: "Screen Size is required" }]}
+          name="screen_size"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Resolution</span>}
+          rules={[{ required: true, message: "Screen Resolution is required" }]}
+          name="screen_resolution"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Refresh Rate</span>}
+          rules={[{ required: true, message: "Screen Refresh Rate is required" }]}
+          name="screen_refresh_rate"
+        >
+          <InputNumber />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Brightness</span>}
+          rules={[{ required: true, message: "Screen Brightness is required" }]}
+          name="screen_brightness"
+        >
+          <InputNumber />
+        </Form.Item>
 
-            <Form.Item
-              label={<RequiredLabel label="Audio Jacks" />}
-              name="number_audio_jacks"
-              rules={[{ required: false }]}
-            >
-              <InputNumber
-                min={0}
-                controls={true}
-                style={{
-                  width: "60px",
-                  fontWeight: "bold",
-                  borderRadius: "4px",
-                  backgroundColor: "#d9d9d9",
-                  padding: "4px",
-                  textAlign: "center",
-                }}
-              />
-            </Form.Item>
+        {/* Battery and Power */}
+        <CustomDivider label="Battery and Power" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Battery Capacity</span>}
+          rules={[{ required: true, message: "Battery Capacity is required" }]}
+          name="battery_capacity"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Battery Cells</span>}
+          rules={[{ required: true, message: "Battery Cells is required" }]}
+          name="battery_cells"
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Other features */}
-            <CustomDivider label="Other features" />
-            <Form.Item
-              label={<OptionalLabel label="Webcam" />}
-              name="webcam_resolution"
-            >
-              <Input style={inputStyle} />
-            </Form.Item>
+        {/* Physical Dimensions and Weight */}
+        <CustomDivider label="Physical Dimensions and Weight" />
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Width</span>} name="width"
+          rules={[{ required: true, message: "Width is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Depth</span>} name="depth"
+          rules={[{ required: true, message: "Depth is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Height</span>} name="height"
+          rules={[{ required: true, message: "Height is required" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item 
+          label={<span style={{fontWeight: "bold"}}>Weight</span>} name="weight"
+          rules={[{ required: true, message: "Weight is required" }]}
+        >
+          <Input />
+        </Form.Item>
 
-            {/* Price */}
-            <CustomDivider label="Retail information" />
-            <Form.Item
-              label={<RequiredLabel label="Quantity" />}
-              name="quantity"
-            >
-              <InputNumber style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<RequiredLabel label="Original Price" />}
-              name="original_price"
-            >
-              <InputNumber suffix="đ" style={inputStyle} />
-            </Form.Item>
-            <Form.Item
-              label={<OptionalLabel label="Sales Price" />}
-              name="sale_price"
-            >
-              <InputNumber suffix="đ" style={inputStyle} />
-            </Form.Item>
-
-            {/* Submit button */}
-            <Form.Item wrapperCol={{ offset: 4 }}>
-              <Button type="primary" onClick={() => handleSubmit(form)}>
-                {id ? "Update Laptop" : "Add Laptop"}
-              </Button>
-            </Form.Item>
-          </div>
-
-          <div
+        {/* Connectivity and Ports */}
+        <CustomDivider label="Connectivity and Ports" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>USB-A Ports</span>}
+          rules={[{ required: true, message: "USB-A Ports is required" }]}
+          name="number_usb_a_ports"
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
             style={{
-              position: "absolute",
-              right: "215px",
-              top: "325px",
-              flex: 1,
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
             }}
-          >
-            <Form.Item name="pictures">
-              <Swiper
-                modules={[Navigation]}
-                navigation
-                spaceBetween={40}
-                slidesPerView={1}
-                style={{ width: "650px", height: "400px", padding: "1rem" }}
-              >
-                {pictures.map((picture, index) => (
-                  <SwiperSlide
-                    key={index}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      position: "relative",
-                    }}
-                  >
-                    <img
-                      src={picture}
-                      alt={`Picture ${index + 1}`}
-                      style={{ width: "600px", height: "400px" }}
-                    />
-                    <button
-                      onClick={() => handleDeletePicture(index)}
-                      style={{
-                        position: "absolute",
-                        top: "-12px",
-                        right: "10px",
-                        background: "#b0b0b0",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        color: "red",
-                        borderRadius: "50%",
-                        width: "22px",
-                        height: "24px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "background 0.3s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.target.style.background = "#8a8a8a")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.target.style.background = "#b0b0b0")
-                      }
-                    >
-                      <CloseOutlined />
-                    </button>
-                  </SwiperSlide>
-                ))}
-                {/* Add Picture Button */}
+          />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>USB-C Ports</span>}
+          name="number_usb_c_ports"
+          rules= {[{ required: true, message: "USB-C Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>HDMI Ports</span>}
+          name="number_hdmi_ports"
+          rules={[{ required: true, message: "HDMI Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Ethernet Ports</span>}
+          name="number_ethernet_ports"
+          rules={[{ required: true, message: "Ethernet Ports is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Audio Jacks</span>}
+          name="number_audio_jacks"
+          rules={[{ required: true, message: "Audio Jacks is required" }]}
+        >
+          <InputNumber
+            min={0}
+            defaultValue={0}
+            controls={true}
+            style={{
+              width: "60px",
+              fontWeight: "bold",
+              borderRadius: "4px",
+              backgroundColor: "#d9d9d9",
+              padding: "4px",
+              textAlign: "center",
+            }}
+          />
+        </Form.Item>
+
+        {/* Other features */}
+        <CustomDivider label="Other features" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Webcam Resolution</span>}
+          rules={[{ required: false, message: "Webcam Resolution is optional" }]}
+          name="webcam_resolution"
+        >
+          <Input />
+        </Form.Item>
+
+        {/* Price */}
+        <CustomDivider label="Retail information" />
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Quantity</span>}
+          rules={[{ required: true, message: "Quantity is required" }]}
+          name="quantity"
+        >
+          <InputNumber defaultValue={0} />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Original Price</span>}
+          rules={[{ required: true, message: "Original Price is required" }]}
+          name="original_price"
+        >
+          <InputNumber suffix="đ" />
+        </Form.Item>
+        <Form.Item
+          label={<span style={{fontWeight: "bold"}}>Sale Price</span>}
+          rules={[{ required: true, message: "Sale Price is required" }]}
+          name="sale_price"
+        >
+          <InputNumber suffix="đ" />
+        </Form.Item>
+
+        {/* Images */}
+        <CustomDivider label="Images" />
+        <Form.Item name="pictures" style={{ width: "100%", border: "2px dashed #aaa", borderRadius: "8px", padding: "2rem" }}>
+          <div className="fjahasfkhkask" style={{  }}>
+            <Swiper
+              modules={[Navigation]}
+              navigation
+              spaceBetween={40}
+              slidesPerView={1}
+              style={{ width: "100%", height: "400px", padding: "1rem" }}
+            >
+              {pictures.map((picture, index) => (
                 <SwiperSlide
+                  key={index}
                   style={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    position: "relative",
                   }}
                 >
-                  <label
+                  <img
+                    src={picture}
+                    alt={`Picture ${index + 1}`}
+                    style={{ width: "600px", height: "400px" }}
+                  />
+                  <button
+                    onClick={() => handleDeletePicture(index)}
                     style={{
+                      position: "absolute",
+                      top: "-12px",
+                      right: "10px",
+                      background: "#b0b0b0",
+                      border: "none",
                       cursor: "pointer",
-                      padding: "20px",
-                      border: "2px dashed #aaa",
-                      borderRadius: "8px",
+                      fontSize: "14px",
+                      color: "red",
+                      borderRadius: "50%",
+                      width: "22px",
+                      height: "24px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background 0.3s ease",
                     }}
+                    onMouseEnter={(e) =>
+                      (e.target.style.background = "#8a8a8a")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.target.style.background = "#b0b0b0")
+                    }
                   >
-                    Add picture
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={handleAddPicture}
-                    />
-                  </label>
+                    <CloseOutlined />
+                  </button>
                 </SwiperSlide>
-              </Swiper>
-            </Form.Item>
+              ))}
+              {/* Add Picture Button */}
+              <SwiperSlide
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <label
+                  style={{
+                    cursor: "pointer",
+                    padding: "20px",
+                    border: "2px dashed #aaa",
+                    borderRadius: "8px",
+                  }}
+                >
+                  Add picture
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleAddPicture}
+                  />
+                </label>
+              </SwiperSlide>
+            </Swiper>
           </div>
-        </div>
+        </Form.Item>
+
+        <br></br>
+        <br></br>
+
+        {/* Submit button */}
+        <Form.Item style={{ display: "flex", justifyContent: "center" }}>
+          <Button type="primary" onClick={() => handleSubmit(form)} style={{ width: "500px", height: "50px" }}>
+            <span style={{ fontWeight: "bold", fontSize: "16px" }}>
+              {id ? "Update Laptop" : "Add Laptop"}
+            </span>
+          </Button>
+        </Form.Item>
       </Form>
     </div>
   );
@@ -562,7 +622,7 @@ const transformStockData = (data) => {
   }));
 };
 
-const StockAlert = () => {
+const StockAlertTab = () => {
   const [stockData, setStockData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -623,7 +683,7 @@ const StockAlert = () => {
   );
 };
 
-const RefundRequest = () => {
+const RefundRequestTab = () => {
   const [emailList, setEmailList] = useState([]);
   const [refundDataByEmail, setRefundDataByEmail] = useState({});
   const [loading, setLoading] = useState(true);
@@ -696,7 +756,7 @@ const RefundRequest = () => {
   );
 };
 
-const Orders = () => {
+const OrdersTab = () => {
   const user = useUser();
   const [form] = Form.useForm();
 
@@ -807,7 +867,7 @@ const Orders = () => {
                 <Select placeholder="Select status" allowClear>
                   <Select.Option value="pending">Pending</Select.Option>
                   <Select.Option value="processing">Processing</Select.Option>
-                  <Select.Option value="shipped">Shipped</Select.Option>
+                  <Select.Option value="shipping">Shipped</Select.Option>
                   <Select.Option value="delivered">Delivered</Select.Option>
                   <Select.Option value="cancelled">Cancelled</Select.Option>
                   <Select.Option value="refunded">Refunded</Select.Option>
@@ -838,47 +898,119 @@ const Orders = () => {
   );
 };
 
-const AdminTabs = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+const DashboardTab = () => {
+  const user = useUser();
+  const [salesByStatus, setSalesByStatus] = useState([]);
+  const [salesOverTime, setSalesOverTime] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [ordersOverTime, setOrdersOverTime] = useState([]);
+  
+  const fetchOrders = async () => {
+  try {
+    const token = await user.accessToken;
+    if (!token) return;
 
-  const getActiveKey = () => {
-    if (location.pathname.includes("/admin/catalog")) return "0";
-    if (location.pathname.includes("/admin/detail")) return "1";
-    if (location.pathname.includes("/admin/refund")) return "2";
-    if (location.pathname.includes("/admin/stock-alerts")) return "3";
-    if (location.pathname.includes("/admin/orders")) return "4";
-    return "0";
-  };
+    const res = await axios.get("http://localhost:8000/orders/admin/list/all", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const handleTabChange = (key) => {
-    if (key === "0") navigate("/admin/catalog/all");
-    if (key === "1") navigate("/admin/detail");
-    if (key === "2") navigate("/admin/refund");
-    if (key === "3") navigate("/admin/stock-alerts");
-    if (key === "4") navigate("/admin/orders");
-  };
+    const orders = res.data.orders || res.data;
 
-  return (
-    <div>
-      <Tabs
-        activeKey={getActiveKey()}
-        onChange={handleTabChange}
-        tabBarGutter={80}
-        tabBarStyle={{ borderBottom: "none", paddingBottom: "1rem" }}
-        style={{ width: "100%" }}
-      >
-        <Tabs.TabPane key="0" tab="All Products" />
-        <Tabs.TabPane key="1" tab="Detail" />
-        <Tabs.TabPane key="2" tab="Refund Request" />
-        <Tabs.TabPane key="3" tab="Stock Alerts" />
-        <Tabs.TabPane key="4" tab="Orders" />
-      </Tabs>
-    </div>
-  );
+    // 1. Total revenue
+    const total = orders.reduce(
+      (sum, order) => sum + (order.total_price || 0),
+      0
+    );
+    setTotalRevenue(total);
+    setOrderCount(orders.length);
+
+    // 2. Sales by status (pie chart)
+    const statusCount = {};
+    for (const order of orders) {
+      const status = order.status || "unknown";
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    }
+    const pieData = Object.entries(statusCount).map(([type, value]) => ({
+      type,
+      value,
+    }));
+    setSalesByStatus(pieData);
+
+    // 3. Sales over time (line chart)
+    const revenueByMonth = {};
+    for (const order of orders) {
+      const dateObj = new Date(order.created_at);
+      const yearMonth = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // e.g. '2024-05'
+
+      revenueByMonth[yearMonth] = (revenueByMonth[yearMonth] || 0) + (order.total_price || 0);
+    }
+
+    const sortedMonths = Object.keys(revenueByMonth).sort();
+
+    const salesOverTime = sortedMonths.map(month => ({
+      date: month,       // X-axis will now show '2024-05'
+      revenue: revenueByMonth[month],
+    }));
+    setSalesOverTime(salesOverTime);
+
+
+    
+
+    // 4. Order count over time (grouped by date)
+    const orderCountByMonth = {};
+    for (const order of orders) {
+      const dateObj = new Date(order.created_at);
+      const yearMonth = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // e.g. '2024-05'
+
+      orderCountByMonth[yearMonth] = (orderCountByMonth[yearMonth] || 0) + 1;
+    }
+
+
+    const ordersOverTime = sortedMonths.map(month => ({
+      date: month,
+      count: orderCountByMonth[month],
+    }));
+    setOrdersOverTime(ordersOverTime);
+
+
+    
+
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+  }
 };
 
+
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      fetchOrders();
+    }
+  }, [user]);
+
+  if (!user || user.role !== "admin") {
+    return <p>Access denied: Admins only</p>;
+  }
+  
+  console.log(totalRevenue, orderCount);
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <Dashboard 
+          totalRevenue={totalRevenue} 
+          orderCount={orderCount}
+          salesByStatus={salesByStatus}
+          salesOverTime={salesOverTime}
+          ordersOverTime={ordersOverTime}
+          />
+    </div>
+  );
+}
+
 const AdministratorPage = () => {
+  const location = useLocation();
+
   return (
     <Layout>
       <WebsiteHeader />
@@ -888,18 +1020,46 @@ const AdministratorPage = () => {
           separator=">"
           style={{ marginBottom: "1rem", fontSize: "14px" }}
         >
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Administrator Page</Breadcrumb.Item>
+          <Breadcrumb.Item>Admin</Breadcrumb.Item>
+          {(() => {
+            
+            const pathSegments = location.pathname.split('/').filter(segment => segment);
+            
+            // Map path segments to display names
+            const pathToDisplayName = {
+              'inventory': 'Inventory',
+              'detail': 'Product Detail',
+              'refund': 'Refund Requests',
+              'stock': 'Stock Alerts',
+              'orders': 'Orders',
+              'dashboard': 'Dashboard'
+            };
+            
+            // Get the current page from the path (last segment)
+            if (pathSegments.length > 0) {
+              const currentPage = pathSegments[1];
+              
+              if (currentPage === 'detail') {
+                if (pathSegments.length > 2) {
+                  // If it's a detail page, use the third segment as the identifier
+                  const detailId = pathSegments[2];
+                  return <Breadcrumb.Item>Product Detail: {detailId}</Breadcrumb.Item>;
+                }
+                else {
+                  return <Breadcrumb.Item>Add Product</Breadcrumb.Item>;
+                }
+              }
+              else {
+                const displayName = pathToDisplayName[currentPage] || 
+                currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+                return <Breadcrumb.Item>{displayName}</Breadcrumb.Item>;
+              }
+            }
+            
+            return <Breadcrumb.Item>Dashboard</Breadcrumb.Item>;
+          })()}
         </Breadcrumb>
 
-        <Title level={2} style={{ fontWeight: "bold" }}>
-          Administrator Page
-        </Title>
-
-        {/* Tabs for Navigation */}
-        <AdminTabs />
-
-        {/* Outlet for Rendering Child Components */}
         <Outlet />
       </Content>
 
@@ -908,15 +1068,5 @@ const AdministratorPage = () => {
   );
 };
 
-CustomDivider.propTypes = {
-  label: PropTypes.string.isRequired,
-};
-RequiredLabel.propTypes = {
-  label: PropTypes.string.isRequired,
-};
-OptionalLabel.propTypes = {
-  label: PropTypes.string.isRequired,
-};
-
 export default AdministratorPage;
-export { Detail, AdminCatalog, RefundRequest, StockAlert, Orders };
+export { DetailTab, Inventory, RefundRequestTab, StockAlertTab, OrdersTab, DashboardTab };

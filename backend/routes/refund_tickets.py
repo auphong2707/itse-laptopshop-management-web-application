@@ -10,6 +10,7 @@ from schemas.refund_tickets import (
     RefundTicketResponse,
 )
 from db.session import get_db
+from db.models import Order
 
 refund_tickets_router = APIRouter(prefix="/refund_tickets", tags=["refund_tickets"])
 
@@ -18,9 +19,10 @@ refund_tickets_router = APIRouter(prefix="/refund_tickets", tags=["refund_ticket
 async def create_refund_ticket(
     refund_ticket: RefundTicketCreate, db: Session = Depends(get_db)
 ):
+    print(f"Creating refund ticket: {refund_ticket}")
     existing_ticket = (
         db.query(RefundTicket)
-        .filter_by(email=refund_ticket.email, phone_number=refund_ticket.phone_number)
+        .filter_by(email=refund_ticket.email, phone_number=refund_ticket.phone_number, order_id=refund_ticket.order_id)
         .first()
     )
 
@@ -30,12 +32,22 @@ async def create_refund_ticket(
             detail="Refund ticket already exists for this email and phone number combination.",
         )
 
+
+    # Check if the order exists and is delivered
+    order = db.query(Order).filter(Order.id == refund_ticket.order_id).first()
+
+    print(f"Order found: {order.status if order else 'None'}")
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order.status != "delivered":
+        raise HTTPException(status_code=400, detail="Refund can only be requested for delivered orders")
+
     new_refund_ticket = RefundTicket(
         email=refund_ticket.email,
         phone_number=refund_ticket.phone_number,
         order_id=refund_ticket.order_id,
         reason=refund_ticket.reason,
-        amount=refund_ticket.amount,
         status=refund_ticket.status,
     )
 
@@ -44,10 +56,16 @@ async def create_refund_ticket(
         db.commit()
         db.refresh(new_refund_ticket)
 
-        return {
-            "message": "Refund ticket created successfully",
-            "ticket": new_refund_ticket,
-        }
+        return RefundTicketResponse(
+            id=new_refund_ticket.id,
+            email=new_refund_ticket.email,
+            phone_number=new_refund_ticket.phone_number,
+            order_id=new_refund_ticket.order_id,
+            reason=new_refund_ticket.reason,
+            status=new_refund_ticket.status,
+            created_at=new_refund_ticket.created_at,
+            resolved_at=new_refund_ticket.resolved_at,
+        )
 
     except IntegrityError:
         db.rollback()

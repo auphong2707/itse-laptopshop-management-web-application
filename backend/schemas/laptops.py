@@ -6,6 +6,8 @@ class LaptopCreate(BaseModel):
     brand: str
     sub_brand: str
     name: str
+    description: str
+    usage_type: str
     cpu: str
     vga: str
     ram_amount: int = Field(..., gt=0)
@@ -40,6 +42,8 @@ class LaptopUpdate(BaseModel):
     brand: Optional[str] = None
     sub_brand: Optional[str] = None
     name: Optional[str] = None
+    description: Optional[str] = None
+    usage_type: Optional[str] = None
     cpu: Optional[str] = None
     vga: Optional[str] = None
     ram_amount: Optional[int] = Field(None, gt=0)

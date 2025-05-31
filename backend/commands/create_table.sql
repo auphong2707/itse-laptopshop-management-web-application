@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS laptops (
     brand TEXT,
     sub_brand TEXT,
     name TEXT,
+    description TEXT,
+    usage_type TEXT,
     cpu TEXT,
     vga TEXT,
     ram_amount INTEGER,
@@ -177,12 +179,11 @@ CREATE TABLE IF NOT EXISTS refund_tickets (
     phone_number TEXT NOT NULL,  -- User's phone number
     order_id INTEGER NOT NULL,  -- Associated order ID
     reason TEXT NOT NULL,  -- Reason for the refund
-    amount DECIMAL(10, 2) CHECK (amount > 0),  -- Refund amount must be positive
     status VARCHAR(50) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',  -- Only valid statuses
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp when the refund was created
     resolved_at TIMESTAMP,  -- Timestamp when the refund was resolved (if applicable)
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,  -- Foreign key to orders
-    CONSTRAINT unique_user_email_phone UNIQUE(email, phone_number)  -- Ensure unique combination of email and phone
+    CONSTRAINT unique_user_email_phone UNIQUE(email, phone_number, order_id)  -- Ensure unique combination of email and phone
 );
 
 -- Create a function that updates the refund status to 'approved' when resolved_at is set

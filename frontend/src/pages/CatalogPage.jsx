@@ -110,6 +110,14 @@ const convertToQueryString = (
   if (sortBy === "price-high") query += "&sort=price_desc";
   if (sortBy === "sale") query += "&sort=sale";
 
+  // Usage Type
+  if (filters.selectedFilters.usageType.length > 0) {
+    filters.selectedFilters.usageType.forEach((usageType) => {
+      usageType = usageType.toLowerCase().replace(" ", "+");
+      query += `&usage_type=${usageType}`;
+    });
+  }
+
   // Sub-brand
   if (filters.selectedFilters.subBrand.length > 0) {
     filters.selectedFilters.subBrand.forEach((subBrand) => {
@@ -212,6 +220,7 @@ const CatalogPage = () => {
         0.5, 5,
       ],
       selectedFilters: {
+        usageType: searchParams.getAll("usageType"),
         subBrand: searchParams.getAll("subBrand"),
         cpu: searchParams.getAll("cpu"),
         vga: searchParams.getAll("vga"),
@@ -264,6 +273,7 @@ const CatalogPage = () => {
       priceRange: [3000000, 180000000],
       weightRange: [0.5, 5],
       selectedFilters: {
+        usageType: [],
         subBrand: [],
         cpu: [],
         vga: [],
@@ -298,6 +308,7 @@ const CatalogPage = () => {
   const [collapseState, setCollapseState] = useState({
     priceRange: 1,
     subBrand: 1,
+    usageType: 1,
     cpu: 1,
     vga: 1,
     ramAmount: 1,

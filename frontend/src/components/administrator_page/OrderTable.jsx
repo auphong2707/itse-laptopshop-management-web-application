@@ -97,7 +97,7 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
         const statusColors = {
           pending: 'gold',
           processing: 'blue',
-          shipped: 'cyan',
+          shipping: 'cyan',
           delivered: 'green',
           cancelled: 'red',
           refunded: 'volcano',
@@ -129,7 +129,7 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
             style={{ width: 120, marginRight: 8 }}
             onChange={(value) => handleStatusChange(record.id, value)}
           >
-            {['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'].map((status) => (
+            {['pending', 'processing', 'shipping', 'delivered', 'cancelled', 'refunded'].map((status) => (
               <Select.Option key={status} value={status}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </Select.Option>
