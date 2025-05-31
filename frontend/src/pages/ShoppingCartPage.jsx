@@ -10,6 +10,7 @@ import {
   Breadcrumb,
   Divider,
   Modal,
+  notification,
 } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -44,6 +45,25 @@ const { Text, Title } = Typography;
 const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
+
+const showPaymentSuccess = () => {
+  notification.success({
+    message: "Payment Successful",
+    description: (
+      <span>
+        Thank you for your payment! Your order is being processed.{" "}
+        <a href="/customer/orders" style={{ fontWeight: "bold" }}>
+          View your orders
+        </a>
+        .
+      </span>
+    ),
+    placement: "topRight",
+    duration: 5,
+  });
+};
+
+
 
 const contentStyle = {
   backgroundColor: "#fff",
@@ -115,6 +135,22 @@ const ShoppingCartPage = () => {
 
     fetchCart();
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter" && qrModalVisible) {
+        setQrModalVisible(false);
+        showPaymentSuccess();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [qrModalVisible]);
+
 
   return (
     <Layout>
