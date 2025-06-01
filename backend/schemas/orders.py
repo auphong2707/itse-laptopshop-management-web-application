@@ -22,13 +22,9 @@ class OrderBase(BaseModel):
 
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    user_name: Optional[str] = None
     user_email: Optional[str] = None
     shipping_address: Optional[str] = None
     phone_number: Optional[str] = None
-    company: Optional[str] = None
-    country: Optional[str] = None
-    zip_code: Optional[str] = None
 
     class Config:
         from_attributes = True
