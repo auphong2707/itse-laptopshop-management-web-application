@@ -135,6 +135,7 @@ CREATE TABLE IF NOT EXISTS orders (
     user_email TEXT,
     shipping_address TEXT,
     phone_number TEXT,
+    payment_method TEXT,
 
     total_price DECIMAL(18, 2) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'pending',

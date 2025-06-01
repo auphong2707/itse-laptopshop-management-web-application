@@ -124,6 +124,7 @@ class Order(Base):
     user_email = Column(Text, nullable=True)
     shipping_address = Column(Text, nullable=True)
     phone_number = Column(Text, nullable=True)
+    payment_method = Column(String(50), nullable=False)
 
     total_price = Column(DECIMAL(10, 2), nullable=False)
     status = Column(String(50), nullable=False, default="pending")

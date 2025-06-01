@@ -25,6 +25,7 @@ class OrderBase(BaseModel):
     user_email: Optional[str] = None
     shipping_address: Optional[str] = None
     phone_number: Optional[str] = None
+    payment_method: Optional[str] = None
 
     class Config:
         from_attributes = True
