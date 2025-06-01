@@ -5,15 +5,10 @@ import {
   ScrollRestoration,
 } from "react-router-dom";
 
+// Layouts
+import AdministratorLayout from "./layouts/AdministratorLayout.jsx";
+
 import { UserProvider } from "./utils/UserContext";
-import AdministratorPage, {
-  Inventory,
-  DetailTab,
-  OrdersTab,
-  RefundRequestTab,
-  StockAlertTab,
-  DashboardTab
-} from "./pages/AdministratorPage";
 import CatalogPage from "./pages/CatalogPage";
 import CustomerLoginPage from "./pages/CustomerLoginPage";
 import HomePage from "./pages/HomePage";
@@ -24,6 +19,15 @@ import ShoppingCartPage from "./pages/ShoppingCartPage";
 import SearchPage from "./pages/SearchPage";
 import PlaceOrderPage from "./pages/PlaceOrderPage";
 import "./App.css";
+
+// Pages – admin
+import AdminDashboardTab from "./pages/admin/AdminDashboardTab.jsx";
+import AdminInventoryTab from "./pages/admin/AdminInventoryTab.jsx";
+import AdminProductDetailTab from "./pages/admin/AdminProductDetailTab.jsx";
+import AdminStockAlertsTab from "./pages/admin/AdminStockAlertsTab.jsx";
+import AdminRefundRequestsTab from "./pages/admin/AdminRefundRequestsTab.jsx";
+import AdminOrdersTab from "./pages/admin/AdminOrdersTab.jsx";
+
 
 const router = createBrowserRouter([
   {
@@ -76,38 +80,26 @@ const router = createBrowserRouter([
     element: (
       <>
         <ScrollRestoration />
-        <AdministratorPage />
+        <AdministratorLayout />
       </>
     ),
+    // các trang con xuất hiện trong <Outlet /> của AdministratorLayout
     children: [
-      {
-        path: "dashboard",
-        element: <DashboardTab />,
-      },
-      {
-        path: "inventory/:brand",
-        element: <Inventory />,
-      },
-      {
-        path: "detail",
-        element: <DetailTab />,
-      },
-      {
-        path: "detail/:id",
-        element: <DetailTab />,
-      },
-      {
-        path: "refund",
-        element: <RefundRequestTab />,
-      },
-      {
-        path: "stock-alerts",
-        element: <StockAlertTab />,
-      },
-      {
-        path: "orders",
-        element: <OrdersTab />,
-      }
+      { index: true, element: <AdminDashboardTab /> },         // /admin
+      { path: "dashboard", element: <AdminDashboardTab /> },   // /admin/dashboard
+
+      // Inventory theo brand → /admin/inventory/asus
+      { path: "inventory/:brand", element: <AdminInventoryTab /> },
+
+      // Thêm mới sản phẩm → /admin/detail
+      { path: "detail", element: <AdminProductDetailTab /> },
+
+      // Sửa sản phẩm → /admin/detail/123
+      { path: "detail/:id", element: <AdminProductDetailTab /> },
+
+      { path: "stock-alerts", element: <AdminStockAlertsTab /> },     // /admin/stock
+      { path: "refund", element: <AdminRefundRequestsTab /> }, // /admin/refund
+      { path: "orders", element: <AdminOrdersTab /> },         // /admin/orders
     ],
   },
   {
