@@ -32,7 +32,7 @@ const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const finalPrice = Math.round(50000 + 1.15 * totalPrice);
+  const finalPrice = Math.round(50000 + totalPrice);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -143,20 +143,7 @@ const ShoppingCartPage = () => {
               <Text strong>Shipping</Text>
               <Text style={{ float: "right" }}>{formatPrice(50000)}</Text>
               <br />
-              <Text type="secondary" style={{ fontSize: "12px" }}>
-                (Standard Rate - Price may vary depending on the
-                item/destination. TECS Staff will contact you.)
-              </Text>
               <br />
-              <Text strong>Tax</Text>
-              <Text style={{ float: "right" }}>
-                {formatPrice(0.05 * totalPrice)}
-              </Text>
-              <br />
-              <Text strong>GST (10%)</Text>
-              <Text style={{ float: "right" }}>
-                {formatPrice(0.1 * totalPrice)}
-              </Text>
               <Divider style={{ marginBottom: "18px" }} />
               <Title level={3} style={{ marginTop: "12px" }}>
                 Order Total:{" "}
