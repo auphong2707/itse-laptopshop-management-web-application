@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { QRPay, BanksObject } from 'vietnam-qr-pay';
-import QRCode from "react-qr-code";
 import {
   Row,
   Col,
@@ -9,11 +7,8 @@ import {
   Layout,
   Breadcrumb,
   Divider,
-  Modal,
-  notification,
 } from "antd";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -21,77 +16,23 @@ import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
 import ShoppingItemsTable from "../components/shopping_cart_page/ShoppingItemsTable";
 
-const PayOnlineButton = styled(Button)`
-  background-color: #ff3b30;
-  color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  height: 50px;
-  border-radius: 9999px;
-  border: none;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #0053b3;
-    color: #fff;
-    cursor: pointer;
-  }
-`;
-
 const { Content } = Layout;
 const { Text, Title } = Typography;
 
-//Hàm format tiền
 const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
-
-const showPaymentSuccess = () => {
-  notification.success({
-    message: "Payment Successful",
-    description: (
-      <span>
-        Thank you for your payment! Your order is being processed.{" "}
-        <a href="/customer/orders" style={{ fontWeight: "bold" }}>
-          View your orders
-        </a>
-        .
-      </span>
-    ),
-    placement: "topRight",
-    duration: 5,
-  });
-};
-
-
 
 const contentStyle = {
   backgroundColor: "#fff",
   padding: "2rem",
 };
 
-
 const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const [qrModalVisible, setQrModalVisible] = useState(false);
-  const [qrUrl, setQrUrl] = useState("");
-
   const finalPrice = Math.round(50000 + 1.15 * totalPrice);
-
-  const handlePay = () => {
-    const momoPay = QRPay.initVietQR({
-      bankBin: BanksObject.tpbank.bin,
-      bankNumber: "07537430201",
-      amount: finalPrice.toString(),
-    });
-    
-    const content = momoPay.build();
-    console.log("MoMo QR Content:", content);
-    setQrUrl(content);
-    setQrModalVisible(true);
-  };
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -135,22 +76,6 @@ const ShoppingCartPage = () => {
 
     fetchCart();
   }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Enter" && qrModalVisible) {
-        setQrModalVisible(false);
-        showPaymentSuccess();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [qrModalVisible]);
-
 
   return (
     <Layout>
@@ -239,43 +164,24 @@ const ShoppingCartPage = () => {
                   {formatPrice(finalPrice)}
                 </span>
               </Title>
-              <Button
-                type="primary"
-                block
-                size="large"
-                style={{
-                  marginTop: "10px",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  height: "50px",
-                  borderRadius: "9999px",
-                }}
-              >
-                Pay on Delivery
-              </Button>
 
-              <PayOnlineButton block size="large" style={{ marginTop: "10px" }} onClick={handlePay}
-              >
-                Pay with E-Banking
-              </PayOnlineButton>
-
-              <Modal
-                title="Scan to Pay"
-                open={qrModalVisible}
-                onCancel={() => setQrModalVisible(false)}
-                footer={null}
-                centered
-              >
-                {qrUrl ? (
-                  <div style={{ textAlign: 'center' }}>
-                    <QRCode value={qrUrl} size={220} />
-                    <p style={{ marginTop: '10px' }}>Use any app to scan and pay</p>
-                  </div>
-                ) : (
-                  <p>Generating QR code...</p>
-                )}
-              </Modal>
-
+              <Link to="/customer/place-order/">
+                <Button
+                  type="primary"
+                  block
+                  size="large"
+                  style={{
+                    marginTop: "10px",
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    height: "50px",
+                    borderRadius: "9999px",
+                    backgroundColor: "#1890ff",
+                  }}
+                >
+                  Place Order
+                </Button>
+              </Link>
 
             </div>
           </Col>
