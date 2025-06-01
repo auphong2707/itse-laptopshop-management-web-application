@@ -184,12 +184,6 @@ const MyOrder = () => {
     });
   };
 
-  const handleCancelOrder = (orderId) => {
-    console.log("Cancel requested for order ID:", orderId);
-    // TODO: Call API or show confirmation for canceling order
-    // Example: message.success(`Order ${orderId} has been canceled`);
-  };
-
   useEffect(() => {
     if (user) {
       fetchOrders(ordersData.page, ordersData.limit);
@@ -249,13 +243,6 @@ const MyOrder = () => {
             disabled={record.status !== 'delivered'}
           >
             Refund
-          </Button>
-          <Button 
-            danger 
-            onClick={() => handleCancelOrder(record.id)}
-            disabled={record.status !== 'pending' && record.status !== 'processing'}
-          >
-            Cancel
           </Button>
         </>
       ),
