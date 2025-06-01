@@ -631,7 +631,12 @@ def generate_orders(
 
     def generate_fake_uid(length=28):
         real_uid = "UXXB26VXsZdin2QRTDvQtKW8HiI2"
-        return random.choice([real_uid, "".join(random.choices(string.ascii_letters + string.digits, k=length))])
+        return random.choice(
+            [
+                real_uid,
+                "".join(random.choices(string.ascii_letters + string.digits, k=length)),
+            ]
+        )
 
     for i in range(num_orders):
         first = random.choice(first_names)
@@ -774,11 +779,12 @@ def generate_orders(
         "IMPORTANT: Assumed Order IDs start from 1. Ensure sequence alignment if needed."
     )
 
+
 def generate_refund_tickets(
     sql_output_path="./backend/commands/insert_sample_data.sql",
     num_tickets=30,
 ):
-    statuses = ["pending", "rejected"]  # 'approved' handled via resolved_at trigger
+    statuses = ["pending", "resolved"]
     reasons = [
         "Sản phẩm bị lỗi phần cứng.",
         "Không đúng mô tả.",
@@ -809,7 +815,7 @@ def generate_refund_tickets(
         status = random.choice(statuses)
         created_at = datetime.utcnow() - timedelta(days=random.randint(1, 100))
         resolved_at = None
-        if status == "rejected":
+        if status == "resolved":
             resolved_at = created_at + timedelta(days=random.randint(1, 7))
 
         updated_at = resolved_at or (created_at + timedelta(days=random.randint(1, 3)))
@@ -839,7 +845,9 @@ def generate_refund_tickets(
         )
         with open(sql_output_path, "a") as f:
             f.write("\n" + insert_query)
-        print(f"[✓] Generated and wrote {num_tickets} refund tickets to {sql_output_path}")
+        print(
+            f"[✓] Generated and wrote {num_tickets} refund tickets to {sql_output_path}"
+        )
     else:
         print("No refund tickets generated.")
 
