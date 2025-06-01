@@ -1,5 +1,5 @@
 import { Layout, Breadcrumb } from "antd";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import WebsiteHeader from "../components/WebsiteHeader.jsx";
 import WebsiteFooter from "../components/WebsiteFooter.jsx";
 
@@ -14,7 +14,7 @@ const pathToName = {
 export default function CustomerLayout() {
   const location = useLocation();
   const segments = location.pathname.split("/").filter(Boolean);
-  const current = segments[1] || "account";
+  const current = segments[1] || "accountInformation"; // Default to accountInformation
 
   return (
     <Layout>
@@ -22,8 +22,16 @@ export default function CustomerLayout() {
 
       <Content style={{ padding: "1.5rem 12%", background: "#fff" }}>
         <Breadcrumb separator=">" style={{ marginBottom: "1rem" }}>
-          <Breadcrumb.Item>Customer</Breadcrumb.Item>
-          <Breadcrumb.Item>{pathToName[current] || current}</Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/customer">Customer</Link>
+          </Breadcrumb.Item>
+          {pathToName[current] ? (
+            <Breadcrumb.Item>
+              <Link to={`/customer/${current}`}>{pathToName[current]}</Link>
+            </Breadcrumb.Item>
+          ) : (
+            <Breadcrumb.Item>{current}</Breadcrumb.Item>
+          )}
         </Breadcrumb>
 
         <Outlet />
