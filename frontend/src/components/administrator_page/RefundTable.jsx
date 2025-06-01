@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   Tag,
@@ -18,6 +18,14 @@ import dayjs from "dayjs";
  *  - onResolve: optional callback fired after the admin confirms resolution.
  */
 const RefundTable = ({ data, onResolve }) => {
+  // Local pagination state to allow page‑size changes
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    showSizeChanger: true,
+    pageSizeOptions: ["10", "20", "50", "100"],
+  });
+
   // Tag color mapping for the two possible states
   const statusColors = {
     Pending: "orange",
@@ -94,7 +102,7 @@ const RefundTable = ({ data, onResolve }) => {
     }
   };
 
-  /** Top‑level refund columns */
+  /** Top-level refund columns */
   const columns = [
     {
       title: "Refund ID",
@@ -158,7 +166,6 @@ const RefundTable = ({ data, onResolve }) => {
     {
       title: "Action",
       key: "action",
-      fixed: "right",
       width: 120,
       render: (_, record) =>
         record.status === "Pending" ? (
@@ -177,13 +184,19 @@ const RefundTable = ({ data, onResolve }) => {
     },
   ];
 
+  /** Handle page or pageSize change */
+  const handleTableChange = (pageInfo) => {
+    setPagination((prev) => ({ ...prev, ...pageInfo }));
+  };
+
   return (
     <Table
       dataSource={data.map((r) => ({ key: r.id, ...r }))}
       columns={columns}
       rowKey="id"
       expandable={{ expandedRowRender }}
-      pagination={{ pageSize: 10, showSizeChanger: true }}
+      pagination={pagination}
+      onChange={handleTableChange}
       scroll={{ x: 1500 }}
     />
   );
