@@ -337,7 +337,7 @@ const PlaceOrderPage = () => {
         pagination={false}
       />
       <div style={{ textAlign: "right", marginTop: 16 }}>
-        <Text strong>Total Price: {formatPrice(cartOrder?.total_price || 0)}</Text>
+        <Text strong>Total Price: {formatPrice(1.15 * cartOrder?.total_price + 50000 || 0)}</Text>
       </div>
     </div>
   );
