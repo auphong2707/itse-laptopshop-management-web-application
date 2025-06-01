@@ -26,20 +26,6 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
     }
   };
 
-  const handleDelete = async (orderId) => {
-    try {
-      await axios.delete(`http://localhost:8000/orders/admin/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      message.success(`Order ${orderId} deleted`);
-      onTableChange({ current: page, pageSize: limit }); // refresh table
-    } catch (error) {
-      message.error('Failed to delete order');
-    }
-  };
-
   const columns = [
     {
       title: 'Order ID',
@@ -70,26 +56,26 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
       key: 'shipping_address',
     },
     {
+      title: 'Payment Method',
+      dataIndex: 'payment_method',
+      key: 'payment_method',
+      align: 'center',
+      render: (method) => {
+        const methodLabels = {
+          'e-banking': 'E-Banking',
+          'delivery': 'Cash on Delivery',
+        };
+        const methodColors = {
+          'e-banking': 'green',
+          'delivery': 'blue',
+        };
+        return <Tag color={methodColors[method] || 'default'}>{methodLabels[method] || method}</Tag>;
+      },
+    },
+    {
       title: 'Total Price',
       dataIndex: 'total_price',
       key: 'total_price',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const statusColors = {
-          pending: 'gold',
-          processing: 'blue',
-          shipping: 'cyan',
-          delivered: 'green',
-          cancelled: 'red',
-          refunded: 'volcano',
-        };
-    
-        return <Tag color={statusColors[status] || 'default'}>{status}</Tag>;
-      },
     },
     {
       title: 'Created At',
@@ -104,8 +90,8 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
       render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: 'Change Status',
+      key: 'change_status',
       fixed: 'right',
       render: (_, record) => (
         <>
@@ -120,14 +106,6 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
               </Select.Option>
             ))}
           </Select>
-          <Popconfirm
-            title="Are you sure to delete this order?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button danger>Delete</Button>
-          </Popconfirm>
         </>
       ),
     }
