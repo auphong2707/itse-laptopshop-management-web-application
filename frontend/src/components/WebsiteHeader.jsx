@@ -99,9 +99,6 @@ const AccountMenu = () => {
               <Menu.Item key="productReviews" style={{ fontWeight: "bold" }}>
                 <Link to="/customer/productReviews">Product Reviews</Link>
               </Menu.Item>
-              <Menu.Item key="newsletterSubscriptions" style={{ fontWeight: "bold" }}>
-                <Link to="/customer/newsletterSubscriptions">Newsletter Subscriptions</Link>
-              </Menu.Item>
             </>
           )}
 

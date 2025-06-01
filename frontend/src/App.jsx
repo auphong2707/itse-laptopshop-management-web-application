@@ -7,6 +7,7 @@ import {
 
 // Layouts
 import AdministratorLayout from "./layouts/AdministratorLayout.jsx";
+import CustomerLayout from "./layouts/CustomerLayout.jsx";
 
 import { UserProvider } from "./utils/UserContext";
 import CatalogPage from "./pages/CatalogPage";
@@ -14,7 +15,6 @@ import CustomerLoginPage from "./pages/CustomerLoginPage";
 import HomePage from "./pages/HomePage";
 import ProductPage from "./pages/ProductPage";
 import RegisterPage from "./pages/RegisterPage";
-import CustomerPage from "./pages/CustomerPage";
 import ShoppingCartPage from "./pages/ShoppingCartPage";
 import SearchPage from "./pages/SearchPage";
 import PlaceOrderPage from "./pages/PlaceOrderPage";
@@ -27,6 +27,11 @@ import AdminProductDetailTab from "./pages/admin/AdminProductDetailTab.jsx";
 import AdminStockAlertsTab from "./pages/admin/AdminStockAlertsTab.jsx";
 import AdminRefundRequestsTab from "./pages/admin/AdminRefundRequestsTab.jsx";
 import AdminOrdersTab from "./pages/admin/AdminOrdersTab.jsx";
+
+// Pages – customer
+import CustomerOrderTab from "./pages/customer/CustomerOrderTab.jsx";
+import CustomerAccountInformationTab from "./pages/customer/CustomerAccountInformationTab.jsx";
+import CustomerProductReviewsTab from "./pages/customer/CustomerProductReviewsTab.jsx";
 
 
 const router = createBrowserRouter([
@@ -54,15 +59,6 @@ const router = createBrowserRouter([
       <>
         <ScrollRestoration />
         <PlaceOrderPage />
-      </>
-    ),
-  },
-  {
-    path: "/customer/:section?",
-    element: (
-      <>
-        <ScrollRestoration />
-        <CustomerPage />
       </>
     ),
   },
@@ -100,6 +96,23 @@ const router = createBrowserRouter([
       { path: "stock-alerts", element: <AdminStockAlertsTab /> },     // /admin/stock
       { path: "refund", element: <AdminRefundRequestsTab /> }, // /admin/refund
       { path: "orders", element: <AdminOrdersTab /> },         // /admin/orders
+    ],
+  },
+  {
+    path: "/customer",
+    element: (
+      <>
+        <ScrollRestoration />
+        <CustomerLayout />
+      </>
+    ),
+    children: [
+      { index: true, element: <CustomerAccountInformationTab /> },
+      { path: "accountInformation", element: <CustomerAccountInformationTab /> },
+
+      { path: "orders", element: <CustomerOrderTab /> },
+
+      { path: "productReviews", element: <CustomerProductReviewsTab /> },
     ],
   },
   {

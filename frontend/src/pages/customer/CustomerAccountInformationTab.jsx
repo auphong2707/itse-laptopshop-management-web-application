@@ -5,7 +5,7 @@ import { useUser } from "../../utils/UserContext.jsx";
 
 const { Title } = Typography;
 
-const AccountInformation = () => {
+const CustomerAccountInformationTab = () => {
   const user = useUser();
 
   const [profile, setProfile] = useState(null);
@@ -39,7 +39,7 @@ const AccountInformation = () => {
   }, [user]);
 
   return (
-    <div style={{ paddingTop: "20px" }}>
+    <>
       <Title level={3}>Account Information</Title>
 
       {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
@@ -59,8 +59,8 @@ const AccountInformation = () => {
       ) : (
         <p>No account information found.</p>
       )}
-    </div>
+    </>
   );
 };
 
-export default AccountInformation;
+export default CustomerAccountInformationTab;
