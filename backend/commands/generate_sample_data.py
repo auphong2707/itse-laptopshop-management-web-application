@@ -381,7 +381,7 @@ def generate_reviews(
 ):
     global NUM_LAPTOPS
     laptop_ids = list(range(1, NUM_LAPTOPS + 1))
-    user_uid = [
+    user_uids = [
         "Hl5K4KJHHkh0T5MELTp14EVXI322",
         "WYMy1mRVw3MZBOkV1YQ96N4z1",
         "We7tZEsDhebqYLLZ7rkZa9w2sJf1",
@@ -397,12 +397,7 @@ def generate_reviews(
         "EJ9XXjOh0uaG1UcjqOyHZBA47ag1",
         "z8e10lgi66OzaiqX46zMuzECBcw2",
         "akaIGoL4sZhV1OT8Pif7LW7qSR83",
-        "mvXJtHXiJANM59NGhYwQu1qLZTL2",
-        "eJR28GJW0veRcJsImdq19peirvF2",
-        "vYfHP1TEYtMIkjnytIxLyz8gHcw2",
-        "pV9rbxNArrNJme7SuBg97ys9hiW2",
-        "sTU9Vn7lfGQt2Drr8D9S9jtnn072",
-        "UXXB26VXsZdin2QRTDvQtKW8HiI2",
+        "mvXJtHXiJANM59NdRTDvQtKW8HiI2",
         "PZ0nCpNSwYX8yLu8SpR35AdfOny1"
     ]
 
@@ -421,7 +416,7 @@ def generate_reviews(
     values = []
     for _ in range(num_reviews):
         laptop_id = random.choice(laptop_ids)
-        user_uid = random.choice(user_uid)
+        user_uid = random.choice(user_uids)
         rating = random.choice(ratings)
         review_text = random.choice(review_texts)
 
