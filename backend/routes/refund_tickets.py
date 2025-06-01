@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 
@@ -12,7 +12,7 @@ from schemas.refund_tickets import (
 from db.session import get_db
 from db.models import Order
 
-refund_tickets_router = APIRouter(prefix="/refund_tickets", tags=["refund_tickets"])
+refund_tickets_router = APIRouter(prefix="/refund-tickets", tags=["refund-tickets"])
 
 
 @refund_tickets_router.post("/", response_model=RefundTicketResponse)
@@ -79,7 +79,10 @@ async def get_refund_tickets(
     status: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
-    query = db.query(RefundTicket)
+    # Use options(joinedload) to eager load the Order relationship and its items
+    query = db.query(RefundTicket).options(
+        joinedload(RefundTicket.order).joinedload(Order.items)
+    ).join(Order, RefundTicket.order_id == Order.id)
 
     if email:
         query = query.filter(RefundTicket.email == email)

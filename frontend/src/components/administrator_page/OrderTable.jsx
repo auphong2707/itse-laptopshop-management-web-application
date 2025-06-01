@@ -1,29 +1,53 @@
-import { Table, Tag, Button, Popconfirm, message, Select } from 'antd';
+import { Table, Tag, Button, Popconfirm, message, Select, Modal } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useUser } from '../../utils/UserContext';
+import React, {useState} from 'react';
 
 const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessToken }) => {
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    console.log(`Updating order ${orderId} status to ${newStatus}`);
-    try {
-      await axios.patch(
-        `http://localhost:8000/orders/admin/${orderId}/status`, 
-        {
-          status: newStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+  const [selectedStatuses, setSelectedStatuses] = useState(() => {
+    const initial = {};
+    orders.forEach(order => {
+      initial[order.id] = order.status;
+    });
+    return initial;
+  });
+  
+
+  const handleStatusChange = (orderId, currentStatus, newStatus) => {
+    if (currentStatus === newStatus) return;
+
+    Modal.confirm({
+      title: `Do you want to change from "${currentStatus}" to "${newStatus}"?`,
+      okText: "Confirm",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await axios.patch(
+            `http://localhost:8000/orders/admin/${orderId}/status`,
+            { status: newStatus },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`
+              }
+            }
+          );
+          message.success("Status changed successfully");
+          setSelectedStatuses(prev => ({ ...prev, [orderId]: newStatus }));
+          onTableChange({ current: page, pageSize: limit }); // refresh table
+        } catch (error) {
+          message.error("Failed to update status");
+          // Revert to original value on error
+          setSelectedStatuses(prev => ({ ...prev, [orderId]: currentStatus }));
         }
-      );
-      message.success(`Order ${orderId} status updated to ${newStatus}`);
-      onTableChange({ current: page, pageSize: limit }); // refresh table
-    } catch (error) {
-      message.error('Failed to update status');
-    }
+      },
+      onCancel: () => {
+        // Revert select value to currentStatus on cancel
+        setSelectedStatuses(prev => ({ ...prev, [orderId]: currentStatus }));
+        message.info("Status change cancelled");
+      }
+    });
   };
 
   const columns = [
@@ -96,9 +120,11 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
       render: (_, record) => (
         <>
           <Select
-            defaultValue={record.status}
+            value={selectedStatuses[record.id]}  // Controlled value
             style={{ width: 120, marginRight: 8 }}
-            onChange={(value) => handleStatusChange(record.id, value)}
+            onChange={(value) =>
+              handleStatusChange(record.id, selectedStatuses[record.id], value)
+            }
           >
             {['pending', 'processing', 'shipping', 'delivered', 'cancelled', 'refunded'].map((status) => (
               <Select.Option key={status} value={status}>
@@ -109,6 +135,10 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
         </>
       ),
     }
+
+
+
+
     
   ];
 
