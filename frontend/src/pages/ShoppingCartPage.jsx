@@ -7,6 +7,7 @@ import {
   Layout,
   Breadcrumb,
   Divider,
+  notification,
 } from "antd";
 import { Link } from "react-router-dom";
 import { getAuth } from "firebase/auth";
@@ -32,7 +33,19 @@ const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const finalPrice = Math.round(50000 + totalPrice);
+  const shippingFee = cartItems.length > 0 ? 50000 : 0;
+  const finalPrice = Math.round(shippingFee + totalPrice);
+
+  const handlePlaceOrder = () => {
+    if (cartItems.length === 0) {
+      notification.error({
+        message: "Cannot place order",
+        description: "You must have at least one item in your cart to place an order.",
+      });
+    } else {
+      window.location.href = "/customer/place-order/";
+    }
+  };
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -136,14 +149,21 @@ const ShoppingCartPage = () => {
               <Title level={3} style={{ margin: "0px 0" }}>
                 Summary
               </Title>
-              <Divider style={{ marginTop: "15px", marginBottom: "20px" }} />
-              <Text strong>Subtotal</Text>
-              <Text style={{ float: "right" }}>{formatPrice(totalPrice)}</Text>
-              <br />
-              <Text strong>Shipping</Text>
-              <Text style={{ float: "right" }}>{formatPrice(50000)}</Text>
-              <br />
-              <br />
+              
+              {cartItems.length > 0 && (
+                <>
+                  <Divider style={{ marginTop: "15px", marginBottom: "20px" }} />
+                  <Text strong>Subtotal</Text>
+                  <Text style={{ float: "right" }}>{formatPrice(totalPrice)}</Text>
+                  <br />
+
+                  <Text strong>Shipping</Text>
+                  <Text style={{ float: "right" }}>{formatPrice(shippingFee)}</Text>
+                  <br />
+                  <br />
+                </>
+              )}
+
               <Divider style={{ marginBottom: "18px" }} />
               <Title level={3} style={{ marginTop: "12px" }}>
                 Order Total:{" "}
@@ -152,23 +172,22 @@ const ShoppingCartPage = () => {
                 </span>
               </Title>
 
-              <Link to="/customer/place-order/">
-                <Button
-                  type="primary"
-                  block
-                  size="large"
-                  style={{
-                    marginTop: "10px",
-                    fontWeight: "bold",
-                    fontSize: "16px",
-                    height: "50px",
-                    borderRadius: "9999px",
-                    backgroundColor: "#1890ff",
-                  }}
-                >
-                  Place Order
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                block
+                size="large"
+                style={{
+                  marginTop: "10px",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  height: "50px",
+                  borderRadius: "9999px",
+                  backgroundColor: "#1890ff",
+                }}
+                onClick={handlePlaceOrder}
+              >
+                Place Order
+              </Button>
 
             </div>
           </Col>
