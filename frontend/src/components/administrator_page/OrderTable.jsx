@@ -38,7 +38,7 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
       dataIndex: 'user_name',
       key: 'user_name',
       render: (_, record) =>
-        `${record.first_name} ${record.last_name} (${record.user_name})`,
+        `${record.first_name} ${record.last_name}`,
     },
     {
       title: 'Email',
