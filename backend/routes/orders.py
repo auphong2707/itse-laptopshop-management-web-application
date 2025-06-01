@@ -127,6 +127,10 @@ def create_order_from_cart(
             )
             laptops_to_update[product_id] = requested_quantity
 
+        # Add shipping cost
+        shipping_cost = 50000  # 50,000 shipping cost
+        order_total_price += shipping_cost
+
         # --- Database Transaction: Create Order, Items, Update Stock ---
         try:
             new_order = Order(
