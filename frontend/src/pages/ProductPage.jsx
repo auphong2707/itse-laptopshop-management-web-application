@@ -246,22 +246,20 @@ const ProductPage = () => {
       return;
     }
 
-    const reviewName = await user.displayName;
-    const reviewEmail = await user.email;
-
     const review = {
-      user_name: reviewName,
-      email: reviewEmail,
       rating: rating,
       review_text: reviewText,
       laptop_id: parseInt(id),
     };
 
     try {
+      const token = user.accessToken;
+
       const res = await fetch("http://localhost:8000/reviews/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(review),
       });
