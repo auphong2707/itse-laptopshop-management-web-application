@@ -34,7 +34,7 @@ async def create_review(review: ReviewCreate, db: Session = Depends(get_db), use
 
     return new_review
 
-@reviews_router.get("/user", response_model=list[ReviewCreate])
+@reviews_router.get("/user", response_model=list[ReviewResponse])
 async def get_reviews_by_user(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
