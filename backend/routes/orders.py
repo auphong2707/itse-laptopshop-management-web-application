@@ -15,7 +15,7 @@ from schemas.orders import (
 )
 from datetime import datetime
 
-from routes.cart import get_current_user_id
+from services.firebase_auth import get_current_user_id
 
 from services.redis_config import redis_client
 

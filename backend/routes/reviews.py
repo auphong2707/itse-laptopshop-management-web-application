@@ -6,7 +6,8 @@ from datetime import datetime
 from elasticsearch import Elasticsearch
 
 from db.models import Review, Laptop
-from schemas.reviews import ReviewCreate  # adjust import if necessary
+from schemas.reviews import ReviewCreate
+from services.firebase_auth import get_current_user_id
 from db.session import get_db
 
 reviews_router = APIRouter(prefix="/reviews", tags=["reviews"])
@@ -14,7 +15,7 @@ es = Elasticsearch("http://elasticsearch:9200")
 
 
 @reviews_router.post("/", response_model=ReviewCreate)
-async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
+async def create_review(review: ReviewCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
     # Check if the laptop with the provided laptop_id exists
     laptop = db.query(Laptop).filter(Laptop.id == review.laptop_id).first()
 
@@ -22,9 +23,8 @@ async def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Laptop not found")
 
     new_review = Review(
+        user_id=user_id,
         laptop_id=review.laptop_id,
-        user_name=review.user_name,
-        email=review.email,
         rating=review.rating,
         review_text=review.review_text,
         created_at=datetime.utcnow().isoformat(),

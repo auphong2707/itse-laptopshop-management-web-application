@@ -3,7 +3,6 @@ from typing import Optional
 
 
 class ReviewCreate(BaseModel):
-    user_id: str  # Firebase UID
     laptop_id: int
     rating: int  # Rating should be between 1 and 5
     review_text: Optional[str] = None
