@@ -184,12 +184,6 @@ const MyOrder = () => {
     });
   };
 
-  const handleCancelOrder = (orderId) => {
-    console.log("Cancel requested for order ID:", orderId);
-    // TODO: Call API or show confirmation for canceling order
-    // Example: message.success(`Order ${orderId} has been canceled`);
-  };
-
   useEffect(() => {
     if (user) {
       fetchOrders(ordersData.page, ordersData.limit);
@@ -200,41 +194,60 @@ const MyOrder = () => {
 
   const columns = [
     {
-      title: "Order ID",
-      dataIndex: "id",
-      key: "id",
+      title: 'Order ID',
+      dataIndex: 'id',
+      key: 'id',
+      fixed: 'left',
     },
     {
-      title: "Total Price",
-      dataIndex: "total_price",
-      key: "total_price",
-      render: (price) => <Text>{formatPrice(price)}</Text>,
-      align: "center",
+      title: 'User Name',
+      dataIndex: 'user_name',
+      key: 'user_name',
+      render: (_, record) =>
+        `${record.first_name} ${record.last_name}`,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const statusColors = {
-          pending: 'gold',
-          processing: 'blue',
-          shipping: 'cyan',
-          delivered: 'green',
-          cancelled: 'red',
-          refunded: 'volcano',
+      title: 'Email',
+      dataIndex: 'user_email',
+      key: 'user_email',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone_number',
+      key: 'phone_number',
+    },
+    {
+      title: 'Shipping Address',
+      dataIndex: 'shipping_address',
+      key: 'shipping_address',
+    },
+    {
+      title: 'Payment Method',
+      dataIndex: 'payment_method',
+      key: 'payment_method',
+      align: 'center',
+      render: (method) => {
+        const methodLabels = {
+          'e-banking': 'E-Banking',
+          'delivery': 'Cash on Delivery',
         };
-    
-        return <Tag color={statusColors[status] || 'default'}>{status}</Tag>;
+        const methodColors = {
+          'e-banking': 'green',
+          'delivery': 'blue',
+        };
+        return <Tag color={methodColors[method] || 'default'}>{methodLabels[method] || method}</Tag>;
       },
-      align: "center"
     },
     {
-      title: "Created At",
-      dataIndex: "created_at",
-      key: "created_at",
+      title: 'Total Price',
+      dataIndex: 'total_price',
+      key: 'total_price',
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+      key: 'created_at',
       render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
-      align: "center",
     },
     {
       title: "Action",
@@ -250,16 +263,10 @@ const MyOrder = () => {
           >
             Refund
           </Button>
-          <Button 
-            danger 
-            onClick={() => handleCancelOrder(record.id)}
-            disabled={record.status !== 'pending' && record.status !== 'processing'}
-          >
-            Cancel
-          </Button>
         </>
       ),
     },
+    
   ];
 
   const expandedRowRender = (order) => {

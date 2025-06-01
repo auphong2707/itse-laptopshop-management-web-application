@@ -93,3 +93,28 @@ def delete_account(uid: str):
 def login_user(user_data=Depends(verify_firebase_token)):
     # user_data contains info like uid, email, etc.
     return {"message": "Login successful", "user": user_data}
+
+@accounts_router.get("/profile")
+def get_account_profile(user_data=Depends(verify_firebase_token)):
+    """
+    Get the complete profile information for the authenticated user.
+    
+    This endpoint requires authentication. Include the Authorization header with
+    a valid Firebase token in the format: 'Authorization: Bearer your-firebase-token'
+    """
+    try:
+        # Get user data from Firestore using the UID from the token
+        user_doc = firestore.client().collection("users").document(user_data["uid"]).get()
+        
+        if not user_doc.exists:
+            raise HTTPException(status_code=404, detail="User profile not found")
+        
+        # Get the user profile data
+        user_profile = user_doc.to_dict()
+        
+        # Add the uid to the profile data
+        user_profile["uid"] = user_data["uid"]
+        
+        return user_profile
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

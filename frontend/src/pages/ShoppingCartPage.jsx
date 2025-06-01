@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { QRPay, BanksObject } from 'vietnam-qr-pay';
-import QRCode from "react-qr-code";
 import {
   Row,
   Col,
@@ -9,10 +7,9 @@ import {
   Layout,
   Breadcrumb,
   Divider,
-  Modal,
+  notification,
 } from "antd";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { Link, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -20,27 +17,9 @@ import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
 import ShoppingItemsTable from "../components/shopping_cart_page/ShoppingItemsTable";
 
-const PayOnlineButton = styled(Button)`
-  background-color: #ff3b30;
-  color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  height: 50px;
-  border-radius: 9999px;
-  border: none;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #0053b3;
-    color: #fff;
-    cursor: pointer;
-  }
-`;
-
 const { Content } = Layout;
 const { Text, Title } = Typography;
 
-//Hàm format tiền
 const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
@@ -50,28 +29,26 @@ const contentStyle = {
   padding: "2rem",
 };
 
-
 const ShoppingCartPage = () => {
+  const navigate = useNavigate();
+
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const [qrModalVisible, setQrModalVisible] = useState(false);
-  const [qrUrl, setQrUrl] = useState("");
+  const shippingFee = cartItems.length > 0 ? 50000 : 0;
+  const finalPrice = Math.round(shippingFee + totalPrice);
 
-  const finalPrice = 50000 + 1.15 * totalPrice;
-
-  const handlePay = () => {
-    const momoPay = QRPay.initVietQR({
-      bankBin: BanksObject.tpbank.bin,
-      bankNumber: "07537430201",
-      amount: finalPrice.toString(),
-    });
-    
-    const content = momoPay.build();
-    console.log("MoMo QR Content:", content);
-    setQrUrl(content);
-    setQrModalVisible(true);
+  const handlePlaceOrder = () => {
+    if (cartItems.length === 0) {
+      notification.error({
+        message: "Cannot place order",
+        description: "You must have at least one item in your cart to place an order.",
+      });
+    } else {
+      navigate("/customer/place-order/", { state: { cartItems } });
+    }
   };
+
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -175,27 +152,21 @@ const ShoppingCartPage = () => {
               <Title level={3} style={{ margin: "0px 0" }}>
                 Summary
               </Title>
-              <Divider style={{ marginTop: "15px", marginBottom: "20px" }} />
-              <Text strong>Subtotal</Text>
-              <Text style={{ float: "right" }}>{formatPrice(totalPrice)}</Text>
-              <br />
-              <Text strong>Shipping</Text>
-              <Text style={{ float: "right" }}>{formatPrice(50000)}</Text>
-              <br />
-              <Text type="secondary" style={{ fontSize: "12px" }}>
-                (Standard Rate - Price may vary depending on the
-                item/destination. TECS Staff will contact you.)
-              </Text>
-              <br />
-              <Text strong>Tax</Text>
-              <Text style={{ float: "right" }}>
-                {formatPrice(0.05 * totalPrice)}
-              </Text>
-              <br />
-              <Text strong>GST (10%)</Text>
-              <Text style={{ float: "right" }}>
-                {formatPrice(0.1 * totalPrice)}
-              </Text>
+              
+              {cartItems.length > 0 && (
+                <>
+                  <Divider style={{ marginTop: "15px", marginBottom: "20px" }} />
+                  <Text strong>Subtotal</Text>
+                  <Text style={{ float: "right" }}>{formatPrice(totalPrice)}</Text>
+                  <br />
+
+                  <Text strong>Shipping</Text>
+                  <Text style={{ float: "right" }}>{formatPrice(shippingFee)}</Text>
+                  <br />
+                  <br />
+                </>
+              )}
+
               <Divider style={{ marginBottom: "18px" }} />
               <Title level={3} style={{ marginTop: "12px" }}>
                 Order Total:{" "}
@@ -203,6 +174,7 @@ const ShoppingCartPage = () => {
                   {formatPrice(finalPrice)}
                 </span>
               </Title>
+
               <Button
                 type="primary"
                 block
@@ -213,33 +185,12 @@ const ShoppingCartPage = () => {
                   fontSize: "16px",
                   height: "50px",
                   borderRadius: "9999px",
+                  backgroundColor: "#1890ff",
                 }}
+                onClick={handlePlaceOrder}
               >
-                Pay on Delivery
+                Place Order
               </Button>
-
-              <PayOnlineButton block size="large" style={{ marginTop: "10px" }} onClick={handlePay}
-              >
-                Pay with E-Banking
-              </PayOnlineButton>
-
-              <Modal
-                title="Scan to Pay"
-                open={qrModalVisible}
-                onCancel={() => setQrModalVisible(false)}
-                footer={null}
-                centered
-              >
-                {qrUrl ? (
-                  <div style={{ textAlign: 'center' }}>
-                    <QRCode value={qrUrl} size={220} />
-                    <p style={{ marginTop: '10px' }}>Use any app to scan and pay</p>
-                  </div>
-                ) : (
-                  <p>Generating QR code...</p>
-                )}
-              </Modal>
-
 
             </div>
           </Col>

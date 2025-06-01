@@ -619,7 +619,6 @@ def generate_orders(
         "Ngo",
     ]
     domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com"]
-    countries = ["VN", "US", "SG", "KR", "JP"]
     statuses = [
         "pending",
         "processing",
@@ -627,6 +626,10 @@ def generate_orders(
         "delivered",
         "cancelled",
         "refunded",
+    ]
+    payment_methods = [
+        "delivery",
+        "e-banking"
     ]
 
     def generate_fake_uid(length=28):
@@ -647,15 +650,9 @@ def generate_orders(
                 "user_id": generate_fake_uid(),
                 "first_name": first,
                 "last_name": last,
-                "user_name": f"{first} {last}",
                 "user_email": email,
                 "shipping_address": f"{random.randint(1, 100)} {random.choice(['Main St', 'High St', 'Elm St'])}, {random.choice(['Hanoi', 'HCMC', 'Danang'])}",
-                "phone_number": f"+84{random.randint(900000000, 999999999)}",
-                "company": random.choice(
-                    [None, "TechCorp", "Innovate Ltd", "Sample Co"]
-                ),
-                "country": random.choice(countries),
-                "zip_code": str(random.randint(10000, 99999)),
+                "phone_number": f"+84{random.randint(900000000, 999999999)}"
             }
         )
 
@@ -694,6 +691,7 @@ def generate_orders(
         num_items = random.randint(1, max_items_per_order)
         order_total_price = Decimal("0.00")
         order_status = random.choice(statuses)
+        payment_method = random.choice(payment_methods)
         days_ago = random.randint(1, 365)
         created_at_dt = datetime.now() - timedelta(days=days_ago)
         current_order_items = []
@@ -719,13 +717,10 @@ def generate_orders(
             format_sql_local(user_data["user_id"]),
             format_sql_local(user_data["first_name"]),
             format_sql_local(user_data["last_name"]),
-            format_sql_local(user_data["user_name"]),
             format_sql_local(user_data["user_email"]),
             format_sql_local(user_data["shipping_address"]),
             format_sql_local(user_data["phone_number"]),
-            format_sql_local(user_data["company"]),
-            format_sql_local(user_data["country"]),
-            format_sql_local(user_data["zip_code"]),
+            format_sql_local(payment_method),
             format_sql_local(order_total_price),
             format_sql_local(order_status),
             format_sql_local(created_at_dt),
@@ -748,7 +743,7 @@ def generate_orders(
     with open(sql_output_path, "a") as sql_file:
         sql_file.write("\n-- Sample Order Data --\n")
         if order_inserts:
-            order_cols = "(user_id, first_name, last_name, user_name, user_email, shipping_address, phone_number, company, country, zip_code, total_price, status, created_at, updated_at)"
+            order_cols = "(user_id, first_name, last_name, user_email, shipping_address, phone_number, payment_method, total_price, status, created_at, updated_at)"
             chunk_size = 100
             for i in range(0, len(order_inserts), chunk_size):
                 chunk = order_inserts[i : i + chunk_size]

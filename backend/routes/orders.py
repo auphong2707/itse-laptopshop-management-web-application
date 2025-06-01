@@ -45,8 +45,18 @@ async def require_admin_role(user_id: str = Depends(get_current_user_id)):
     return user_id
 
 
+class CreateOrderRequest(BaseModel):
+    first_name: str
+    last_name: str
+    user_email: str
+    shipping_address: str
+    phone_number: str
+    payment_method: str
+
+
 @orders_router.post("")
 def create_order_from_cart(
+    order_data: CreateOrderRequest,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
@@ -59,20 +69,7 @@ def create_order_from_cart(
     if not cart_items_raw:
         raise HTTPException(status_code=400, detail="Cart is empty.")
 
-    # --- 1. Fetch User Profile from Firestore ---
-    user_profile_data = {}
-    if db_firestore:
-        try:
-            user_profile_ref = db_firestore.collection("users").document(user_id)
-            user_profile_doc = user_profile_ref.get()
-            if user_profile_doc.exists:
-                user_profile_data = user_profile_doc.to_dict()
-            else:
-                print(f"User profile not found in Firestore for UID: {user_id}")
-        except Exception as e:
-            print(f"Error fetching user profile from Firestore: {e}")
-
-    # --- 2. Process Cart Items & Validate Stock (keep as before) ---
+    # --- Process Cart Items & Validate Stock ---
     order_total_price = 0
     items_to_create = []
     laptops_to_update = {}
@@ -130,32 +127,25 @@ def create_order_from_cart(
             )
             laptops_to_update[product_id] = requested_quantity
 
-        # --- 3. Database Transaction: Create Order, Items, Update Stock ---
-        try:
-            f_name = user_profile_data.get("first_name")
-            l_name = user_profile_data.get("last_name")
-            constructed_user_name = (
-                f"{f_name} {l_name}".strip() if f_name or l_name else None
-            )
+        # Add shipping cost
+        shipping_cost = 50000  # 50,000 shipping cost
+        order_total_price += shipping_cost
 
+        # --- Database Transaction: Create Order, Items, Update Stock ---
+        try:
             new_order = Order(
                 user_id=user_id,
                 total_price=order_total_price,
                 status="pending",
-                first_name=f_name,
-                last_name=l_name,
-                user_name=constructed_user_name,
-                user_email=user_profile_data.get("email"),
-                shipping_address=user_profile_data.get("address"),
-                phone_number=user_profile_data.get("phone_number"),
-                company=user_profile_data.get("company"),
-                country=user_profile_data.get("country"),
-                zip_code=user_profile_data.get("zip_code"),
+                first_name=order_data.first_name,
+                last_name=order_data.last_name,
+                user_email=order_data.user_email,
+                shipping_address=order_data.shipping_address,
+                phone_number=order_data.phone_number,
+                payment_method=order_data.payment_method,
             )
             db.add(new_order)
-            # It's generally better to flush AFTER adding dependent items
-            # if you need the order ID for them immediately, but here we add order first.
-            db.flush()  # Flush maybe needed here if you need the ID *before* commit
+            db.flush()
 
             order_items_obj_list = []
             for item_data in items_to_create:
@@ -197,7 +187,7 @@ def create_order_from_cart(
 
             raise HTTPException(status_code=500, detail=detail_msg)
 
-        # --- 4. Clear Redis Cart ---
+        # --- Clear Redis Cart ---
         try:
             redis_client.delete(cart_key)
         except Exception as e:
@@ -205,7 +195,7 @@ def create_order_from_cart(
                 f"Warning: Failed to clear Redis cart '{cart_key}' for order {new_order.id}: {e}"
             )
 
-        # --- 5. Return Response ---
+        # --- Return Response ---
         db.refresh(new_order)
 
         for item in new_order.items:
