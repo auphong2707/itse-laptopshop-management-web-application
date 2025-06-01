@@ -65,21 +65,6 @@ const OrderTable = ({ orders, page, limit, total_count, onTableChange, accessTok
       key: 'phone_number',
     },
     {
-      title: 'Company',
-      dataIndex: 'company',
-      key: 'company',
-    },
-    {
-      title: 'Country',
-      dataIndex: 'country',
-      key: 'country',
-    },
-    {
-      title: 'Zip Code',
-      dataIndex: 'zip_code',
-      key: 'zip_code',
-    },
-    {
       title: 'Shipping Address',
       dataIndex: 'shipping_address',
       key: 'shipping_address',
