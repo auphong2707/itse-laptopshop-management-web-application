@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { QRPay, BanksObject } from 'vietnam-qr-pay';
 import QRCode from "react-qr-code";
 import { Button, Form, Layout, Modal, notification, Typography, Table, Spin, Input, Divider } from "antd";
@@ -39,6 +40,8 @@ const showPaymentSuccess = () => {
 };
 
 const PlaceOrderPage = () => {
+  const location = useLocation();
+
   const [cartOrder, setCartOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -173,7 +176,14 @@ const PlaceOrderPage = () => {
     setConfirmEbankingPayment(true);
   };
 
-  useEffect(() => { fetchCartOrder(); }, []);
+  useEffect(() => {
+    if (location.state?.cartOrder) {
+      setCartOrder(location.state.cartOrder);
+      setLoading(false);
+    } else {
+      fetchCartOrder();
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchProfile = async () => {

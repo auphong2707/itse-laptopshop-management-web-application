@@ -9,7 +9,7 @@ import {
   Divider,
   notification,
 } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
 
@@ -30,6 +30,8 @@ const contentStyle = {
 };
 
 const ShoppingCartPage = () => {
+  const navigate = useNavigate();
+
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -43,9 +45,10 @@ const ShoppingCartPage = () => {
         description: "You must have at least one item in your cart to place an order.",
       });
     } else {
-      window.location.href = "/customer/place-order/";
+      navigate("/customer/place-order/", { state: { cartItems } });
     }
   };
+
 
   useEffect(() => {
     const fetchCart = async () => {
