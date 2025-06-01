@@ -40,9 +40,8 @@ CREATE TABLE IF NOT EXISTS laptops (
 
 CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL, -- Firebase UID
     laptop_id INTEGER NOT NULL,
-    user_name TEXT,
-    email TEXT,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
