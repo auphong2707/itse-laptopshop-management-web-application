@@ -229,25 +229,6 @@ const WebsiteHeader = () => {
             <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Ultrabook">
               Ultrabooks
             </Typography.Link>
-            <Typography.Link
-              strong
-              style={{
-                color: "rgba(1, 86, 255, 1)",
-                border: "2px solid rgba(1, 86, 255, 1)",
-                padding: "5px 18px",
-                borderRadius: "20px",
-              }}
-              onMouseEnter={(e) => {
-                (e.target.style.backgroundColor = "rgba(1, 86, 255, 1)"),
-                  (e.target.style.color = "white");
-              }}
-              onMouseLeave={(e) => {
-                (e.target.style.backgroundColor = "white"),
-                  (e.target.style.color = "rgba(1, 86, 255, 1)");
-              }}
-            >
-              Our Deals
-            </Typography.Link>
           </Flex>
         </Flex>
 
