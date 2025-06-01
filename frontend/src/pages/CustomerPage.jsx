@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { Layout, Typography, Breadcrumb, Tabs, Row, Col } from "antd";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
+import { Layout, Typography, Breadcrumb } from "antd";
+import { Link, useParams } from "react-router-dom";
 
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
@@ -10,11 +9,8 @@ import MyOrder from "../components/customer_page/MyOrder";
 const { Content } = Layout;
 const { Text } = Typography;
 
-const StyledTabs = styled(Tabs)` /* ... */ `;
-
 const CustomerPage = () => {
   const { section } = useParams();
-  const navigate = useNavigate();
 
   const tabs = useMemo(
     () => [
@@ -45,10 +41,6 @@ const CustomerPage = () => {
   const activeKey =
     tabs.find((t) => t.key === section)?.key || "accountInformation";
 
-  const handleTabChange = (key) => {
-    navigate(`/customer/${key}`);
-  };
-
   return (
     <Layout>
       <WebsiteHeader />
@@ -61,15 +53,6 @@ const CustomerPage = () => {
             <Link to="/customer">Customer Dashboard</Link>
           </Breadcrumb.Item>
         </Breadcrumb>
-
-        <StyledTabs
-          activeKey={activeKey}
-          onChange={handleTabChange}
-        >
-          {tabs.map((tab) => (
-            <Tabs.TabPane tab={tab.label} key={tab.key} />
-          ))}
-        </StyledTabs>
 
           {tabs.find((t) => t.key === activeKey)?.content}
       </Content>
