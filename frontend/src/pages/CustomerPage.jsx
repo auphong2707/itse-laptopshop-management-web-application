@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
+import AccountInformation from "../components/customer_page/AccountInformation";
 import MyOrder from "../components/customer_page/MyOrder";
 
 const { Content } = Layout;
@@ -17,7 +18,7 @@ const CustomerPage = () => {
       {
         key: "accountInformation",
         label: "Account Information",
-        content: <Text>Manage your account details here.</Text>,
+        content: <AccountInformation />,
       },
       {
         key: "orders",
