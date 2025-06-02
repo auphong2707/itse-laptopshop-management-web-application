@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import "swiper/css";
@@ -12,15 +10,20 @@ import {
   Button,
   Select,
   notification,
+  message,
+  Upload,
+  Image
 } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { Divider } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
 
 const transformFormData = (values) => {
   return {
     brand: values.brand || "",
     sub_brand: values.sub_brand || "",
     name: values.name || "",
+    description: values.description || "",
+    usage_type: values.usage_type || "general",
     cpu: values.cpu || "",
     vga: values.vga || "",
     ram_amount: values.ram_amount ? parseInt(values.ram_amount, 10) : 0,
@@ -65,7 +68,7 @@ const transformFormData = (values) => {
     number_audio_jacks: values.number_audio_jacks
       ? parseInt(values.number_audio_jacks, 10)
       : 0,
-    product_image_mini: values.product_image_mini || "",
+    product_image_mini: values.pictures.map((file) => file.filepath || file.response.filepath),
     quantity: values.quantity ? parseInt(values.quantity, 10) : 0,
     original_price: values.original_price
       ? parseInt(values.original_price, 10)
@@ -74,115 +77,123 @@ const transformFormData = (values) => {
   };
 };
 
+const getBase64 = (file) =>
+  new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => res(reader.result);
+    reader.onerror = rej;
+  });
+
+const sectionTitleStyle = {
+  fontSize: "20px",
+  fontWeight: "bold",
+  marginTop: "2rem",
+};
+
+const CustomDivider = ({ label }) => (
+  <>
+    <h3 style={sectionTitleStyle}>{label}</h3>
+    <div style={{ width: "100%" }}>
+      <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
+    </div>
+  </>
+);
+
+CustomDivider.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+
 const AdminProductDetailTab = () => {
   const navigate = useNavigate();
-
-  const sectionTitleStyle = {
-    fontSize: "20px",
-    fontWeight: "bold",
-    marginTop: "2rem",
-  };
-
-  const CustomDivider = ({ label }) => (
-    <>
-      <h3 style={sectionTitleStyle}>{label}</h3>
-      <div style={{ width: "100%" }}>
-        <Divider style={{ margin: "8px 0 24px 0", borderTopWidth: "2px" }} />
-      </div>
-    </>
-  );
-
-  CustomDivider.propTypes = {
-    label: PropTypes.string.isRequired,
-  };
-
   const [form] = Form.useForm();
   const { id } = useParams();
-  const [_, setProductData] = useState({});
-  const [pictures, setPictures] = useState([]);
+
+  const [sessionId, _] = useState(`session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
+
+  console.log("Session ID:", sessionId);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+
+  const MAX_FILES = 8;
+  const beforeUpload = (file, fileList) => {
+    const okType = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+    if (!okType) message.error("Chỉ nhận JPG/PNG/WebP!");
+    const okSize = file.size / 1024 / 1024 < 2;
+    if (!okSize) message.error("Ảnh phải < 2 MB!");
+    const current = (form.getFieldValue("pictures") || []).length;
+    if (current + fileList.length > MAX_FILES) {
+      message.error(`Tối đa ${MAX_FILES} ảnh!`);
+      return Upload.LIST_IGNORE;
+    }
+    return okType && okSize;
+  };
+
+  const normFile = (e) => (Array.isArray(e) ? e : e?.fileList);
+
+  const pictures = Form.useWatch('pictures', form) || [];
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get(`http://localhost:8000/laptops/id/${id}`)
-        .then((response) => {
-          setProductData(response.data);
-          form.setFieldsValue(response.data);
-
-          // Extract and parse product images
-          let images = [];
-          if (response.data.product_image_mini) {
-            try {
-              images = JSON.parse(response.data.product_image_mini || "[]").map(
-                (url) => `http://localhost:8000${url}`,
-              );
-              console.log("Parsed images:", images);
-            } catch (error) {
-              console.error("Error parsing product images:", error);
-              images = [];
-            }
-          }
-          setPictures(images);
-        })
-        .catch(() => {
-          setProductData({});
-          form.resetFields();
-          setPictures([]); // Clear pictures on error
-        });
-    } else {
+    if (!id) {
       form.resetFields();
-      setPictures([]); // Clear pictures when no ID
+      return;
     }
+
+    axios
+      .get(`http://localhost:8000/laptops/id/${id}`)
+      .then(({ data }) => {
+        form.setFieldsValue(data);
+
+        if (data.product_image_mini) {
+          try {
+            const urls = JSON.parse(data.product_image_mini);
+            const list = urls.map((u, i) => ({
+              uid: `old-${i}`,
+              name: `img_${i}.jpg`,
+              status: 'done',
+              url: `http://localhost:8000${u}`,
+              filepath: u,
+            }));
+            form.setFieldValue('pictures', list);
+          } catch (e) {
+            console.error('Parse image error', e);
+          }
+        }
+      })
+      .catch(() => form.resetFields());
   }, [id]);
 
-  const handleAddPicture = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const newPicture = URL.createObjectURL(file);
-      setPictures((prev) => [...prev, newPicture]);
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
     }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
   };
 
-  const handleDeletePicture = (indexToDelete) => {
-    setPictures((prevPictures) =>
-      prevPictures.filter((_, index) => index !== indexToDelete),
-    );
-  };
+  const handleSubmit = async () => {
+    const raw = form.getFieldsValue();
 
-  const handleSubmit = async (form) => {
-    const formData = form.getFieldsValue();
+    const payload = {
+      ...transformFormData(raw)
+    };
 
     try {
+      console.log("Submitting payload:", payload);
       if (id) {
-        // Update existing laptop
-        await axios.put(`http://localhost:8000/laptops/${id}`, formData);
-        notification.success({
-          message: "Update Success",
-          description: "Laptop details updated successfully. Please wait for at most 2 minutes for the changes to take effect.",
-        });
-        console.log("Update Success");
-        navigate(`/admin/inventory/all`);
+        await axios.put(`http://localhost:8000/laptops/${id}`, payload);
+        notification.success({ message: 'Update sucessfully!' });
       } else {
-        const transformedData = transformFormData(formData);
-        console.log(
-          "Transformed Data:",
-          JSON.stringify(transformedData, null, 2),
-        );
-        // Insert new laptop
-        await axios.post("http://localhost:8000/laptops/", transformedData);
-        notification.success({
-          message: "Insert Success",
-          description: "Laptop added successfully. Please wait for at most 2 minutes for the changes to take effect.",
-        });
-        console.log("Insert Success");
-        navigate(`/admin/inventory/all`);
+        await axios.post('http://localhost:8000/laptops/', payload);
+        notification.success({ message: 'Insert successfully!' });
         form.resetFields();
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+      navigate('/admin/inventory/all');
+    } catch (err) {
       notification.error({
-        message: "Error",
-        description: error.response?.data?.detail || "An error occurred while submitting the form.",
+        message: 'Error',
+        description: err.response?.data || 'Something went wrong!',
       });
     }
   };
@@ -492,115 +503,77 @@ const AdminProductDetailTab = () => {
           rules={[{ required: true, message: "Quantity is required" }]}
           name="quantity"
         >
-          <InputNumber defaultValue={0} />
+          <InputNumber defaultValue={0} style={{ width: 300}} />
         </Form.Item>
         <Form.Item
           label={<span style={{fontWeight: "bold"}}>Original Price</span>}
           rules={[{ required: true, message: "Original Price is required" }]}
           name="original_price"
         >
-          <InputNumber suffix="đ" />
+          <InputNumber suffix="đ" style={{ width: 300}} />
         </Form.Item>
         <Form.Item
           label={<span style={{fontWeight: "bold"}}>Sale Price</span>}
           rules={[{ required: true, message: "Sale Price is required" }]}
           name="sale_price"
         >
-          <InputNumber suffix="đ" />
+          <InputNumber suffix="đ" style={{ width: 300}} />
         </Form.Item>
 
-        {/* Images */}
-        <CustomDivider label="Images" />
-        <Form.Item name="pictures" style={{ width: "100%", border: "2px dashed #aaa", borderRadius: "8px", padding: "2rem" }}>
-          <div className="fjahasfkhkask" style={{  }}>
-            <Swiper
-              modules={[Navigation]}
-              navigation
-              spaceBetween={40}
-              slidesPerView={1}
-              style={{ width: "100%", height: "400px", padding: "1rem" }}
-            >
-              {pictures.map((picture, index) => (
-                <SwiperSlide
-                  key={index}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative",
-                  }}
-                >
-                  <img
-                    src={picture}
-                    alt={`Picture ${index + 1}`}
-                    style={{ width: "600px", height: "400px" }}
-                  />
-                  <button
-                    onClick={() => handleDeletePicture(index)}
-                    style={{
-                      position: "absolute",
-                      top: "-12px",
-                      right: "10px",
-                      background: "#b0b0b0",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      color: "red",
-                      borderRadius: "50%",
-                      width: "22px",
-                      height: "24px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      transition: "background 0.3s ease",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.background = "#8a8a8a")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.background = "#b0b0b0")
-                    }
-                  >
-                    <CloseOutlined />
-                  </button>
-                </SwiperSlide>
-              ))}
-              {/* Add Picture Button */}
-              <SwiperSlide
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <label
-                  style={{
-                    cursor: "pointer",
-                    padding: "20px",
-                    border: "2px dashed #aaa",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Add picture
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={handleAddPicture}
-                  />
-                </label>
-              </SwiperSlide>
-            </Swiper>
-          </div>
+        {/* Pictures */}
+        <CustomDivider label="Pictures" />
+        <Form.Item
+          name="pictures"
+          label={<span style={{fontWeight: "bold"}}>Images</span>}
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[{ required: true, message: 'Please select at least 1 image!' }]}
+        >
+          <Upload
+            listType="picture-card"
+            accept="image/*"
+            multiple
+            beforeUpload={beforeUpload}
+            fileList={pictures}
+            onChange={({ fileList }) =>
+              form.setFieldValue('pictures', fileList)
+            }
+            onPreview={handlePreview}
+            action={`http://localhost:8000/laptops/upload-temp/${sessionId}/${sessionId}${pictures.length + 1}.jpg`}
+          >
+            {pictures.length >= MAX_FILES ? null : (
+              <button type="button" style={{ border: 0, background: 'none' }}>
+                <PlusOutlined />
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </button>
+            )}
+          </Upload>
         </Form.Item>
+
+        {/* PREVIEW MODAL */}
+        {previewImage && (
+          <Image
+            wrapperStyle={{ display: 'none' }}
+            src={previewImage}
+            preview={{
+              visible: previewOpen,
+              onVisibleChange: setPreviewOpen,
+              afterOpenChange: (v) => !v && setPreviewImage(''),
+            }}
+          />
+        )}
 
         <br></br>
         <br></br>
 
         {/* Submit button */}
-        <Form.Item style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" onClick={() => handleSubmit(form)} style={{ width: "500px", height: "50px" }}>
-            <span style={{ fontWeight: "bold", fontSize: "16px" }}>
+        <Form.Item style={{ textAlign: "center" }}>
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            style={{ width: 500, height: 50 }}
+          >
+            <span style={{ fontWeight: "bold", fontSize: 16 }}>
               {id ? "Update Laptop" : "Add Laptop"}
             </span>
           </Button>

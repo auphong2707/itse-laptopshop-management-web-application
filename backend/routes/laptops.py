@@ -11,14 +11,63 @@ from schemas.laptops import LaptopCreate, LaptopUpdate
 from db.session import get_db
 from fastapi import UploadFile, File
 from PIL import Image, ImageDraw, ImageFont
+from typing import List
+import time
 
 
 laptops_router = APIRouter(prefix="/laptops", tags=["laptops"])
 es = Elasticsearch("http://elasticsearch:9200")
 
+@laptops_router.post("/upload-temp/{folder_name}/{filename}")
+async def upload_temp_file(file: UploadFile = File(...), folder_name: str = "temp", filename: str = "temp_file"):
+    """
+    Upload a file to a temporary folder and return the file path.
+    
+    Args:
+        file: The uploaded file
+        folder_name: The name of the folder within the temp directory
+        filename: The name of the file to be saved
+
+    Returns:
+        JSON response with the temporary file path
+    """
+    try:
+        # Create temp directory if it doesn't exist
+        os.makedirs(f"static/temp/{folder_name}", exist_ok=True)
+
+        # Generate a unique filename using timestamp and original filename
+        filepath = os.path.join("static/temp", folder_name, filename)
+
+        # Save the file using async operations
+        content = await file.read()
+        with open(filepath, "wb") as buffer:
+            buffer.write(content)
+        
+        # Return the file path as a URL
+        relative_path = f"/static/temp/{folder_name}/{filename}"
+
+        return {
+            "filename": filename,
+            "filepath": relative_path
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
 
 @laptops_router.post("/")
 def insert_laptop(laptop: LaptopCreate, db: Session = Depends(get_db)):
+    for i, filepath in enumerate(laptop.product_image_mini):
+        # Move the image to the static folder
+        if not filepath.startswith("/static/laptop_images/"):
+            # Ensure the directory exists
+            os.makedirs("static/laptop_images", exist_ok=True)
+            # Generate a new filename
+            filename = os.path.basename(filepath)
+            # Move the file
+            shutil.move("." + filepath, os.path.join("static/laptop_images", filename))
+            # Update the filepath in the list
+            laptop.product_image_mini[i] = f"/static/laptop_images/{filename}"
+
+
     new_laptop = Laptop(**laptop.dict())
     db.add(new_laptop)
     db.commit()
