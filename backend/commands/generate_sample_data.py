@@ -381,16 +381,27 @@ def generate_reviews(
 ):
     global NUM_LAPTOPS
     laptop_ids = list(range(1, NUM_LAPTOPS + 1))
-    user_names = [
-        "Nguyen Van An",
-        "Tran Thi Binh",
-        "Le Minh Chi",
-        "Pham Duc Duy",
-        "Hoang Thi Em",
-        "Vu Quang Phat",
-        "Bui Tuan Ga",
-        "Doan Huyen Ha",
+    user_uids = [
+        "Hl5K4KJHHkh0T5MELTp14EVXI322",
+        "WYMy1mRVw3MZBOkV1YQ96N4z1",
+        "We7tZEsDhebqYLLZ7rkZa9w2sJf1",
+        "iyMJcIKxG0RPAPq4glKyMKSBL5P2",
+        "iFU0HJmTyNXXTW5GQcR1wVWB2eg1",
+        "6juDetdMZjfGSCaXArUl9UEJBit1",
+        "IypkU8639yQ0aFr6D1ZlJSJWo3B2",
+        "RvzrqHtZCPSM6W7xQrrYgIlr2ah2",
+        "KmUVJCur6tMkn0dqBX7by20H5iB2",
+        "d9nfHiV8gZV20tFXr4k2ZiN3tVE3",
+        "ENZvfENNh5fTkVNMGzKIXTHnD113",
+        "bEExz1oTJweq7HwAeQy848mJct03",
+        "EJ9XXjOh0uaG1UcjqOyHZBA47ag1",
+        "z8e10lgi66OzaiqX46zMuzECBcw2",
+        "akaIGoL4sZhV1OT8Pif7LW7qSR83",
+        "mvXJtHXiJANM59NdRTDvQtKW8HiI2",
+        "PZ0nCpNSwYX8yLu8SpR35AdfOny1"
     ]
+
+
     ratings = [1, 2, 3, 4, 5]
     review_texts = [
         "Sản phẩm thực sự xuất sắc! Tôi đã sử dụng laptop này trong hơn một tháng và rất ấn tượng với hiệu năng mạnh mẽ, pin trâu và thiết kế tinh tế. Màn hình hiển thị sắc nét, bàn phím gõ rất êm, phù hợp cho cả công việc văn phòng lẫn chơi game nhẹ. Giao hàng nhanh, đóng gói cẩn thận, đáng giá từng đồng!",
@@ -405,15 +416,15 @@ def generate_reviews(
     values = []
     for _ in range(num_reviews):
         laptop_id = random.choice(laptop_ids)
-        user_name = random.choice(user_names)
+        user_uid = random.choice(user_uids)
         rating = random.choice(ratings)
         review_text = random.choice(review_texts)
 
-        values.append(f"({laptop_id}, '{user_name}', {rating}, '{review_text}')")
+        values.append(f"('{user_uid}', {laptop_id}, {rating}, '{review_text}')")
 
     # Create and write the INSERT query
     insert_query = (
-        "INSERT INTO reviews (laptop_id, user_name, rating, review_text) VALUES "
+        "INSERT INTO reviews (user_id, laptop_id, rating, review_text) VALUES "
     )
     insert_query += ", ".join(values) + ";"
 

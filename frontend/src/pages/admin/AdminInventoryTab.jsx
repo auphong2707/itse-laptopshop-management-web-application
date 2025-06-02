@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-import BrandsSection from "../catalog_page/BrandsSection";
-import FilterSection from "../catalog_page/FilterSection";
-import ProductCard from "../ProductCard";
+import BrandsSection from "../../components/catalog_page/BrandsSection";
+import FilterSection from "../../components/catalog_page/FilterSection";
+import ProductCard from "../../components/ProductCard";
 import { transformLaptopData } from "../../utils/transformData";
 
 const { Text } = Typography;
@@ -83,19 +83,6 @@ const subBrands = {
     "MSI Creator",
     "MSI Modern",
   ],
-};
-
-const formatBrand = (brand) => {
-  const brandMap = {
-    all: "All",
-    asus: "ASUS",
-    lenovo: "Lenovo",
-    acer: "Acer",
-    dell: "DELL",
-    hp: "HP",
-    msi: "MSI",
-  };
-  return brandMap[brand] || brand;
 };
 
 const convertToQueryString = (
@@ -195,7 +182,7 @@ const convertToQueryString = (
   return query ? `${query}` : "";
 };
 
-const Inventory = () => {
+const AdminInventoryTab = () => {
   const { brand } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -305,11 +292,6 @@ const Inventory = () => {
     sortBy,
   );
 
-  if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
-    return <div>Not Found</div>;
-  }
-
-  const formatedBrand = formatBrand(brand);
 
   // Additional state
   const [collapseState, setCollapseState] = useState({
@@ -340,6 +322,11 @@ const Inventory = () => {
       .then((data) => setProducts(data))
       .catch((error) => console.log(error));
   }, [brand, page, quantityPerPage, sortBy, appliedFilters]);
+
+
+  if (!["all", "asus", "lenovo", "acer", "dell", "hp", "msi"].includes(brand)) {
+    return <div>Not Found</div>;
+  }
 
   const from = (page - 1) * quantityPerPage + 1;
   const to = Math.min(page * quantityPerPage, totalProducts);
@@ -427,7 +414,7 @@ const Inventory = () => {
 
         <div className="grid-division">
           {products.map((product, index) => (
-            <ProductCard {...product} isAdmin={true} showDeleteButton={true} />
+            <ProductCard key={product.id || index} {...product} isAdmin={true} showDeleteButton={true} />
           ))}
         </div>
 
@@ -448,4 +435,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default AdminInventoryTab;

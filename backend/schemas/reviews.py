@@ -1,11 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 
 class ReviewCreate(BaseModel):
     laptop_id: int
-    user_name: Optional[str] = None
-    email: Optional[str] = None
     rating: int  # Rating should be between 1 and 5
     review_text: Optional[str] = None
 
@@ -15,7 +14,8 @@ class ReviewCreate(BaseModel):
 
 class ReviewResponse(ReviewCreate):
     id: int
-    created_at: str  # The timestamp when the review was created
+    user_id: str  # The ID of the user who created the review
+    created_at: datetime  # The timestamp when the review was created
 
     class Config:
         orm_mode = True  # Tells Pydantic to treat the model as a dict for the ORM

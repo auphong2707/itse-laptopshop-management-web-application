@@ -158,6 +158,7 @@ def filter_laptops(
     page: int = Query(1),
     sort: str = Query("latest"),
 ):
+    print(cpu)
     filter_query = {"bool": {"filter": []}}
     should_query = {"bool": {"should": []}}
 
@@ -174,13 +175,15 @@ def filter_laptops(
             {"terms": {"storage_amount": storage_amount}}
         )
     if cpu:
-        should_query["bool"]["should"].extend(
-            [
-                {"wildcard": {"cpu.keyword": f"*{c.lower()}*"}}
-                for c in cpu
-                if isinstance(c, str)
-            ]
-        )
+        cpu_conditions = []
+        for cpu_value in cpu:
+            cpu_conditions.append({"match_phrase": {"cpu": cpu_value}})
+        filter_query["bool"]["filter"].append({
+            "bool": {
+                "should": cpu_conditions,
+                "minimum_should_match": 1
+            }
+        })
     if vga:
         should_query["bool"]["should"].extend(
             [

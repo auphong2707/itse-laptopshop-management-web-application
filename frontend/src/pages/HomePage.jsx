@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Layout, Typography, Image } from "antd";
+import { Layout, Typography, Image, Button } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -9,7 +9,6 @@ import ImageGallery from "../components/homepage/ImageGallery";
 import ProductSlider from "../components/homepage/ProductSlider";
 import TabProductSlider from "../components/homepage/TabProductSlider";
 import PostCardGridLayout from "../components/homepage/PostCardGridLayout";
-import TestimonialSlider from "../components/homepage/TestimonialSlider";
 import WebsiteFooter from "../components/WebsiteFooter";
 import { transformLaptopData } from "../utils/transformData";
 
@@ -75,15 +74,6 @@ const BrandLogoGallery = () => {
 const contentStyle = {
   color: "#fff",
   backgroundColor: "white",
-};
-
-const transformTestimonialData = (data) => {
-  return data.map((item) => {
-    return {
-      testimonial: item.review_text,
-      author: item.user_name,
-    };
-  });
 };
 
 const transformPostData = (data) => {
@@ -156,8 +146,6 @@ const HomePage = () => {
     },
   });
 
-  const [testimonialData, setTestimonialData] = React.useState([]);
-
   const [postData, setPostData] = React.useState([]);
 
   useEffect(() => {
@@ -184,22 +172,14 @@ const HomePage = () => {
             ),
         );
 
-        // Fetch testimonials
-        const testimonialRequest = axios
-          .get("http://localhost:8000/reviews?rating=5")
-          .then((response) =>
-            transformTestimonialData(response.data["results"]),
-          );
-
         const postRequest = axios
           .get("http://localhost:8000/posts?limit=18")
           .then((response) => transformPostData(response.data["results"]));
 
         // Await all requests together
-        const [newProductData, testimonialData, postData, ...brandResults] =
+        const [newProductData, postData, ...brandResults] =
           await Promise.all([
             newProductRequest,
-            testimonialRequest,
             postRequest,
             ...brandRequests,
           ]);
@@ -220,7 +200,6 @@ const HomePage = () => {
         setPostData(postData);
         console.log("Post data:", postData);
 
-        setTestimonialData(testimonialData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -248,17 +227,23 @@ const HomePage = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignContent: "baseline",
+              alignContent: "center",
             }}
           >
             <Text strong style={{ fontSize: 25, color: "#333" }}>
               New Products
             </Text>
 
-            <Typography.Link href={"/laptops/all"} underline>
-              See All New Products
-            </Typography.Link>
+            <Button 
+              type="primary" 
+              onClick={() => window.location.href = '/laptops/all'} 
+              style={{ borderRadius: '20px', fontWeight: 'bold', height: '40px' }}
+            >
+              See All Products
+            </Button>
           </div>
+
+          <br></br>
           <ProductSlider productData={newProductData} isAdmin={isAdmin} />
         </div>
 
@@ -423,12 +408,7 @@ const HomePage = () => {
 
         <br></br>
         <br></br>
-        <br></br>
-        <br></br>
 
-        <div style={{ width: "85%", margin: "auto" }}>
-          <TestimonialSlider testimonialData={testimonialData} />
-        </div>
       </Content>
 
       {/* Footer */}

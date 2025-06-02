@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, Spin, Typography, Button, Tag, Modal, notification } from "antd";
 import axios from "axios";
 import { useUser } from "../../utils/UserContext.jsx";
+import CustomerOrderTable from "../../components/customer_page/CustomerOrderTable";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
@@ -10,7 +11,7 @@ const formatPrice = (price) => {
   return price.toLocaleString("vi-VN") + "đ";
 };
 
-const MyOrder = () => {
+const CustomerOrderTab = () => {
   const user = useUser();
 
   const [ordersData, setOrdersData] = useState({
@@ -45,15 +46,9 @@ const MyOrder = () => {
     try {
       const token = await user.accessToken;
 
-      const params = {
-        page,
-        limit,
-      };
-
+      const params = { page, limit };
       const response = await axios.get("http://localhost:8000/orders", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         params,
       });
 
@@ -71,10 +66,7 @@ const MyOrder = () => {
             })
           );
 
-          return {
-            ...order,
-            items: itemsWithDetails,
-          };
+          return { ...order, items: itemsWithDetails };
         })
       );
 
@@ -93,16 +85,13 @@ const MyOrder = () => {
 
   const postTicket = async ({ orderId, reason }) => {
     const token = await user.accessToken;
-    console.log(user);
     const refundData = {
       email: user.email,
       phone_number: user.phoneNumber,
       order_id: orderId,
-      reason: reason,
+      reason,
       status: "pending"
     };
-
-    console.log("Submitting refund request:", refundData);
 
     try {
       await axios.post("http://localhost:8000/refund-tickets/", refundData, {
@@ -120,19 +109,16 @@ const MyOrder = () => {
       console.error("Error creating refund ticket:", error);
       notification.error({
         message: 'Refund Request Failed',
-        description: error.response.data.detail || 'Failed to submit refund request.',
+        description: error.response?.data?.detail || 'Failed to submit refund request.',
       });
       return Promise.reject();
     }
   };
 
   const handleRefundRequest = (orderId) => {
-    console.log("Refund requested for order ID:", orderId);
-    
     Modal.confirm({
       title: 'Request Refund',
       width: 700,
-      height: 400,
       centered: true,
       content: (
         <div>
@@ -172,12 +158,10 @@ const MyOrder = () => {
             width: 500,
             onOk() {
               postTicket({ orderId, reason })
-                .then(() => resolve())
-                .catch(() => reject());
+                .then(resolve)
+                .catch(reject);
             },
-            onCancel() {
-              reject();
-            },
+            onCancel: reject,
           });
         });
       },
@@ -201,10 +185,8 @@ const MyOrder = () => {
     },
     {
       title: 'User Name',
-      dataIndex: 'user_name',
       key: 'user_name',
-      render: (_, record) =>
-        `${record.first_name} ${record.last_name}`,
+      render: (_, record) => `${record.first_name} ${record.last_name}`,
     },
     {
       title: 'Email',
@@ -254,19 +236,15 @@ const MyOrder = () => {
       key: "actions",
       align: "center",
       render: (_, record) => (
-        <>
-          <Button 
-            type="primary" 
-            onClick={() => handleRefundRequest(record.id)} 
-            style={{ marginRight: 8 }}
-            disabled={record.status !== 'delivered'}
-          >
-            Refund
-          </Button>
-        </>
+        <Button 
+          type="primary" 
+          onClick={() => handleRefundRequest(record.id)} 
+          disabled={record.status !== 'delivered'}
+        >
+          Refund
+        </Button>
       ),
     },
-    
   ];
 
   const expandedRowRender = (order) => {
@@ -329,29 +307,22 @@ const MyOrder = () => {
   };
 
   return (
-    <div style={{ paddingTop: "20px" }}>
+    <>
+      <Typography.Title level={3}>My Orders</Typography.Title>
+
       {error && <Text type="danger">{error}</Text>}
 
       {loading ? (
         <Spin tip="Loading orders..." />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={ordersData.orders}
-          expandable={{ expandedRowRender }}
-          rowKey="id"
-          pagination={{
-            current: ordersData.page,
-            pageSize: 20,
-            total: ordersData.total_count,
-            showSizeChanger: false,
-          }}
-          scroll={{ x: 'max-content' }}
-          onChange={handleTableChange}
+        <CustomerOrderTable
+          ordersData={ordersData}
+          onTableChange={handleTableChange}
+          handleRefundRequest={handleRefundRequest}
         />
       )}
-    </div>
+    </>
   );
 };
 
-export default MyOrder;
+export default CustomerOrderTab;

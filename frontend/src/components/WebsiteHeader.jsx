@@ -99,9 +99,6 @@ const AccountMenu = () => {
               <Menu.Item key="productReviews" style={{ fontWeight: "bold" }}>
                 <Link to="/customer/productReviews">Product Reviews</Link>
               </Menu.Item>
-              <Menu.Item key="newsletterSubscriptions" style={{ fontWeight: "bold" }}>
-                <Link to="/customer/newsletterSubscriptions">Newsletter Subscriptions</Link>
-              </Menu.Item>
             </>
           )}
 
@@ -184,7 +181,14 @@ const WebsiteHeader = () => {
           <Text strong style={{ color: "grey" }}>
             Visit our showroom in 1234 Street Address City Address, 1234
           </Text>
-          <Typography.Link strong underline style={{ color: "white" }}>
+          <Typography.Link
+            strong
+            underline
+            style={{ color: "white" }}
+            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Contact Us
           </Typography.Link>
         </div>
@@ -228,25 +232,6 @@ const WebsiteHeader = () => {
             </Typography.Link>
             <Typography.Link strong style={{ color: "black" }} href="/laptops/all?usageType=Ultrabook">
               Ultrabooks
-            </Typography.Link>
-            <Typography.Link
-              strong
-              style={{
-                color: "rgba(1, 86, 255, 1)",
-                border: "2px solid rgba(1, 86, 255, 1)",
-                padding: "5px 18px",
-                borderRadius: "20px",
-              }}
-              onMouseEnter={(e) => {
-                (e.target.style.backgroundColor = "rgba(1, 86, 255, 1)"),
-                  (e.target.style.color = "white");
-              }}
-              onMouseLeave={(e) => {
-                (e.target.style.backgroundColor = "white"),
-                  (e.target.style.color = "rgba(1, 86, 255, 1)");
-              }}
-            >
-              Our Deals
             </Typography.Link>
           </Flex>
         </Flex>

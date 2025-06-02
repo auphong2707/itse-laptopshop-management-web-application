@@ -1,4 +1,3 @@
-from elasticsearch import Elasticsearch
 from fastapi import FastAPI, Depends
 
 from dotenv import load_dotenv
@@ -53,9 +52,6 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Initialize Elasticsearch Client
-es = Elasticsearch("http://elasticsearch:9200")
 
 
 @app.get("/secure")
