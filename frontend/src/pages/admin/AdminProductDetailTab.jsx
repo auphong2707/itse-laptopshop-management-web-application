@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import "swiper/css";
 import axios from "axios";
@@ -11,6 +11,7 @@ import {
   InputNumber,
   Button,
   Select,
+  notification,
 } from "antd";
 import { Divider } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
@@ -74,6 +75,8 @@ const transformFormData = (values) => {
 };
 
 const AdminProductDetailTab = () => {
+  const navigate = useNavigate();
+
   const sectionTitleStyle = {
     fontSize: "20px",
     fontWeight: "bold",
@@ -153,7 +156,12 @@ const AdminProductDetailTab = () => {
       if (id) {
         // Update existing laptop
         await axios.put(`http://localhost:8000/laptops/${id}`, formData);
+        notification.success({
+          message: "Update Success",
+          description: "Laptop details updated successfully. Please wait for at most 2 minutes for the changes to take effect.",
+        });
         console.log("Update Success");
+        navigate(`/admin/inventory/all`);
       } else {
         const transformedData = transformFormData(formData);
         console.log(
@@ -162,11 +170,20 @@ const AdminProductDetailTab = () => {
         );
         // Insert new laptop
         await axios.post("http://localhost:8000/laptops/", transformedData);
+        notification.success({
+          message: "Insert Success",
+          description: "Laptop added successfully. Please wait for at most 2 minutes for the changes to take effect.",
+        });
         console.log("Insert Success");
+        navigate(`/admin/inventory/all`);
         form.resetFields();
       }
     } catch (error) {
-      console.log("Error submitting form:", error);
+      console.error("Error submitting form:", error);
+      notification.error({
+        message: "Error",
+        description: error.response?.data?.detail || "An error occurred while submitting the form.",
+      });
     }
   };
 
