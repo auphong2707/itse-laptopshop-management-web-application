@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   Tag,
@@ -108,6 +108,7 @@ const RefundTable = ({ data, onResolve }) => {
       title: "Refund ID",
       dataIndex: "id",
       key: "id",
+      fixed: "left",
       width: 100,
       sorter: (a, b) => a.id - b.id,
     },
@@ -167,6 +168,7 @@ const RefundTable = ({ data, onResolve }) => {
       title: "Action",
       key: "action",
       width: 120,
+      fixed: "right",
       render: (_, record) =>
         record.status === "Pending" ? (
           <Popconfirm
