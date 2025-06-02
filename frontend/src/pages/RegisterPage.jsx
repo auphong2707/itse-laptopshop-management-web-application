@@ -251,7 +251,7 @@ const RegisterPage = () => {
                     rules={[
                       { required: true, message: "Please enter phone number" },
                       {
-                        pattern: /^(\+84|0)[1-9][0-9]{8}$/,
+                        pattern: /^(\+84|0)[1-9][0-9]{8,10}$/,
                         message: "Invalid phone number",
                       },
                     ]}
