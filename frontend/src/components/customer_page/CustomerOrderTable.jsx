@@ -83,6 +83,7 @@ const CustomerOrderTable = ({ ordersData, onTableChange, handleRefundRequest }) 
       title: "Action",
       key: "actions",
       align: "center",
+      fixed: 'right',
       render: (_, record) => (
         <Button 
           type="primary" 
