@@ -337,7 +337,7 @@ const PlaceOrderPage = () => {
       <Table
         columns={[
           { title: "Image", dataIndex: "image", key: "image", render: (img) => <img src={img} alt="Product" width={60} />, align: "center" },
-          { title: "Product Name", dataIndex: "product_name", key: "product_name" },
+          { title: "Product Name", dataIndex: "product_name", key: "product_name", render: (name) => name.toUpperCase() },
           { title: "Quantity", dataIndex: "quantity", key: "quantity", align: "center" },
           { title: "Price at Purchase", dataIndex: "price_at_purchase", key: "price_at_purchase", render: formatPrice, align: "center" },
           { title: "Total", dataIndex: "subtotal", key: "subtotal", render: formatPrice, align: "center" },
