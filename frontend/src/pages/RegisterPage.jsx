@@ -395,6 +395,7 @@ const RegisterPage = () => {
                       size="large"
                       placeholder="Enter your password"
                       autoComplete="new-password"
+                      type="password"
                       style={{ height: "50px", fontSize: "1.1rem" }}
                     />
                   </Form.Item>
@@ -428,6 +429,7 @@ const RegisterPage = () => {
                       size="large"
                       placeholder="Confirm your password"
                       autoComplete="new-password"
+                      type="password"
                       style={{ height: "50px", fontSize: "1.1rem" }}
                     />
                   </Form.Item>
