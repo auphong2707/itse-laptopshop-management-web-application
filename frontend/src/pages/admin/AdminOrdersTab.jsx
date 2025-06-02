@@ -117,7 +117,7 @@ const AdminOrdersTab = () => {
                 <Select placeholder="Select status" allowClear>
                   <Select.Option value="pending">Pending</Select.Option>
                   <Select.Option value="processing">Processing</Select.Option>
-                  <Select.Option value="shipping">Shipped</Select.Option>
+                  <Select.Option value="shipping">Shipping</Select.Option>
                   <Select.Option value="delivered">Delivered</Select.Option>
                   <Select.Option value="cancelled">Cancelled</Select.Option>
                   <Select.Option value="refunded">Refunded</Select.Option>
