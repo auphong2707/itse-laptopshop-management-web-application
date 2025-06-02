@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { Layout, Typography, Breadcrumb, Table, Image, Rate, Modal, notification } from "antd";
+import { Layout, Typography, Breadcrumb, Table, Image, Rate, Modal, notification, List } from "antd";
 import PropTypes from "prop-types";
 
 import WebsiteHeader from "../components/WebsiteHeader";
@@ -199,12 +199,26 @@ const ProductPage = () => {
   const user = useUser();
   const { id } = useParams();
   const [productData, setProductData] = useState({});
+  const [Reviews, setReviews] = useState([]);
+
   useEffect(() => {
     fetch(`http://localhost:8000/laptops/id/${id}`)
       .then((response) => response.json())
       .then((data) => transformData(data))
       .then((data) => setProductData(data));
+
+    fetch(`http://localhost:8000/reviews/laptop/${id}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews');
+        }
+        return response.json();
+      })
+      .then((data) => setReviews(data))
+      .catch((error) => console.error('Error fetching reviews:', error));
   }, [id]);
+
+  console.log("Reviews:", Reviews);
   
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -353,7 +367,7 @@ const ProductPage = () => {
         {/* Right Side: Product Image */}
         <ProductImage
           imageUrls={JSON.parse(productData.product_image_mini || "[]").map(
-            (url) => `http://localhost:8000${url}`,
+            (url) => `http://localhost:8000${url}`
           )}
         />
       </Content>
@@ -365,97 +379,126 @@ const ProductPage = () => {
           alignSelf: "center",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
+        <Title level={4} style={{ fontWeight: "bold", marginBottom: "1rem" }}>
+          Customer Reviews
+        </Title>
+        <List
+          itemLayout="vertical"
+          dataSource={Reviews}
+          pagination={{
+            pageSize: 5,
+            position: "bottom",
           }}
-        >
-          <Title level={4} style={{ fontWeight: "bold", margin: 0 }}>
-            SUBMIT REVIEWS AND RATINGS
-          </Title>
-        </div>
-        <hr style={{ marginTop: "25px", marginBottom: "1.5rem" }} />
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "1rem",
-            marginBottom: "24px",
-          }}
-        >
-          <Image
-            src={imageUrl}
-            alt="Product"
-            width={80}
-            height={60}
-            style={{ borderRadius: "4px" }}
-            preview={false}
-          />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Text
-              style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                marginBottom: "0.25rem",
-                lineHeight: "1.4",
-              }}
-            >
-              {productData.name || "PRODUCT’S NAME"}
-            </Text>
-            <Rate
-              value={rating}
-              onChange={setRating}
-              style={{ fontSize: "24px" }}
-            />
-          </div>
-        </div>
-
-        <textarea
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-          rows={4}
-          placeholder="Write your review..."
-          style={{
-            width: "100%",
-            padding: "1rem",
-            marginBottom: "1rem",
-            border: "1px solid #000",
-            borderRadius: "4px",
-            fontSize: "16px",
-            fontFamily: "sans-serif",
-          }}
+          renderItem={(review) => (
+            <List.Item key={review.id}>
+              <List.Item.Meta
+                title={
+                  <>
+                    <Rate disabled defaultValue={review.rating} style={{ fontSize: "16px" }} />
+                    <span style={{ marginLeft: "1rem" }}>
+                      {new Date(review.created_at).toLocaleDateString()}
+                    </span>
+                  </>
+                }
+              />
+              <p>{review.review_text}</p>
+            </List.Item>
+          )}
         />
+      </div>
 
-        <button
-          onClick={handleSubmitReview}
+      <div style={{ backgroundColor: "#ffffff", justifyContent: "center", display: "flex" }}>
+        <div
           style={{
-            padding: "0.6rem 1.5rem",
-            backgroundColor: "#4e6ef2",
-            color: "#fff",
-            border: "none",
-            borderRadius: "20px",
-            fontWeight: "bold",
-            float: "right",
-            cursor: "pointer",
-            marginTop: "8px",
+            padding: "2rem",
+            width: "60%",
+            alignSelf: "center",
           }}
         >
-          SUBMIT
-        </button>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <Title level={4} style={{ fontWeight: "bold", margin: 0 }}>
+              SUBMIT REVIEWS AND RATINGS
+            </Title>
+          </div>
+          <hr style={{ marginTop: "25px", marginBottom: "1.5rem" }} />
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              marginBottom: "24px",
+            }}
+          >
+            <Image
+              src={imageUrl}
+              alt="Product"
+              width={80}
+              height={60}
+              style={{ borderRadius: "4px" }}
+              preview={false}
+            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Text
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  marginBottom: "0.25rem",
+                  lineHeight: "1.4",
+                }}
+              >
+                {productData.name || "PRODUCT’S NAME"}
+              </Text>
+              <Rate
+                value={rating}
+                onChange={setRating}
+                style={{ fontSize: "24px" }}
+              />
+            </div>
+          </div>
+
+          <textarea
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            rows={4}
+            placeholder="Write your review..."
+            style={{
+              width: "100%",
+              padding: "1rem",
+              marginBottom: "1rem",
+              border: "1px solid #000",
+              borderRadius: "4px",
+              fontSize: "16px",
+              fontFamily: "sans-serif",
+            }}
+          />
+
+          <button
+            onClick={handleSubmitReview}
+            style={{
+              padding: "0.6rem 1.5rem",
+              backgroundColor: "#4e6ef2",
+              color: "#fff",
+              border: "none",
+              borderRadius: "20px",
+              fontWeight: "bold",
+              float: "right",
+              cursor: "pointer",
+              marginTop: "8px",
+            }}
+          >
+            SUBMIT
+          </button>
+        </div>
       </div>
 
       <SupportSection />
-
-      {/* Banner */}
-      <Image
-        src="/product_page_banner_2.png"
-        width={"100%"}
-        style={{ width: "100%", height: "auto" }}
-        preview={false}
-      />
 
       <WebsiteFooter />
     </Layout>

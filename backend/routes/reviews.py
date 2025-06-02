@@ -47,3 +47,22 @@ async def get_reviews_by_user(
         return []
     
     return reviews
+
+@reviews_router.get("/laptop/{laptop_id}", response_model=list[ReviewResponse])
+async def get_reviews_by_laptop(
+    laptop_id: int,
+    skip: int = Query(0, ge=0),
+    db: Session = Depends(get_db)
+):
+    # Check if the laptop exists
+    laptop = db.query(Laptop).filter(Laptop.id == laptop_id).first()
+    if not laptop:
+        raise HTTPException(status_code=404, detail="Laptop not found")
+    
+    # Get reviews for this laptop
+    reviews = db.query(Review).filter(Review.laptop_id == laptop_id).offset(skip).all()
+    
+    if not reviews:
+        return []
+    
+    return reviews
