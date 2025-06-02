@@ -376,12 +376,18 @@ def admin_get_all_orders(
     ),
     get_all: bool = Query(
         False, description="Set to true to retrieve all orders without pagination"
-    ),  # NEW parameter
+    ),
     status_filter: Optional[str] = Query(
         None, alias="status", description="Filter by order status"
-    ),  # Renamed for clarity
-    user_id_filter: Optional[str] = Query(
-        None, alias="userId", description="Filter by User ID (Firebase UID)"
+    ),
+    email_filter: Optional[str] = Query(
+        None, alias="user_email", description="Filter by user email"
+    ),
+    phone_filter: Optional[str] = Query(
+        None, alias="phone_number", description="Filter by phone number"
+    ),
+    payment_method_filter: Optional[str] = Query(
+        None, alias="payment_method", description="Filter by payment method"
     ),
     start_date: Optional[datetime] = Query(
         None, description="Filter orders created on or after this date (ISO Format)"
@@ -391,6 +397,9 @@ def admin_get_all_orders(
     ),
     db: Session = Depends(get_db),
 ):
+    print(
+        f"Admin fetching all orders with filters: page={page}, limit={limit}, get_all={get_all}, status_filter={status_filter}, email_filter={email_filter}, phone_filter={phone_filter}, payment_method_filter={payment_method_filter}, start_date={start_date}, end_date={end_date}"
+    )
     """
     [Admin] Retrieves a list of all orders, with optional filters.
     Supports pagination by default, or can retrieve all orders if 'get_all=true'.
@@ -399,16 +408,18 @@ def admin_get_all_orders(
     try:
         query = db.query(Order).options(joinedload(Order.items))  # Eager load items
 
-        # Apply filters (renamed 'status' to 'status_filter' to avoid conflict with status module)
+        # Apply filters
         if status_filter:
             query = query.filter(Order.status == status_filter)
-        if user_id_filter:
-            query = query.filter(Order.user_id == user_id_filter)
+        if email_filter:
+            query = query.filter(Order.user_email.ilike(f"%{email_filter}%"))
+        if phone_filter:
+            query = query.filter(Order.phone_number.ilike(f"%{phone_filter}%"))
+        if payment_method_filter:
+            query = query.filter(Order.payment_method == payment_method_filter)
         if start_date:
             query = query.filter(Order.created_at >= start_date)
         if end_date:
-            # For 'end_date' to be inclusive of the whole day, you might need to adjust it
-            # e.g., end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
             query = query.filter(Order.created_at <= end_date)
 
         # Order the results
@@ -417,10 +428,6 @@ def admin_get_all_orders(
         if get_all:
             # Retrieve all matching orders
             orders = query.all()
-            # For the response, if you want to distinguish, you might return just the list
-            # or wrap it in a consistent structure. Let's return just the list for now.
-            # FastAPI will serialize the list of Order ORM objects using OrderResponse.
-            # The auto-generated docs might need manual adjustment for the response_model.
             return orders  # Returns List[OrderResponse] effectively
         else:
             # Apply pagination
