@@ -74,7 +74,7 @@ const Items = ({ product, index, onSubtotalChange, onRemove }) => {
 
       {/* Product Name */}
       <Text style={{ fontSize: "14px", fontWeight: "bold" }}>
-        {product.name}
+        {product.name.toUpperCase()}
       </Text>
 
       {/* Product Price */}
