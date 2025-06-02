@@ -68,7 +68,7 @@ class LaptopUpdate(BaseModel):
     number_hdmi_ports: Optional[int] = Field(None, ge=0)
     number_ethernet_ports: Optional[int] = Field(None, ge=0)
     number_audio_jacks: Optional[int] = Field(None, ge=0)
-    product_image_mini: Optional[str] = None
+    product_image_mini: List[str]
     quantity: Optional[int] = Field(None, ge=0)
     original_price: Optional[int] = Field(None, gt=0)
     sale_price: Optional[int] = Field(None, gt=0)

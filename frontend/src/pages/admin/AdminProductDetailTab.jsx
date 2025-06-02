@@ -183,10 +183,10 @@ const AdminProductDetailTab = () => {
       console.log("Submitting payload:", payload);
       if (id) {
         await axios.put(`http://localhost:8000/laptops/${id}`, payload);
-        notification.success({ message: 'Update sucessfully!' });
+        notification.success({ message: 'Update sucessfully! Please wait for at most 2 minutes to see the changes.' });
       } else {
         await axios.post('http://localhost:8000/laptops/', payload);
-        notification.success({ message: 'Insert successfully!' });
+        notification.success({ message: 'Insert successfully! Please wait for at most 2 minutes to see the changes.' });
         form.resetFields();
       }
       navigate('/admin/inventory/all');

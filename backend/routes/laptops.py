@@ -96,6 +96,32 @@ def update_laptop(
 
     update_data = laptop_update.dict(exclude_unset=True)
     for key, value in update_data.items():
+        if key == "product_image_mini":
+            if isinstance(value, list):
+                # If the updated product_image_mini have new paths, move them to the static folder
+                for i, filepath in enumerate(value):
+                    if not filepath.startswith("/static/laptop_images/"):
+                        # Ensure the directory exists
+                        os.makedirs("static/laptop_images", exist_ok=True)
+                        # Generate a new filename
+                        filename = os.path.basename(filepath)
+                        # Move the file
+                        shutil.move("." + filepath, os.path.join("static/laptop_images", filename))
+                        # Update the filepath in the list
+                        value[i] = f"/static/laptop_images/{filename}"
+
+                # If the updated product_image_mini removes some images, we need to handle that
+                for i, filepath in enumerate(json.loads(laptop.product_image_mini)):
+                    if filepath not in value:
+                        # If the image is not in the new list, we can delete it from the static folder
+                        try:
+                            os.remove("." + filepath)
+                        except FileNotFoundError:
+                            pass
+            else:
+                raise HTTPException(status_code=400, detail="Invalid product_image_mini format")
+            
+
         setattr(laptop, key, value)
 
     db.commit()
