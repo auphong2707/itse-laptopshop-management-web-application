@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Layout, Typography, Image } from "antd";
+import { Layout, Typography, Image, Button } from "antd";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -227,17 +227,23 @@ const HomePage = () => {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignContent: "baseline",
+              alignContent: "center",
             }}
           >
             <Text strong style={{ fontSize: 25, color: "#333" }}>
               New Products
             </Text>
 
-            <Typography.Link href={"/laptops/all"} underline>
-              See All New Products
-            </Typography.Link>
+            <Button 
+              type="primary" 
+              onClick={() => window.location.href = '/laptops/all'} 
+              style={{ borderRadius: '20px', fontWeight: 'bold', height: '40px' }}
+            >
+              See All Products
+            </Button>
           </div>
+
+          <br></br>
           <ProductSlider productData={newProductData} isAdmin={isAdmin} />
         </div>
 
