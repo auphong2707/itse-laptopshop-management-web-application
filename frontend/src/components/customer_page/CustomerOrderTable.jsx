@@ -51,6 +51,23 @@ const CustomerOrderTable = ({ ordersData, onTableChange, handleRefundRequest }) 
       },
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: (status) => {
+        const statusColors = {
+          pending: 'orange',
+          processing: 'blue',
+          shipping: 'geekblue',
+          delivered: 'green',
+          cancelled: 'red',
+          refunded: 'magenta',
+        };
+        return <Tag color={statusColors[status] || 'default'}>{status}</Tag>;
+      },
+    },
+    {
       title: 'Total Price',
       dataIndex: 'total_price',
       key: 'total_price',
@@ -59,6 +76,7 @@ const CustomerOrderTable = ({ ordersData, onTableChange, handleRefundRequest }) 
       title: 'Created At',
       dataIndex: 'created_at',
       key: 'created_at',
+      align: 'center',
       render: (val) => dayjs(val).format('DD-MM-YYYY HH:mm'),
     },
     {
