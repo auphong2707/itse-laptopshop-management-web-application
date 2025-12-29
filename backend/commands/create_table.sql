@@ -38,15 +38,38 @@ CREATE TABLE IF NOT EXISTS laptops (
     num_rate INTEGER DEFAULT 0
 );
 
+-- Users table for local authentication
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    shipping_address TEXT,
+    role VARCHAR(20) NOT NULL DEFAULT 'customer',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT check_valid_role CHECK (role IN ('customer', 'admin'))
+);
+
+-- Create index on email and phone for faster lookups
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone_number);
+
 CREATE TABLE IF NOT EXISTS reviews (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL, -- Firebase UID
+    user_id INTEGER,  -- Nullable for legacy/sample data during migration
     laptop_id INTEGER NOT NULL,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (laptop_id) REFERENCES laptops(id) ON DELETE CASCADE
 );
+
+-- Create index on user_id for faster lookups (where not null)
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id) WHERE user_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
     id SERIAL PRIMARY KEY,
@@ -126,7 +149,7 @@ EXECUTE FUNCTION set_updated_at();
 DROP TABLE IF EXISTS orders CASCADE; 
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL, -- Firebase UID
+    user_id INTEGER,  -- Nullable for legacy/sample data during migration
 
     -- User details snapshot at time of order
     first_name TEXT,
@@ -142,16 +165,22 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create index on user_id for faster lookups (where not null)
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id) WHERE user_id IS NOT NULL;
+
 DROP TABLE IF EXISTS order_items;
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL, -- Should reference laptops.id
+    product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
-    price_at_purchase DECIMAL(18, 2) NOT NULL, -- **IMPORTANT: Store the price paid per item**
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-    -- Optional: Add FOREIGN KEY (product_id) REFERENCES laptops(id) ON DELETE SET NULL (or RESTRICT)
+    price_at_purchase DECIMAL(18, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES laptops(id) ON DELETE RESTRICT
 );
+
+-- Create index on product_id for faster lookups
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
 
 -- Ensure updated_at updates on modification for orders
 DROP TRIGGER IF EXISTS set_orders_updated_at ON orders; -- Add drop for idempotency

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Row,
   Col,
@@ -13,8 +13,11 @@ import {
   Divider,
 } from "antd";
 
+const { TextArea } = Input;
+
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
+import { register, checkEmailExists, checkPhoneExists } from "../utils/authService";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -30,6 +33,8 @@ const RegisterPage = () => {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  
   const handleSignIn = async (values) => {
     console.log("Password step values:", values);
 
@@ -47,60 +52,26 @@ const RegisterPage = () => {
     const userData = {
       email: step1Data.email,
       password: values.password,
-      display_name: `${step1Data.firstName} ${step1Data.lastName}`,
       phone_number: normalizePhone(step1Data.phoneNumber),
       first_name: step1Data.firstName,
       last_name: step1Data.lastName,
-      company: step1Data.company,
-      address: step1Data.address,
-      country: step1Data.country,
-      zip_code: step1Data.zipPostalCode,
+      shipping_address: step1Data.address || "",
       role: "customer",
-      secret_key: "",
     };
 
-    setIsLoading(true); // 👉 Bắt đầu loading
+    setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/accounts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
+      const data = await register(userData);
+      console.log("Registration successful:", data);
 
-      const data = await response.json();
-      console.log("Backend response:", data);
-
-      if (response.ok) {
-        localStorage.removeItem("register_step1");
-        setCurrent(2); // 👉 chuyển sang bước xác nhận
-      } else {
-        alert(data.detail || "Registration failed.");
-      }
+      localStorage.removeItem("register_step1");
+      setCurrent(2); // Move to confirmation step
     } catch (error) {
       console.error("Error during registration:", error);
-      alert("Something went wrong. Please try again.");
+      alert(error.message || "Registration failed. Please try again.");
     } finally {
-      setIsLoading(false); // 👉 Tắt loading
-    }
-  };
-  const checkEmailAndPhone = async (email, phoneNumber) => {
-    try {
-      const response = await fetch("http://localhost:8000/accounts/check", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, phone_number: phoneNumber }),
-      });
-
-      const data = await response.json();
-      return data; // trả về { email_exists: true, phone_exists: false } chẳng hạn
-    } catch (error) {
-      console.error("Error checking email/phone:", error);
-      return null;
+      setIsLoading(false);
     }
   };
 
@@ -116,35 +87,37 @@ const RegisterPage = () => {
         return phone;
       };
 
-      const checkResult = await checkEmailAndPhone(
-        values.email,
-        normalizePhone(values.phoneNumber),
-      );
-
-      if (!checkResult) {
-        return; // không làm gì nếu lỗi kết nối
-      }
-
+      // Check if email and phone already exist
       let hasError = false;
 
-      if (checkResult.email_exists) {
-        form.setFields([
-          {
-            name: "email",
-            errors: ["Email already exists."],
-          },
-        ]);
-        hasError = true;
+      try {
+        const emailExists = await checkEmailExists(values.email);
+        if (emailExists) {
+          form.setFields([
+            {
+              name: "email",
+              errors: ["Email already exists."],
+            },
+          ]);
+          hasError = true;
+        }
+      } catch (error) {
+        console.error("Error checking email:", error);
       }
 
-      if (checkResult.phone_exists) {
-        form.setFields([
-          {
-            name: "phoneNumber",
-            errors: ["Phone number already exists."],
-          },
-        ]);
-        hasError = true;
+      try {
+        const phoneExists = await checkPhoneExists(normalizePhone(values.phoneNumber));
+        if (phoneExists) {
+          form.setFields([
+            {
+              name: "phoneNumber",
+              errors: ["Phone number already exists."],
+            },
+          ]);
+          hasError = true;
+        }
+      } catch (error) {
+        console.error("Error checking phone:", error);
       }
 
       if (hasError) return;
@@ -287,65 +260,14 @@ const RegisterPage = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Company</span>}
-                    name="company"
-                  >
-                    <Input
-                      size="large"
-                      placeholder="Enter your company name"
-                      style={{ height: "50px", fontSize: "1.1rem" }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    label={<span style={{ fontSize: "1.3rem" }}>Address</span>}
+                    label={<span style={{ fontSize: "1.3rem" }}>Shipping Address</span>}
                     name="address"
                   >
-                    <Input
+                    <TextArea
                       size="large"
-                      placeholder="Enter your address"
-                      style={{ height: "50px", fontSize: "1.1rem" }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    label={
-                      <span style={{ fontSize: "1.3rem" }}>
-                        Country<span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    name="country"
-                    rules={[
-                      { required: true, message: "Please enter your country" },
-                    ]}
-                    required={false}
-                  >
-                    <Input
-                      size="large"
-                      placeholder="Enter your country"
-                      style={{ height: "50px", fontSize: "1.1rem" }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    label={
-                      <span style={{ fontSize: "1.3rem" }}>
-                        Zip/Postal code <span style={{ color: "red" }}>*</span>
-                      </span>
-                    }
-                    name="zipPostalCode"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your zip/postal code",
-                      },
-                    ]}
-                    required={false}
-                  >
-                    <Input
-                      size="large"
-                      placeholder="Enter your zip/postal code"
-                      style={{ height: "50px", fontSize: "1.1rem" }}
+                      placeholder="Enter your shipping address (optional)"
+                      autoSize={{ minRows: 3, maxRows: 5 }}
+                      style={{ fontSize: "1.1rem" }}
                     />
                   </Form.Item>
 

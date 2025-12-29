@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Modal, Typography, Image, InputNumber, Button } from "antd";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import { getAuth } from "firebase/auth";
 import axios from "axios";
+import { getToken } from "../../utils/authService";
 
 const { Text } = Typography;
 
@@ -22,11 +22,8 @@ const Items = ({ product, index, onSubtotalChange, onRemove }) => {
       onSubtotalChange(product.sale_price * value, index);
 
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) throw new Error("User not authenticated");
-
-        const token = await user.getIdToken();
+        const token = getToken();
+        if (!token) throw new Error("User not authenticated");
 
         await axios.put(
           "http://localhost:8000/cart/update",

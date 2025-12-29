@@ -3,14 +3,14 @@ from services.redis_config import redis_client
 from fastapi.security import HTTPBearer
 
 from schemas.cart import *
-from services.firebase_auth import get_current_user_id
+from services.auth import get_current_user_id
 
 security = HTTPBearer()
 cart_router = APIRouter(prefix="/cart", tags=["cart"])
 
 
 @cart_router.post("/add")
-def add_to_cart(item: CartItemAdd, uid: str = Depends(get_current_user_id)):
+def add_to_cart(item: CartItemAdd, uid: int = Depends(get_current_user_id)):
     cart_key = f"cart:{uid}"
     redis_client.hincrby(cart_key, str(item.laptop_id), item.quantity)
     current_quantity = redis_client.hget(cart_key, str(item.laptop_id))
@@ -22,7 +22,7 @@ def add_to_cart(item: CartItemAdd, uid: str = Depends(get_current_user_id)):
 
 
 @cart_router.get("/view")
-def view_cart(uid: str = Depends(get_current_user_id)):
+def view_cart(uid: int = Depends(get_current_user_id)):
     cart_key = f"cart:{uid}"
     cart_items_raw = redis_client.hgetall(cart_key)
     cart_items = {int(k): int(v) for k, v in cart_items_raw.items()}
@@ -32,7 +32,7 @@ def view_cart(uid: str = Depends(get_current_user_id)):
 @cart_router.put("/update")
 def update_cart_item(
     item: CartItemUpdate,
-    uid: str = Depends(get_current_user_id),
+    uid: int = Depends(get_current_user_id),
 ):
 
     cart_key = f"cart:{uid}"
@@ -60,7 +60,7 @@ def update_cart_item(
 
 
 @cart_router.delete("/remove/{laptop_id}")
-def remove_from_cart(laptop_id: int, uid: str = Depends(get_current_user_id)):
+def remove_from_cart(laptop_id: int, uid: int = Depends(get_current_user_id)):
     """
     Remove specific item from cart
     """
@@ -80,7 +80,7 @@ def remove_from_cart(laptop_id: int, uid: str = Depends(get_current_user_id)):
 
 
 @cart_router.delete("/clear")
-def clear_cart(uid: str = Depends(get_current_user_id)):
+def clear_cart(uid: int = Depends(get_current_user_id)):
     """
     Clear all items from the cart
     """

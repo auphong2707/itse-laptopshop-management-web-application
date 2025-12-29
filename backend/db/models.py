@@ -12,6 +12,7 @@ from sqlalchemy import (
     Enum,
     Index,
     Text,
+    Boolean,
 )
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import JSON
@@ -19,6 +20,30 @@ from datetime import datetime
 import enum
 
 Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    phone_number = Column(String(20), unique=True, nullable=False, index=True)
+    shipping_address = Column(Text, nullable=True)
+    role = Column(String(20), nullable=False, default="customer")  # 'customer' or 'admin'
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    # Relationships
+    reviews = relationship("Review", back_populates="user", cascade="all, delete-orphan")
+    orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
+
+    __table_args__ = (
+        CheckConstraint("role IN ('customer', 'admin')", name="check_valid_role"),
+    )
 
 
 class Laptop(Base):
@@ -84,13 +109,16 @@ class Review(Base):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(String(255), nullable=False)  # Firebase UID length
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     laptop_id = Column(
         Integer, ForeignKey("laptops.id", ondelete="CASCADE"), nullable=False
     )
     rating = Column(Integer, nullable=False)
     review_text = Column(String, nullable=True)
     created_at = Column(String, nullable=False)
+
+    # Relationships
+    user = relationship("User", back_populates="reviews")
 
 
 class Post(Base):
@@ -116,7 +144,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(String(255), nullable=False)  # Firebase UID length
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
@@ -132,9 +160,11 @@ class Order(Base):
         TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
+    # Relationships
     items = relationship(
         "OrderItem", back_populates="order", cascade="all, delete-orphan"
     )
+    user = relationship("User", back_populates="orders")
 
 
 class OrderItem(Base):
@@ -144,7 +174,9 @@ class OrderItem(Base):
     order_id = Column(
         Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
     )
-    product_id = Column(Integer, nullable=False)  # Consider ForeignKey("laptops.id")
+    product_id = Column(
+        Integer, ForeignKey("laptops.id", ondelete="RESTRICT"), nullable=False
+    )
     quantity = Column(Integer, nullable=False)
     price_at_purchase = Column(DECIMAL(10, 2), nullable=False)  # Store the price
 

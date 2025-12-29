@@ -381,25 +381,9 @@ def generate_reviews(
 ):
     global NUM_LAPTOPS
     laptop_ids = list(range(1, NUM_LAPTOPS + 1))
-    user_uids = [
-        "Hl5K4KJHHkh0T5MELTp14EVXI322",
-        "WYMy1mRVw3MZBOkV1YQ96N4z1",
-        "We7tZEsDhebqYLLZ7rkZa9w2sJf1",
-        "iyMJcIKxG0RPAPq4glKyMKSBL5P2",
-        "iFU0HJmTyNXXTW5GQcR1wVWB2eg1",
-        "6juDetdMZjfGSCaXArUl9UEJBit1",
-        "IypkU8639yQ0aFr6D1ZlJSJWo3B2",
-        "RvzrqHtZCPSM6W7xQrrYgIlr2ah2",
-        "KmUVJCur6tMkn0dqBX7by20H5iB2",
-        "d9nfHiV8gZV20tFXr4k2ZiN3tVE3",
-        "ENZvfENNh5fTkVNMGzKIXTHnD113",
-        "bEExz1oTJweq7HwAeQy848mJct03",
-        "EJ9XXjOh0uaG1UcjqOyHZBA47ag1",
-        "z8e10lgi66OzaiqX46zMuzECBcw2",
-        "akaIGoL4sZhV1OT8Pif7LW7qSR83",
-        "mvXJtHXiJANM59NdRTDvQtKW8HiI2",
-        "PZ0nCpNSwYX8yLu8SpR35AdfOny1"
-    ]
+    # Using NULL for user_id since we're migrating from Firebase to local auth
+    # New reviews will use actual integer user IDs from the users table
+    user_ids = [None] * 17  # NULL values for legacy data
 
 
     ratings = [1, 2, 3, 4, 5]
@@ -416,11 +400,11 @@ def generate_reviews(
     values = []
     for _ in range(num_reviews):
         laptop_id = random.choice(laptop_ids)
-        user_uid = random.choice(user_uids)
+        # Use NULL for user_id (legacy sample data)
         rating = random.choice(ratings)
         review_text = random.choice(review_texts)
 
-        values.append(f"('{user_uid}', {laptop_id}, {rating}, '{review_text}')")
+        values.append(f"(NULL, {laptop_id}, {rating}, '{review_text}')")
 
     # Create and write the INSERT query
     insert_query = (
@@ -643,22 +627,15 @@ def generate_orders(
         "e-banking"
     ]
 
-    def generate_fake_uid(length=28):
-        real_uid = "UXXB26VXsZdin2QRTDvQtKW8HiI2"
-        return random.choice(
-            [
-                real_uid,
-                "".join(random.choices(string.ascii_letters + string.digits, k=length)),
-            ]
-        )
-
+    # Legacy sample data - use NULL for user_id
+    # New orders will use actual integer user IDs from the users table
     for i in range(num_orders):
         first = random.choice(first_names)
         last = random.choice(last_names)
         email = f"{first.lower()}.{last.lower()}{random.randint(1,99)}@{random.choice(domains)}"
         fake_users.append(
             {
-                "user_id": generate_fake_uid(),
+                "user_id": None,  # NULL for legacy data
                 "first_name": first,
                 "last_name": last,
                 "user_email": email,

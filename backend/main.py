@@ -12,7 +12,6 @@ from schemas.orders import *
 from schemas.refund_tickets import *
 from schemas.reviews import *
 
-from services.firebase_auth import *
 from fastapi.staticfiles import StaticFiles
 
 from routes.laptops import laptops_router

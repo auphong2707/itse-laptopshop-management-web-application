@@ -6,14 +6,14 @@ from datetime import datetime
 
 from db.models import Review, Laptop
 from schemas.reviews import ReviewCreate, ReviewResponse
-from services.firebase_auth import get_current_user_id
+from services.auth import get_current_user_id
 from db.session import get_db
 
 reviews_router = APIRouter(prefix="/reviews", tags=["reviews"])
 
 
 @reviews_router.post("/", response_model=ReviewCreate)
-async def create_review(review: ReviewCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user_id)):
+async def create_review(review: ReviewCreate, db: Session = Depends(get_db), user_id: int = Depends(get_current_user_id)):
     # Check if the laptop with the provided laptop_id exists
     laptop = db.query(Laptop).filter(Laptop.id == review.laptop_id).first()
 
@@ -39,7 +39,7 @@ async def get_reviews_by_user(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id)
+    user_id: int = Depends(get_current_user_id)
 ):
     reviews = db.query(Review).filter(Review.user_id == user_id).offset(skip).limit(limit).all()
     

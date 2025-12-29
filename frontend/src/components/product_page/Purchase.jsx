@@ -1,8 +1,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, InputNumber, Typography, Flex, notification, Modal } from "antd";
-import { getAuth } from "firebase/auth";
 import axios from "axios";
+import { getToken } from "../../utils/authService";
 
 const { Text } = Typography;
 
@@ -22,10 +22,9 @@ const Purchase = ({ price, laptopId }) => {
   };
 
   const handleAddToCart = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const token = getToken();
 
-    if (!user) {
+    if (!token) {
       Modal.confirm({
         title: "Login Required",
         content: "You must be logged in to add items to the cart.",
@@ -39,8 +38,6 @@ const Purchase = ({ price, laptopId }) => {
     }
 
     try {
-      const token = await user.getIdToken();
-
       const response = await axios.post(
         "http://localhost:8000/cart/add",
         {

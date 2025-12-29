@@ -10,8 +10,8 @@ import {
   notification,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { getAuth } from "firebase/auth";
 import axios from "axios";
+import { getToken } from "../utils/authService";
 
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";

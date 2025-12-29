@@ -5,7 +5,7 @@ import QRCode from "react-qr-code";
 import { Button, Form, Layout, Modal, notification, Typography, Table, Spin, Input, Divider } from "antd";
 
 import axios from "axios";
-import { getAuth } from "firebase/auth";
+import { getToken } from "../utils/authService";
 
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";

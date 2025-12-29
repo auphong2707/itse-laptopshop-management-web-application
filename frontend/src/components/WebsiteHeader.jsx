@@ -9,9 +9,7 @@ import {
 } from "@ant-design/icons";
 
 import { useUser } from "../utils/UserContext";
-
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-
+import { logout } from "../utils/authService";
 
 import logo from "/vite.svg";
 
@@ -32,31 +30,15 @@ const headerStyle = {
 
 const AccountMenu = () => {
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        const tokenResult = await currentUser.getIdTokenResult();
-        const role = tokenResult.claims.role;
-
-        setUser({ ...currentUser, role });
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
+  const { user, clearUser } = useUser();
 
   const handleMenuClick = (e) => {
     setOpen(false);
     if (e.key === "logout") {
-      signOut(auth).then(() => {
-        navigate("/customer/login");
-      });
+      logout();
+      clearUser();
+      navigate("/customer/login");
     } else if (e.key === "account") {
       // navigate("/my-account"); // Route to the user's account page
     }
@@ -140,14 +122,13 @@ const AccountMenu = () => {
       <Avatar
         icon={<UserOutlined />}
         style={{ cursor: "pointer" }}
-        src={user?.photoURL || null}
       />
     </Dropdown>
   );
 };
 
 const WebsiteHeader = () => {
-  const user = useUser();
+  const { user } = useUser();
   const navigate = useNavigate(); 
 
   const handleSearch = (value) => {

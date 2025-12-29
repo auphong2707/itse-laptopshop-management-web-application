@@ -1,120 +1,154 @@
 import os
 from fastapi import APIRouter, Body, HTTPException, Depends
-from firebase_admin import auth, firestore
-from services.firebase_auth import ExtendedUserCreate
-from services.firebase_auth import verify_firebase_token  # if you use Depends for auth
+from sqlalchemy.orm import Session
+from services.auth import (
+    UserCreate,
+    UserLogin,
+    Token,
+    authenticate_user,
+    create_user,
+    create_access_token,
+    get_current_user,
+    get_current_admin_user,
+)
+from db.session import get_db
+from db.models import User
 
 accounts_router = APIRouter(prefix="/accounts", tags=["accounts"])
 
 
 @accounts_router.post("/check")
-def check_email_and_phone(data: dict = Body(...)):
+def check_email_and_phone(data: dict = Body(...), db: Session = Depends(get_db)):
+    """Check if email or phone number already exists"""
     email = data.get("email")
     phone = data.get("phone_number")
 
-    users_ref = firestore.client().collection("users")
     email_exists = False
     phone_exists = False
 
     if email:
-        query = users_ref.where("email", "==", email).limit(1).stream()
-        email_exists = any(query)
+        email_exists = db.query(User).filter(User.email == email).first() is not None
 
     if phone:
-        query = users_ref.where("phone_number", "==", phone).limit(1).stream()
-        phone_exists = any(query)
+        phone_exists = db.query(User).filter(User.phone_number == phone).first() is not None
 
     return {"email_exists": email_exists, "phone_exists": phone_exists}
 
 
-@accounts_router.post("")
-def create_account(user_data: ExtendedUserCreate):
+@accounts_router.post("", status_code=201)
+def create_account(user_data: UserCreate, db: Session = Depends(get_db)):
+    """Create a new user account"""
     try:
-        # 1. Role validation
-        if user_data.role not in ["admin", "customer"]:
-            raise HTTPException(status_code=400, detail="Invalid role.")
-
-        # 2. If admin, require secret key
-        if user_data.role == "admin":
-            if user_data.secret_key != os.getenv("ADMIN_CREATION_SECRET"):
-                raise HTTPException(
-                    status_code=403, detail="Unauthorized to create admin account."
-                )
-
-        # 3. Create Firebase user
-        user_record = auth.create_user(
-            email=user_data.email,
-            password=user_data.password,
-            display_name=user_data.display_name,
-            phone_number=user_data.phone_number,
-        )
-
-        # 4. Set custom claim
-        auth.set_custom_user_claims(user_record.uid, {"role": user_data.role})
-
-        # 5. Store extended profile in Firestore
-        firestore.client().collection("users").document(user_record.uid).set(
-            {
-                "email": user_data.email,
-                "phone_number": user_data.phone_number,
-                "first_name": user_data.first_name,
-                "last_name": user_data.last_name,
-                "company": user_data.company,
-                "address": user_data.address,
-                "country": user_data.country,
-                "zip_code": user_data.zip_code,
-                "role": user_data.role,
-            }
-        )
-
+        user = create_user(user_data, db)
+        
         return {
-            "message": f"{user_data.role.capitalize()} account created successfully",
-            "uid": user_record.uid,
-            "email": user_record.email,
+            "message": f"{user.role.capitalize()} account created successfully",
+            "user_id": user.id,
+            "email": user.email,
         }
-
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@accounts_router.delete("/{uid}")
-def delete_account(uid: str):
-    """
-    Delete the user from Firebase by UID.
-    """
+@accounts_router.delete("/{user_id}")
+def delete_account(
+    user_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a user account (admin only)"""
     try:
-        auth.delete_user(uid)
-        return {"message": f"Account with UID {uid} deleted successfully."}
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        db.delete(user)
+        db.commit()
+        
+        return {"message": f"Account with ID {user_id} deleted successfully."}
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
-@accounts_router.post("/login")
-def login_user(user_data=Depends(verify_firebase_token)):
-    # user_data contains info like uid, email, etc.
-    return {"message": "Login successful", "user": user_data}
+@accounts_router.post("/login", response_model=Token)
+def login_user(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    """Login and receive access token"""
+    user = authenticate_user(user_credentials.email, user_credentials.password, db)
+    
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=403,
+            detail="Account is inactive"
+        )
+    
+    # Create access token
+    access_token = create_access_token(
+        data={
+            "sub": str(user.id),  # JWT spec requires 'sub' to be a string
+            "email": user.email,
+            "role": user.role
+        }
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
 
 @accounts_router.get("/profile")
-def get_account_profile(user_data=Depends(verify_firebase_token)):
-    """
-    Get the complete profile information for the authenticated user.
-    
-    This endpoint requires authentication. Include the Authorization header with
-    a valid Firebase token in the format: 'Authorization: Bearer your-firebase-token'
-    """
+def get_account_profile(current_user: User = Depends(get_current_user)):
+    """Get the complete profile information for the authenticated user"""
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "phone_number": current_user.phone_number,
+        "shipping_address": current_user.shipping_address,
+        "role": current_user.role,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+    }
+
+
+@accounts_router.put("/profile")
+def update_account_profile(
+    data: dict = Body(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update the authenticated user's profile"""
     try:
-        # Get user data from Firestore using the UID from the token
-        user_doc = firestore.client().collection("users").document(user_data["uid"]).get()
+        # Fields that can be updated
+        updatable_fields = ["first_name", "last_name", "phone_number", "shipping_address"]
         
-        if not user_doc.exists:
-            raise HTTPException(status_code=404, detail="User profile not found")
+        for field in updatable_fields:
+            if field in data:
+                setattr(current_user, field, data[field])
         
-        # Get the user profile data
-        user_profile = user_doc.to_dict()
+        db.commit()
+        db.refresh(current_user)
         
-        # Add the uid to the profile data
-        user_profile["uid"] = user_data["uid"]
-        
-        return user_profile
+        return {
+            "message": "Profile updated successfully",
+            "user": {
+                "id": current_user.id,
+                "email": current_user.email,
+                "first_name": current_user.first_name,
+                "last_name": current_user.last_name,
+                "phone_number": current_user.phone_number,
+                "shipping_address": current_user.shipping_address,
+            }
+        }
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=400, detail=str(e))

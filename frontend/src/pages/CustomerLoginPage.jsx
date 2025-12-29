@@ -11,11 +11,11 @@ import {
   Alert,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
 
 import WebsiteHeader from "../components/WebsiteHeader";
 import WebsiteFooter from "../components/WebsiteFooter";
-import { auth } from "../utils/firebase";
+import { login } from "../utils/authService";
+import { useUser } from "../utils/UserContext";
 
 const { Content } = Layout;
 const { Text, Title } = Typography;
@@ -25,51 +25,33 @@ const contentStyle = {
   padding: "2rem",
 };
 
-const login = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    const user = userCredential.user;
-    console.log("User:", user);
-
-    // Get the Firebase Auth ID token
-    const token = await user.getIdToken();
-    console.log("Token:", token);
-    // Send token to FastAPI backend
-    const response = await fetch("http://localhost:8000/accounts/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-    console.log("Backend response:", data);
-  } catch (error) {
-    console.error("Error signing in:", error);
-    throw error;
-  }
-};
-
 const CustomerLoginPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { refreshUser } = useUser();
 
   const handleSignIn = async (values) => {
     const { email, password } = values;
 
     try {
       setLoginError(""); // clear any previous error
+      setIsLoading(true);
+      
+      // Login and get user profile
       await login(email, password);
-      navigate("/"); // redirect to home
+      
+      // Refresh user context
+      await refreshUser();
+      
+      // Redirect to home
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
-      setLoginError("Invalid email or password.");
+      setLoginError(error.message || "Invalid email or password.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -168,6 +150,7 @@ const CustomerLoginPage = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
+                    loading={isLoading}
                     style={{
                       padding: "1rem 2rem",
                       borderRadius: "25px",

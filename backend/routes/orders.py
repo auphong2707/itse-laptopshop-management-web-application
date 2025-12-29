@@ -2,12 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from firebase_admin import auth
 from decimal import Decimal, InvalidOperation
 from typing import List, Optional
 from pydantic import BaseModel
 
-from db.models import Laptop, Order, OrderItem
+from db.models import Laptop, Order, OrderItem, User
 from db.session import get_db
 from schemas.orders import (
     OrderResponse,
@@ -15,34 +14,17 @@ from schemas.orders import (
 )
 from datetime import datetime
 
-from services.firebase_auth import get_current_user_id
+from services.auth import get_current_user_id, get_current_admin_user, get_current_user
 
 from services.redis_config import redis_client
-
-# --- Initialize Firestore Client ---
-try:
-    from services.firebase_auth import db_firestore
-except ImportError:
-    print(
-        "Warning: Firestore client (db_firestore) not found in services.firebase_auth. User profile fetch will fail."
-    )
-    db_firestore = None
-except Exception as e:
-    print(f"Warning: Firestore client could not be initialized. Error: {e}")
-    db_firestore = None
 
 # --- Create Router ---
 orders_router = APIRouter(prefix="/orders", tags=["orders"])
 
 
-async def require_admin_role(user_id: str = Depends(get_current_user_id)):
-
-    user = auth.get_user(user_id)
-    if not user.custom_claims or user.custom_claims.get("role") != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required"
-        )
-    return user_id
+async def require_admin_role(user: User = Depends(get_current_admin_user)):
+    """Verify the current user is an admin"""
+    return user.id
 
 
 class CreateOrderRequest(BaseModel):
@@ -58,7 +40,7 @@ class CreateOrderRequest(BaseModel):
 def create_order_from_cart(
     order_data: CreateOrderRequest,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id),
+    user_id: int = Depends(get_current_user_id),
 ):
     """
     Creates a new order from the user's cart.
@@ -227,7 +209,7 @@ def get_my_orders(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(10, ge=1, le=100, description="Items per page"),
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id),
+    user_id: int = Depends(get_current_user_id),
 ):
     """
     Retrieves a paginated list of orders for the currently authenticated user
@@ -262,7 +244,7 @@ def get_my_orders(
 def get_my_single_order(
     order_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id),
+    user_id: int = Depends(get_current_user_id),
 ):
     """
     Fetches a single order by authenticated user ID.
@@ -290,7 +272,7 @@ def get_my_single_order(
 def cancel_my_order(
     order_id: int,
     db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id),
+    user_id: int = Depends(get_current_user_id),
 ):
     """
     Allows the currently authenticated user to cancel their own order,
@@ -462,8 +444,8 @@ def admin_get_all_orders_unpaginated(
     status_filter: Optional[str] = Query(
         None, alias="status", description="Filter by order status"
     ),
-    user_id_filter: Optional[str] = Query(
-        None, alias="userId", description="Filter by User ID (Firebase UID)"
+    user_id_filter: Optional[int] = Query(
+        None, alias="userId", description="Filter by User ID"
     ),
     start_date: Optional[datetime] = Query(
         None, description="Filter orders created on or after this date (ISO Format)"
