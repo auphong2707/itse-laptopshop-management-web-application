@@ -218,14 +218,14 @@ def get_laptop_description(laptop):
     return description
     
 def clear_old_commands():
-    with open("./backend/commands/insert_sample_data.sql", "w") as sql_file:
+    with open("./commands/insert_sample_data.sql", "w") as sql_file:
         sql_file.write("")
     print("Old commands cleared")
 
 
 def generate_laptop_insert_queries(
-    json_data_directory="./backend/data/",
-    sql_output_path="./backend/commands/insert_sample_data.sql",
+    json_data_directory="./data/",
+    sql_output_path="./commands/insert_sample_data.sql",
 ):
     """
     Generate insert queries from JSON data file AND store data for orders.
@@ -377,7 +377,7 @@ def generate_laptop_insert_queries(
 
 
 def generate_reviews(
-    sql_output_path="./backend/commands/insert_sample_data.sql", num_reviews=10000
+    sql_output_path="./commands/insert_sample_data.sql", num_reviews=10000
 ):
     global NUM_LAPTOPS
     laptop_ids = list(range(1, NUM_LAPTOPS + 1))
@@ -435,7 +435,7 @@ def generate_reviews(
 
 
 def generate_subscriptions(
-    sql_output_path="./backend/commands/insert_sample_data.sql", num_subs=20
+    sql_output_path="./commands/insert_sample_data.sql", num_subs=20
 ):
     names = [
         "NguyenVanAn",
@@ -468,7 +468,7 @@ def generate_subscriptions(
 
 
 def generate_posts(
-    sql_output_path="./backend/commands/insert_sample_data.sql", num_posts=20
+    sql_output_path="./commands/insert_sample_data.sql", num_posts=20
 ):
     global NUM_POSTS
     NUM_POSTS = num_posts  # store for image generation
@@ -518,8 +518,8 @@ def generate_posts(
 
 
 def generate_laptop_images(
-    template_dir="./backend/static/templates",
-    output_dir="./backend/static/laptop_images",
+    template_dir="./static/templates",
+    output_dir="./static/laptop_images",
 ):
     global NUM_LAPTOPS
 
@@ -565,8 +565,8 @@ def generate_laptop_images(
 
 def generate_post_images(
     num_posts=20,
-    template_path="./backend/static/templates/posts.jpg",
-    output_dir="./backend/static/post_images",
+    template_path="./static/templates/posts.jpg",
+    output_dir="./static/post_images",
 ):
 
     if not os.path.exists(output_dir):
@@ -601,7 +601,7 @@ def generate_post_images(
 
 
 def generate_orders(
-    sql_output_path="./backend/commands/insert_sample_data.sql",
+    sql_output_path="./commands/insert_sample_data.sql",
     num_orders=50,
     max_items_per_order=5,
     max_quantity_per_item=3,
@@ -787,7 +787,7 @@ def generate_orders(
 
 
 def generate_refund_tickets(
-    sql_output_path="./backend/commands/insert_sample_data.sql",
+    sql_output_path="./commands/insert_sample_data.sql",
     num_tickets=30,
 ):
     statuses = ["pending", "resolved"]

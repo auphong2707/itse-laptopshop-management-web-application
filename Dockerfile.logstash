@@ -4,7 +4,7 @@ FROM docker.elastic.co/logstash/logstash:8.5.0
 ADD https://jdbc.postgresql.org/download/postgresql-42.3.1.jar /usr/share/logstash/postgresql.jar
 
 # Copy the Logstash configuration file
-COPY ../backend/logstash.conf /usr/share/logstash/pipeline/
+COPY backend/logstash.conf /usr/share/logstash/pipeline/
 
 # Change to root user to change the mode of the PostgreSQL JDBC Driver
 USER root
