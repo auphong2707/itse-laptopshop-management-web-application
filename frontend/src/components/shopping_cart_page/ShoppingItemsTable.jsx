@@ -126,61 +126,59 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
   const [subTotals, setSubTotals] = useState([]);
 
   useEffect(() => {
-    const auth = getAuth();
-
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const token = await user.getIdToken();
-
-          // 1. Get cart
-          const cartResponse = await axios.get(
-            "http://localhost:8000/cart/view",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
-
-          const cartData = cartResponse.data;
-
-          // 2. Fetch product info
-          const productFetches = Object.keys(cartData).map((id) =>
-            axios.get(`http://localhost:8000/laptops/id/${id}`),
-          );
-
-          const productResponses = await Promise.all(productFetches);
-
-          // 3. Combine product info
-          const productsWithQty = productResponses.map((res) => {
-            const product = res.data;
-            const quantity = cartData[product.id];
-            const imageUrls = JSON.parse(
-              product.product_image_mini || "[]",
-            ).map((url) => `http://localhost:8000${url}`);
-
-            return {
-              ...product,
-              quantity,
-              imageUrl:
-                imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
-            };
-          });
-
-          setCartItems(productsWithQty);
-          setSubTotals(
-            productsWithQty.map((item) => item.sale_price * item.quantity),
-          );
-        } catch (err) {
-          console.error("Error fetching cart:", err);
+    const fetchCart = async () => {
+      try {
+        const token = getToken();
+        if (!token) {
+          console.warn("No user logged in");
+          return;
         }
-      } else {
-        console.warn("No user logged in");
-      }
-    });
 
-    return () => unsubscribe(); // clean up the listener
+        // 1. Get cart
+        const cartResponse = await axios.get(
+          "http://localhost:8000/cart/view",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const cartData = cartResponse.data;
+
+        // 2. Fetch product info
+        const productFetches = Object.keys(cartData).map((id) =>
+          axios.get(`http://localhost:8000/laptops/id/${id}`),
+        );
+
+        const productResponses = await Promise.all(productFetches);
+
+        // 3. Combine product info
+        const productsWithQty = productResponses.map((res) => {
+          const product = res.data;
+          const quantity = cartData[product.id];
+          const imageUrls = JSON.parse(
+            product.product_image_mini || "[]",
+          ).map((url) => `http://localhost:8000${url}`);
+
+          return {
+            ...product,
+            quantity,
+            imageUrl:
+              imageUrls.length > 0 ? imageUrls[0] : "/default-image.jpg",
+          };
+        });
+
+        setCartItems(productsWithQty);
+        setSubTotals(
+          productsWithQty.map((item) => item.sale_price * item.quantity),
+        );
+      } catch (err) {
+        console.error("Error fetching cart:", err);
+      }
+    };
+
+    fetchCart();
   }, []);
 
   const handleSubtotalChange = (newSubtotal, index) => {
@@ -196,11 +194,8 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          const auth = getAuth();
-          const user = auth.currentUser;
-          if (!user) throw new Error("User not authenticated");
-
-          const token = await user.getIdToken();
+          const token = getToken();
+          if (!token) throw new Error("User not authenticated");
 
           await axios.delete(`http://localhost:8000/cart/remove/${product.id}`, {
             headers: {
@@ -235,11 +230,8 @@ const ShoppingItemsTable = ({ setTotalPrice }) => {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          const auth = getAuth();
-          const user = auth.currentUser;
-          if (!user) throw new Error("User not authenticated");
-
-          const token = await user.getIdToken();
+          const token = getToken();
+          if (!token) throw new Error("User not authenticated");
 
           await axios.delete("http://localhost:8000/cart/clear", {
             headers: {

@@ -57,11 +57,8 @@ const PlaceOrderPage = () => {
 
   const fetchCartOrder = async () => {
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
-
-      const token = await user.getIdToken();
+      const token = getToken();
+      if (!token) throw new Error("User not authenticated");
 
       const cartResponse = await axios.get("http://localhost:8000/cart/view", {
         headers: { Authorization: `Bearer ${token}` },
@@ -112,10 +109,8 @@ const PlaceOrderPage = () => {
     try {
       const values = await form.validateFields();
 
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
-      const authToken = await user.getIdToken();
+      const authToken = getToken();
+      if (!authToken) throw new Error("User not authenticated");
 
       const payload = {
         first_name: values.first_name,
@@ -188,11 +183,9 @@ const PlaceOrderPage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
+        const token = getToken();
+        if (!token) return;
 
-        const token = await user.getIdToken();
         const response = await axios.get("http://localhost:8000/accounts/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });

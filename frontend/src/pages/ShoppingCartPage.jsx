@@ -53,15 +53,12 @@ const ShoppingCartPage = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
+        const token = getToken();
 
-        if (!user) {
+        if (!token) {
           console.error("User not signed in.");
           return;
         }
-
-        const token = await user.getIdToken();
 
         const response = await axios.get("http://localhost:8000/cart/view", {
           headers: {
