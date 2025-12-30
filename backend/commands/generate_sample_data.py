@@ -7,6 +7,10 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal, ROUND_HALF_UP
 import string
+from passlib.context import CryptContext
+
+# Password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 NUM_LAPTOPS = 0
 NUM_POSTS = 0
@@ -221,6 +225,29 @@ def clear_old_commands():
     with open("./commands/insert_sample_data.sql", "w") as sql_file:
         sql_file.write("")
     print("Old commands cleared")
+
+
+def generate_admin_account(sql_output_path="./commands/insert_sample_data.sql"):
+    """
+    Generate SQL insert for an admin account with credentials:
+    Email: admin@admin.com
+    Password: admin
+    """
+    # Hash the password using bcrypt
+    hashed_password = pwd_context.hash("admin")
+    
+    # Prepare the SQL insert statement
+    insert_query = f"""-- Admin Account --
+INSERT INTO users (email, hashed_password, first_name, last_name, phone_number, shipping_address, role, is_active)
+VALUES ('admin@admin.com', '{hashed_password}', 'Admin', 'User', '+84999999999', 'Admin Address', 'admin', true);
+
+"""
+    
+    # Write to file
+    with open(sql_output_path, "a") as sql_file:
+        sql_file.write(insert_query)
+    
+    print("✓ Admin account seeded (email: admin@admin.com, password: admin)")
 
 
 def generate_laptop_insert_queries(
@@ -837,6 +864,7 @@ def generate_refund_tickets(
 
 if __name__ == "__main__":
     clear_old_commands()
+    generate_admin_account()
     generate_laptop_insert_queries()
     generate_laptop_images()
     generate_reviews()

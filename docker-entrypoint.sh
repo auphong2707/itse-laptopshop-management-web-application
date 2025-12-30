@@ -24,6 +24,9 @@ if [ "$TABLE_EXISTS" = "f" ]; then
   # Insert sample data
   PGPASSWORD=$PGPASSWORD psql -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -f commands/insert_sample_data.sql
   
+  # Ensure admin account exists
+  python commands/ensure_admin.py
+  
   # Setup pg_cron extension
   PGPASSWORD=$PGPASSWORD psql -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -c "DROP EXTENSION IF EXISTS pg_cron CASCADE;" || true
   PGPASSWORD=$PGPASSWORD psql -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -c "CREATE EXTENSION pg_cron;" || true
@@ -40,6 +43,10 @@ else
   else
     echo "Images already exist - skipping image generation"
   fi
+  
+  # Ensure admin account exists even if database was already initialized
+  echo "Checking admin account..."
+  python commands/ensure_admin.py
 fi
 
 echo "Waiting for Elasticsearch to be ready..."
